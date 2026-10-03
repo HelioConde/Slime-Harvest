@@ -7,6 +7,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export_range(1, 100) var material_limit: int = 25
+@export_range(0, 8) var roof_bottom_inset_px: int = 2
 
 @onready var player: CharacterBody2D = get_node_or_null(player_path) as CharacterBody2D
 @onready var ground: TileMapLayer = get_node_or_null(ground_path) as TileMapLayer
@@ -84,6 +85,23 @@ func _make_roof_terrain() -> void:
 		image.blit_rect(original, Rect2i(tile_x * 16, 48, 16, 16), Vector2i(tile_x * 16, 64))
 		if last >= 0:
 			image.blit_rect(original, Rect2i(tile_x * 16, 64, 16, last + 1), Vector2i(tile_x * 16, 79 - last))
+	# Concave top pieces must use the same edge height as the straight top.
+	var top_padding: int = 16
+	for y in range(16):
+		for x in range(16):
+			if original.get_pixel(16 + x, y).a > 0.0:
+				top_padding = mini(top_padding, y)
+	if top_padding < 16:
+		for corner_x in [3, 4]:
+			image.blit_rect(original, Rect2i(16, 16, 16, 16), Vector2i(corner_x * 16, 0))
+			image.blit_rect(original, Rect2i(corner_x * 16, top_padding, 16, 16 - top_padding), Vector2i(corner_x * 16, 0))
+	# Lift only the lower scalloped edge, leaving the upper roof in place.
+	var bottom_inset: int = clampi(roof_bottom_inset_px, 0, 8)
+	if bottom_inset > 0:
+		for tile_x in range(3):
+			var bottom_tile: Image = image.get_region(Rect2i(tile_x * 16, 64, 16, 16))
+			image.fill_rect(Rect2i(tile_x * 16, 64, 16, 16), Color.TRANSPARENT)
+			image.blit_rect(bottom_tile, Rect2i(0, bottom_inset, 16, 16 - bottom_inset), Vector2i(tile_x * 16, 64))
 	var private_tiles := TileSet.new()
 	private_tiles.tile_size = roof_tiles.tile_size
 	terrain_source = TileSetAtlasSource.new()
@@ -462,7 +480,10 @@ func _add_roof_overhang(cell: Vector2i, atlas: Vector2i) -> void:
 		var edge := Sprite2D.new()
 		edge.texture = texture
 		edge.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		edge.position = roof.map_to_local(cell) + Vector2(0, direction.y * 8.5)
+		var edge_y: float = direction.y * 8.5
+		if direction == Vector2i.DOWN:
+			edge_y -= clampi(roof_bottom_inset_px, 0, 8)
+		edge.position = roof.map_to_local(cell) + Vector2(0, edge_y)
 		roof.add_child(edge)
 
 func _add_block(cell: Vector2i) -> void:
