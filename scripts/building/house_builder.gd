@@ -357,7 +357,10 @@ func _removal_reason(start: Vector2i, end: Vector2i) -> String:
 			return "Para criar um pátio, selecione um quadrado de pelo menos 2×2."
 		if not creates_patio and not _valid_exterior_cut(cut, width, height, patios):
 			return "Remova pelas pontas ou selecione uma faixa 2×1 na mesma borda da casa."
-	return _house_layout_error(proposed)
+	var layout_error: String = _house_layout_error(proposed)
+	if not layout_error.is_empty():
+		return layout_error
+	return _contour_change_error(proposed)
 
 func _valid_exterior_cut(cut: Array[Vector2i], width: int, height: int, patios: Dictionary) -> bool:
 	if cut.size() == 1:
@@ -390,7 +393,7 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 	var addition: Dictionary = {cell: true}
 	var patios: Dictionary = _enclosed_empty_cells(footprint)
 	if not patios.has(cell):
-		return _complete_vertical_wall_addition(cell, addition, patios)
+		return addition
 	# Close a complete 2x2 courtyard in one transaction, not one tile at a time.
 	var component: Dictionary = {cell: true}
 	var queue: Array[Vector2i] = [cell]
@@ -408,23 +411,6 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			var corner: Vector2i = key
 			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
 				return component
-	return _complete_vertical_wall_addition(cell, addition, patios)
-
-func _complete_vertical_wall_addition(cell: Vector2i, addition: Dictionary, patios: Dictionary) -> Dictionary:
-	if not footprint.has(cell + Vector2i.DOWN) or footprint.has(cell + Vector2i.UP):
-		return addition
-	var junction: bool = patios.has(cell) or _is_inner_wall_corner(cell)
-	for direction in DIRECTIONS:
-		junction = junction or _is_inner_wall_corner(cell + direction)
-	if not junction:
-		return addition
-	# The horizontal face spans the clicked tile plus two cells above it.
-	# Open exterior notches require the same treatment as enclosed courtyards.
-	for step in range(1, 3):
-		var above: Vector2i = cell + Vector2i.UP * step
-		if footprint.has(above):
-			break
-		addition[above] = true
 	return addition
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
@@ -451,30 +437,46 @@ func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
 	_rebuild()
 	status.text = "Área removida; materiais devolvidos. Salve para guardar."
 
-func _is_inner_wall_corner(cell: Vector2i) -> bool:
-	if footprint.has(cell):
-		return false
-	var left: bool = footprint.has(cell + Vector2i.LEFT)
-	var right: bool = footprint.has(cell + Vector2i.RIGHT)
-	var up: bool = footprint.has(cell + Vector2i.UP)
-	var down: bool = footprint.has(cell + Vector2i.DOWN)
-	# Same geometry as the four generated concave wall caps, before door/window overrides.
-	return left != right and up != down
+func _wall_conflicts(cells: Dictionary) -> Dictionary:
+	var ring: Dictionary = {}
+	for key in cells:
+		var cell: Vector2i = key
+		for y in range(-1, 2):
+			for x in range(-1, 2):
+				var edge: Vector2i = cell + Vector2i(x, y)
+				if not cells.has(edge):
+					ring[edge] = true
+	var conflicts: Dictionary = {}
+	for key in ring:
+		var cell: Vector2i = key
+		var left: bool = cells.has(cell + Vector2i.LEFT)
+		var right: bool = cells.has(cell + Vector2i.RIGHT)
+		var up: bool = cells.has(cell + Vector2i.UP)
+		var down: bool = cells.has(cell + Vector2i.DOWN)
+		# One atlas tile cannot represent two opposite interior wall faces.
+		if (left and right) or (up and down):
+			var mask: int = (1 if left else 0) | (2 if right else 0) | (4 if up else 0) | (8 if down else 0)
+			conflicts[cell] = mask
+	return conflicts
 
-func _curve_add_error(cell: Vector2i, addition: Dictionary) -> String:
-	if addition.size() != 1:
-		return ""
-	# Include the adjacent junction: advancing the entrance may shift the visible cap.
-	var near_corner: bool = _is_inner_wall_corner(cell)
-	for direction in DIRECTIONS:
-		near_corner = near_corner or _is_inner_wall_corner(cell + direction)
-	if not near_corner:
-		return ""
-	for direction in DIRECTIONS:
-		var between: Vector2i = cell + direction
-		var opposite: Vector2i = cell + direction * 2
-		if not footprint.has(between) and footprint.has(opposite):
-			return "Essa curva deixaria apenas um bloco de espaço entre os pisos."
+func _face_count(mask: int) -> int:
+	var count: int = 0
+	for bit in [1, 2, 4, 8]:
+		if mask & bit:
+			count += 1
+	return count
+
+func _contour_change_error(proposed: Dictionary) -> String:
+	var previous: Dictionary = _wall_conflicts(footprint)
+	var conflicts: Dictionary = _wall_conflicts(proposed)
+	for key in conflicts:
+		var mask: int = int(conflicts[key])
+		# Existing bad joins must not prevent unrelated work or repairs.
+		if previous.has(key):
+			var old_mask: int = int(previous[key])
+			if old_mask == mask or _face_count(mask) < _face_count(old_mask):
+				continue
+		return "Esse desenho cria duas faces opostas na mesma parede. Alargue ou feche o espaço."
 	return ""
 
 func _house_layout_error(cells: Dictionary) -> String:
@@ -599,9 +601,6 @@ func _add_reason(cell: Vector2i) -> String:
 	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 		return "Pinte sobre o solo."
 	if brush == "Piso":
-		var curve_error: String = _curve_add_error(cell, addition)
-		if not curve_error.is_empty():
-			return curve_error
 		var proposed: Dictionary = footprint.duplicate()
 		for key in addition:
 			var added_cell: Vector2i = key
@@ -611,6 +610,9 @@ func _add_reason(cell: Vector2i) -> String:
 		var layout_error: String = _house_layout_error(proposed)
 		if not layout_error.is_empty():
 			return layout_error
+		var contour_error: String = _contour_change_error(proposed)
+		if not contour_error.is_empty():
+			return contour_error
 	if brush == "Piso" and not _has_house_space(cell):
 		return "Deixe espaço para as paredes e uma célula de margem até a borda do mapa."
 	if brush == "Parede":
