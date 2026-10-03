@@ -22,6 +22,7 @@ var roof_cells: Dictionary = {}
 var brush := "Piso"
 var floor_layer: TileMapLayer
 var manually_hide_roof := false
+var preview_roof := false
 var footprint: Dictionary = {}
 var history: Array[Dictionary] = []
 var bodies: Array[StaticBody2D] = []
@@ -160,6 +161,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if not building:
 			previous_controls = bool(player.get("controls_enabled"))
 		building = not building
+		preview_roof = false
 		player.call("set_controls_enabled", false if building else previous_controls)
 		panel.visible = building
 		hint.visible = not building
@@ -289,6 +291,10 @@ func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 	var right := roof_cells.has(cell + Vector2i.RIGHT)
 	var up := roof_cells.has(cell + Vector2i.UP)
 	var down := roof_cells.has(cell + Vector2i.DOWN)
+	# The ridge must stay continuous through side branches and junctions.
+	if cell.y == ridge and up and down:
+		var ridge_x: int = 0 if not left else 2 if not right else 1
+		return Vector2i(ridge_x, 2)
 	if up and left and not roof_cells.has(cell + Vector2i(-1, -1)):
 		return Vector2i(3, 0)
 	if up and right and not roof_cells.has(cell + Vector2i(1, -1)):
@@ -488,13 +494,16 @@ func _undo() -> void:
 	status.text = "Última pintura desfeita."
 
 func _toggle_roof() -> void:
-	manually_hide_roof = not manually_hide_roof
+	if building:
+		preview_roof = not preview_roof
+	else:
+		manually_hide_roof = not manually_hide_roof
 	_update_roof_visibility()
 
 func _update_roof_visibility() -> void:
 	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
 	var inside := (footprint.has(cell) or cell == entrance_cell) and not wall_cells.has(cell)
-	roof.visible = not manually_hide_roof and (not building and not inside)
+	roof.visible = preview_roof if building else not manually_hide_roof and not inside
 
 func _refresh_balance() -> void:
 	balance.text = "Piso: %d / %d materiais livres" % [material_limit - footprint.size(), material_limit]
