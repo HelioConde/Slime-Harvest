@@ -119,7 +119,7 @@ func _build_ui() -> void:
 	box.add_child(balance)
 	var brushes := HBoxContainer.new()
 	box.add_child(brushes)
-	for name in ["Piso", "Parede"]:
+	for name in ["Piso"]:
 		_button(brushes, name, _select_brush.bind(name))
 	var tools := HBoxContainer.new()
 	box.add_child(tools)
@@ -132,7 +132,7 @@ func _build_ui() -> void:
 	status = Label.new()
 	status.custom_minimum_size.x = 210
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.text = "Pinte piso e paredes; telhado automático."
+	status.text = "Pinte o piso; paredes e telhado automáticos."
 	box.add_child(status)
 	var help := Label.new()
 	help.text = "Esquerdo: pintar / expandir\nDireito: apagar nesta camada\nB / Esc: sair"
@@ -299,23 +299,31 @@ func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 	return Vector2i(x, y)
 
 func _rebuild() -> void:
-	# Remove orphan pieces when shrinking the floor or loading an old test.
-	for cell in wall_cells.keys():
-		if footprint.has(cell) or not _supported(cell, "Parede"):
-			wall_cells.erase(cell)
-	# Close only diagonal wall junctions, leaving straight entrance gaps open.
-	var junctions: Dictionary = {}
-	for wall in wall_cells:
-		for direction in DIRECTIONS:
-			var cell: Vector2i = wall + direction
-			if wall_cells.has(cell) or footprint.has(cell) or not _supported(cell, "Parede"):
-				continue
-			var horizontal := wall_cells.has(cell + Vector2i.LEFT) or wall_cells.has(cell + Vector2i.RIGHT)
-			var vertical := wall_cells.has(cell + Vector2i.UP) or wall_cells.has(cell + Vector2i.DOWN)
-			if horizontal and vertical:
-				junctions[cell] = true
-	for cell in junctions:
-		wall_cells[cell] = true
+	# Generate the exterior ring from the floor, including diagonal corners.
+	wall_cells.clear()
+	for key in footprint:
+		var cell: Vector2i = key
+		for y in range(-1, 2):
+			for x in range(-1, 2):
+				var edge := cell + Vector2i(x, y)
+				if not footprint.has(edge):
+					wall_cells[edge] = true
+	# One front entrance aligned with the lowest floor row.
+	if not footprint.is_empty():
+		var bottom := -2147483647
+		var mean_x := 0.0
+		for cell in footprint:
+			bottom = maxi(bottom, cell.y)
+			mean_x += cell.x
+		mean_x /= footprint.size()
+		var entrance := Vector2i(2147483647, bottom)
+		var distance := INF
+		for key in footprint:
+			var cell: Vector2i = key
+			if cell.y == bottom and absf(cell.x - mean_x) < distance:
+				entrance = cell
+				distance = absf(cell.x - mean_x)
+		wall_cells.erase(entrance + Vector2i.DOWN)
 	# Coverage is derived; it never needs a roof brush or extra materials.
 	roof_cells = footprint.duplicate()
 	for cell in wall_cells:
@@ -442,7 +450,7 @@ func _save_house() -> void:
 	if file == null:
 		status.text = "Não foi possível salvar."
 		return
-	file.store_string(JSON.stringify({"version": 2, "floor": _encode_cells(footprint), "walls": _encode_cells(wall_cells), "roof": []}))
+	file.store_string(JSON.stringify({"version": 2, "floor": _encode_cells(footprint), "walls": [], "roof": []}))
 	file.flush()
 	var error := file.get_error()
 	file.close()
