@@ -7,7 +7,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export_range(1, 100) var material_limit: int = 25
-@export_range(0, 8) var roof_bottom_inset_px: int = 2
+@export_range(0, 8) var roof_bottom_inset_px: int = 4
 
 @onready var player: CharacterBody2D = get_node_or_null(player_path) as CharacterBody2D
 @onready var ground: TileMapLayer = get_node_or_null(ground_path) as TileMapLayer
@@ -102,6 +102,17 @@ func _make_roof_terrain() -> void:
 			var bottom_tile: Image = image.get_region(Rect2i(tile_x * 16, 64, 16, 16))
 			image.fill_rect(Rect2i(tile_x * 16, 64, 16, 16), Color.TRANSPARENT)
 			image.blit_rect(bottom_tile, Rect2i(0, bottom_inset, 16, 16 - bottom_inset), Vector2i(tile_x * 16, 64))
+	# Lower concave corners follow the same edge height as the straight eave.
+	var lower_edge_last: int = -1
+	for y in range(16):
+		for x in range(16):
+			if original.get_pixel(16 + x, 64 + y).a > 0.0:
+				lower_edge_last = maxi(lower_edge_last, y)
+	if lower_edge_last >= 0:
+		var lower_corner_shift: int = maxi(0, 15 - lower_edge_last - bottom_inset)
+		for corner_x in [3, 4]:
+			image.blit_rect(original, Rect2i(16, 48, 16, 16), Vector2i(corner_x * 16, 16))
+			image.blit_rect(original, Rect2i(corner_x * 16, 16, 16, 16 - lower_corner_shift), Vector2i(corner_x * 16, 16 + lower_corner_shift))
 	var private_tiles := TileSet.new()
 	private_tiles.tile_size = roof_tiles.tile_size
 	terrain_source = TileSetAtlasSource.new()
