@@ -69,7 +69,7 @@ func _ready() -> void:
 	add_child(front_walls)
 	_make_roof_terrain()
 	var texture := AtlasTexture.new()
-	texture.atlas = terrain_source.texture
+	texture.atlas = (wall_tiles.get_source(wall_tiles.get_source_id(0)) as TileSetAtlasSource).texture
 	texture.region = Rect2(16, 16, 16, 16)
 	texture.filter_clip = true
 	ghost.texture = texture
@@ -199,6 +199,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			previous_controls = bool(player.get("controls_enabled"))
 		building = not building
 		preview_roof = false
+		if building:
+			_select_brush("Piso")
 		removing_area = false
 		removal_outline.clear_points()
 		player.call("set_controls_enabled", false if building else previous_controls)
@@ -322,7 +324,13 @@ func _removal_reason(start: Vector2i, end: Vector2i) -> String:
 	if touches_patio:
 		if cut.size() != 2 or not ((width == 2 and height == 1) or (width == 1 and height == 2)):
 			return "Amplie o pátio com uma faixa 2×1 ligada pelos dois tiles à borda."
-		var directions: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN] if width == 2 else [Vector2i.LEFT, Vector2i.RIGHT]
+		var directions: Array[Vector2i] = []
+		if width == 2:
+			directions.append(Vector2i.UP)
+			directions.append(Vector2i.DOWN)
+		else:
+			directions.append(Vector2i.LEFT)
+			directions.append(Vector2i.RIGHT)
 		var attached: bool = false
 		for direction in directions:
 			if patios.has(cut[0] + direction) and patios.has(cut[1] + direction):
@@ -393,7 +401,8 @@ func _house_layout_error(cells: Dictionary) -> String:
 	high += Vector2i.ONE
 	# Flood the empty exterior. Every remaining empty component is a courtyard.
 	var exterior: Dictionary = {low: true}
-	queue = [low]
+	queue.clear()
+	queue.append(low)
 	index = 0
 	while index < queue.size():
 		var cell: Vector2i = queue[index]
@@ -413,7 +422,8 @@ func _house_layout_error(cells: Dictionary) -> String:
 				continue
 			var hole_low: Vector2i = seed
 			var hole_high: Vector2i = seed
-			queue = [seed]
+			queue.clear()
+			queue.append(seed)
 			checked[seed] = true
 			index = 0
 			while index < queue.size():
