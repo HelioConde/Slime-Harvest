@@ -260,15 +260,15 @@ func _wall_atlas(cell: Vector2i) -> Vector2i:
 	var right := footprint.has(cell + Vector2i.RIGHT)
 	var up := footprint.has(cell + Vector2i.UP)
 	var down := footprint.has(cell + Vector2i.DOWN)
-	# Interior corners surround floor on two perpendicular sides.
+	# Inner joins use the opposite vertical corner row, as in the wall atlas.
 	if right and down and not left and not up:
-		return Vector2i(2, 2)
-	if left and down and not right and not up:
 		return Vector2i(0, 2)
+	if left and down and not right and not up:
+		return Vector2i(2, 2)
 	if right and up and not left and not down:
-		return Vector2i(2, 0)
-	if left and up and not right and not down:
 		return Vector2i(0, 0)
+	if left and up and not right and not down:
+		return Vector2i(2, 0)
 	if right and not left:
 		return Vector2i(0, 1)
 	if left and not right:
