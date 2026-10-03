@@ -19,6 +19,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 var entrance_door: AutomaticDoor
 var show_tile_numbers := false
 var entrance_cell := Vector2i(99999, 99999)
+var front_walls: TileMapLayer
 var roof_underlay: TileMapLayer
 var wall_cells: Dictionary = {}
 var roof_cells: Dictionary = {}
@@ -55,6 +56,13 @@ func _ready() -> void:
 	add_child(floor_layer)
 	roof.position = floor_layer.position
 	walls.tile_set = wall_tiles
+	front_walls = TileMapLayer.new()
+	front_walls.name = "FrontWalls"
+	front_walls.tile_set = wall_tiles
+	front_walls.position = walls.position
+	front_walls.z_index = player.z_index + 1
+	front_walls.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	add_child(front_walls)
 	_make_roof_terrain()
 	var texture := AtlasTexture.new()
 	texture.atlas = terrain_source.texture
@@ -369,6 +377,7 @@ func _rebuild() -> void:
 			roof.remove_child(child)
 			child.queue_free()
 	walls.clear()
+	front_walls.clear()
 	floor_layer.clear()
 	for body in bodies:
 		body.collision_layer = 0
@@ -405,6 +414,12 @@ func _rebuild() -> void:
 		elif left and up and not right and not down:
 			walls.set_cell(cell, wall_source, Vector2i(3, 0))
 	_add_front_windows(wall_source)
+	# Front faces cover the player; upper walls retain their current layer.
+	for key in wall_cells:
+		var cell: Vector2i = key
+		if footprint.has(cell + Vector2i.UP) and not footprint.has(cell + Vector2i.DOWN):
+			front_walls.set_cell(cell, wall_source, walls.get_cell_atlas_coords(cell))
+			walls.erase_cell(cell)
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
 	# A single ridge spans the painted roof, rather than repeating every tile.
 	if not roof_cells.is_empty():
@@ -424,6 +439,7 @@ func _rebuild() -> void:
 				roof_underlay.set_cell(cell, roof_tiles.get_source_id(0), Vector2i(1, slope))
 			roof.set_cell(cell, roof_tiles.get_source_id(0), atlas)
 			_add_roof_overhang(cell, atlas)
+	_add_roof_chimney()
 	entrance_door.visible = not footprint.is_empty()
 	if entrance_door.visible:
 		entrance_door.position = to_local(floor_layer.to_global(floor_layer.map_to_local(entrance_cell)))
@@ -431,6 +447,27 @@ func _rebuild() -> void:
 	_update_roof_visibility()
 	_refresh_tile_numbers()
 	_refresh_balance()
+
+func _add_roof_chimney() -> void:
+	# One chimney, centered in the first complete group of three ridge cells.
+	var ridge_cells: Array[Vector2i] = []
+	for key in roof_cells:
+		var cell: Vector2i = key
+		var atlas: Vector2i = roof.get_cell_atlas_coords(cell)
+		if atlas.y == 2 and atlas.x >= 0 and atlas.x <= 2:
+			ridge_cells.append(cell)
+	ridge_cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return a.y < b.y or (a.y == b.y and a.x < b.x))
+	var group: Array[Vector2i] = []
+	var previous: Vector2i = Vector2i(2147483647, 2147483647)
+	for cell in ridge_cells:
+		if cell != previous + Vector2i.RIGHT:
+			group.clear()
+		group.append(cell)
+		previous = cell
+		if group.size() == 3:
+			roof.set_cell(group[1], roof_tiles.get_source_id(0), Vector2i(5, 0))
+			return
 
 func _add_front_windows(wall_source: int) -> void:
 	# Only straight front walls; doors and corners break each run.
@@ -455,7 +492,7 @@ func _add_front_windows(wall_source: int) -> void:
 			group.clear()
 
 func _refresh_tile_numbers() -> void:
-	for layer: TileMapLayer in [floor_layer, walls, roof]:
+	for layer: TileMapLayer in [floor_layer, walls, front_walls, roof]:
 		var previous: Node = layer.get_node_or_null("TileNumbers")
 		if previous != null:
 			layer.remove_child(previous)
@@ -466,7 +503,7 @@ func _refresh_tile_numbers() -> void:
 		overlay.name = "TileNumbers"
 		overlay.z_index = 100
 		layer.add_child(overlay)
-		var prefix: String = "P" if layer == floor_layer else "W" if layer == walls else "T"
+		var prefix: String = "P" if layer == floor_layer else "W" if layer == walls or layer == front_walls else "T"
 		var cells: Array[Vector2i] = layer.get_used_cells()
 		cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.y < b.y or a.y == b.y and a.x < b.x)
 		var index := 0
@@ -480,7 +517,7 @@ func _refresh_tile_numbers() -> void:
 			label.add_theme_font_size_override("font_size", 7)
 			label.add_theme_constant_override("outline_size", 2)
 			label.add_theme_color_override("font_outline_color", Color.BLACK)
-			label.add_theme_color_override("font_color", Color.YELLOW if layer == walls else Color.WHITE)
+			label.add_theme_color_override("font_color", Color.YELLOW if layer == walls or layer == front_walls else Color.WHITE)
 			overlay.add_child(label)
 
 func _add_roof_overhang(cell: Vector2i, atlas: Vector2i) -> void:
@@ -552,7 +589,8 @@ func _toggle_roof() -> void:
 func _update_roof_visibility() -> void:
 	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
 	var inside := (footprint.has(cell) or cell == entrance_cell) and not wall_cells.has(cell)
-	roof.visible = preview_roof if building else not manually_hide_roof and not inside
+	roof.visible = not footprint.is_empty() if building else not manually_hide_roof and not inside
+	roof.modulate.a = (1.0 if preview_roof else 0.2) if building else 1.0
 
 func _refresh_balance() -> void:
 	balance.text = "Piso: %d / %d materiais livres" % [material_limit - footprint.size(), material_limit]
