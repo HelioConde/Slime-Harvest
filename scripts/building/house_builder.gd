@@ -392,6 +392,44 @@ func _is_exterior(cell: Vector2i, patios: Dictionary) -> bool:
 	return not footprint.has(cell) and not patios.has(cell)
 
 func _floor_addition(cell: Vector2i) -> Dictionary:
+	var addition: Dictionary = _raw_floor_addition(cell)
+	if footprint.is_empty():
+		return addition
+	var low: Vector2i = footprint.keys()[0]
+	var high: Vector2i = low
+	for key in footprint:
+		var existing: Vector2i = key
+		low = Vector2i(mini(low.x, existing.x), mini(low.y, existing.y))
+		high = Vector2i(maxi(high.x, existing.x), maxi(high.y, existing.y))
+	var previous: Dictionary = _wall_conflicts(footprint)
+	var proposed: Dictionary = footprint.duplicate()
+	for key in addition:
+		proposed[key] = true
+	# Resolve new internal pinches as one floor transaction, even in an open notch.
+	# Never auto-grow outside the existing house bounds or change unrelated old joins.
+	for iteration in range(1024):
+		var pending: Dictionary = {}
+		var conflicts: Dictionary = _wall_conflicts(proposed)
+		for key in conflicts:
+			var edge: Vector2i = key
+			var mask: int = int(conflicts[key])
+			if previous.has(edge):
+				var old_mask: int = int(previous[edge])
+				if old_mask == mask or _face_count(mask) < _face_count(old_mask):
+					continue
+			if edge.x < low.x or edge.y < low.y or edge.x > high.x or edge.y > high.y:
+				continue
+			pending[edge] = true
+		if pending.is_empty():
+			break
+		for key in pending:
+			proposed[key] = true
+			addition[key] = true
+		if addition.size() > 1024:
+			break
+	return addition
+
+func _raw_floor_addition(cell: Vector2i) -> Dictionary:
 	var addition: Dictionary = {cell: true}
 	var patios: Dictionary = _enclosed_empty_cells(footprint)
 	var seed: Vector2i = cell
