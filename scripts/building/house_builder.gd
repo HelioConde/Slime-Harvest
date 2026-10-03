@@ -9,6 +9,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var roof_tiles: TileSet
 @export_range(1, 100) var material_limit: int = 25
 @export_range(0, 8) var roof_bottom_inset_px: int = 0
+@export_range(0.1, 1.0) var construction_roof_opacity: float = 0.5
 
 @onready var player: CharacterBody2D = get_node_or_null(player_path) as CharacterBody2D
 @onready var ground: TileMapLayer = get_node_or_null(ground_path) as TileMapLayer
@@ -249,6 +250,18 @@ func _select_brush(name: String) -> void:
 	texture.region = Rect2(16, 16 if name != "Telhado" else 0, 16, 16)
 	_update_roof_visibility()
 
+func _has_house_space(floor_cell: Vector2i) -> bool:
+	# One tile for generated walls, plus one for eaves and a map-edge margin.
+	# Check actual ground cells so holes in the map are also respected.
+	for y in range(-2, 3):
+		for x in range(-2, 3):
+			var cell: Vector2i = floor_cell + Vector2i(x, y)
+			var point: Vector2 = floor_layer.to_global(floor_layer.map_to_local(cell))
+			var ground_cell: Vector2i = ground.local_to_map(ground.to_local(point))
+			if ground.get_cell_source_id(ground_cell) == -1:
+				return false
+	return true
+
 func _add_reason(cell: Vector2i) -> String:
 	if _selected_cells().has(cell):
 		return ""
@@ -265,6 +278,8 @@ func _add_reason(cell: Vector2i) -> String:
 	var point := floor_layer.to_global(floor_layer.map_to_local(cell))
 	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 		return "Pinte sobre o solo."
+	if brush == "Piso" and not _has_house_space(cell):
+		return "Deixe espaço para as paredes e uma célula de margem até a borda do mapa."
 	if brush == "Parede":
 		if footprint.has(cell):
 			return "Pinte a parede fora do piso, no contorno da casa."
@@ -590,7 +605,7 @@ func _update_roof_visibility() -> void:
 	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
 	var inside := (footprint.has(cell) or cell == entrance_cell) and not wall_cells.has(cell)
 	roof.visible = not footprint.is_empty() if building else not manually_hide_roof and not inside
-	roof.modulate.a = (1.0 if preview_roof else 0.2) if building else 1.0
+	roof.modulate.a = (1.0 if preview_roof else construction_roof_opacity) if building else 1.0
 
 func _refresh_balance() -> void:
 	balance.text = "Piso: %d / %d materiais livres" % [material_limit - footprint.size(), material_limit]
@@ -644,6 +659,11 @@ func _load_house() -> void:
 	if decoded.floor.size() > material_limit:
 		status.text = "Piso ultrapassa o limite de materiais."
 		return
+	for key in decoded.floor:
+		var cell: Vector2i = key
+		if not _has_house_space(cell):
+			status.text = "Casa salva perto demais da borda do mapa."
+			return
 	for cell in decoded.walls:
 		var player_cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
 		if cell == player_cell:
