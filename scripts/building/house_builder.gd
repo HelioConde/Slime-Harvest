@@ -443,7 +443,12 @@ func _curve_add_error(cell: Vector2i, addition: Dictionary) -> String:
 	if atlas == Vector2i(-1, -1):
 		atlas = front_walls.get_cell_atlas_coords(cell)
 	if (atlas.x == 3 or atlas.x == 4) and (atlas.y == 0 or atlas.y == 1):
-		return "Não construa sobre o canto interno da curva. Expanda por outra borda."
+		# A corner alone is valid. Block only a one-cell gap to opposing floor.
+		for direction in DIRECTIONS:
+			var between: Vector2i = cell + direction
+			var opposite: Vector2i = cell + direction * 2
+			if not footprint.has(between) and footprint.has(opposite):
+				return "Essa curva deixaria apenas um bloco de espaço entre os pisos."
 	return ""
 
 func _house_layout_error(cells: Dictionary) -> String:
