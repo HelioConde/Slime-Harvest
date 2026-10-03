@@ -38,7 +38,7 @@ func _ready() -> void:
 	_make_roof_terrain()
 	var texture := AtlasTexture.new()
 	texture.atlas = terrain_source.texture
-	texture.region = Rect2(16, 16, 16, 16)
+	texture.region = Rect2(15 * 16, 0, 16, 16)
 	texture.filter_clip = true
 	ghost.texture = texture
 	_build_ui()
@@ -46,6 +46,25 @@ func _ready() -> void:
 
 func _make_roof_terrain() -> void:
 	var original := roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
+	var source_image := original.texture.get_image()
+	var atlas_image := Image.create(16 * 16, 16, false, Image.FORMAT_RGBA8)
+	# The vertical roof at x=0..2 contains transparent margins and a ridge.
+	# Use the opaque horizontal roof filling instead; each neighbour pattern
+	# receives only the exterior trim, so interior cells join without seams.
+	var border := Color("69505c")
+	for mask in range(16):
+		var origin := Vector2i(mask * 16, 0)
+		atlas_image.blit_rect(source_image, Rect2i(64, 48, 16, 16), origin)
+		if (mask & 1) == 0:
+			atlas_image.blit_rect(source_image, Rect2i(64, 32, 16, 3), origin)
+			atlas_image.fill_rect(Rect2i(origin, Vector2i(16, 1)), border)
+		if (mask & 4) == 0:
+			atlas_image.blit_rect(source_image, Rect2i(64, 64, 16, 3), origin + Vector2i(0, 13))
+			atlas_image.fill_rect(Rect2i(origin + Vector2i(0, 15), Vector2i(16, 1)), border)
+		if (mask & 8) == 0:
+			atlas_image.fill_rect(Rect2i(origin, Vector2i(1, 16)), border)
+		if (mask & 2) == 0:
+			atlas_image.fill_rect(Rect2i(origin + Vector2i(15, 0), Vector2i(1, 16)), border)
 	var tiles := TileSet.new()
 	tiles.tile_size = Vector2i(16, 16)
 	tiles.add_terrain_set()
@@ -53,29 +72,20 @@ func _make_roof_terrain() -> void:
 	tiles.add_terrain(0)
 	tiles.set_terrain_name(0, 0, "Casa")
 	terrain_source = TileSetAtlasSource.new()
-	terrain_source.texture = original.texture
+	terrain_source.texture = ImageTexture.create_from_image(atlas_image)
 	terrain_source.texture_region_size = Vector2i(16, 16)
 	tiles.add_source(terrain_source, 0)
 	var peers: Array[int] = [TileSet.CELL_NEIGHBOR_TOP_SIDE, TileSet.CELL_NEIGHBOR_RIGHT_SIDE, TileSet.CELL_NEIGHBOR_BOTTOM_SIDE, TileSet.CELL_NEIGHBOR_LEFT_SIDE]
-	# All sixteen side combinations have explicit alternatives. The original
-	# artwork has nine edge pieces; narrow/isolated combinations reuse those.
 	for mask in range(16):
-		var north := (mask & 1) != 0
-		var east := (mask & 2) != 0
-		var south := (mask & 4) != 0
-		var west := (mask & 8) != 0
-		var x := 0 if not west and east else 2 if west and not east else 1
-		var y := 0 if not north else 4 if not south else 1
-		var atlas := Vector2i(x, y)
-		if not terrain_source.has_tile(atlas):
-			terrain_source.create_tile(atlas)
-		var alternative := terrain_source.create_alternative_tile(atlas, mask + 1)
-		var data := terrain_source.get_tile_data(atlas, alternative)
+		var atlas := Vector2i(mask, 0)
+		terrain_source.create_tile(atlas)
+		var data := terrain_source.get_tile_data(atlas, 0)
 		data.terrain_set = 0
 		data.terrain = 0
 		for index in range(4):
 			data.set_terrain_peering_bit(peers[index], 0 if (mask & (1 << index)) != 0 else -1)
 	roof.tile_set = tiles
+	roof.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 func _build_ui() -> void:
 	var canvas := CanvasLayer.new()
@@ -219,13 +229,16 @@ func _facade(cells: Dictionary) -> Dictionary:
 		var cell: Vector2i = key
 		if cells.has(cell + Vector2i.DOWN):
 			continue
-		var left := cells.has(cell + Vector2i.LEFT)
-		var right := cells.has(cell + Vector2i.RIGHT)
-		var x := 0 if not left and right else 2 if left and not right else 1
 		for y in range(1, 3):
 			var front := cell + Vector2i(0, y)
 			if not cells.has(front):
-				result[front] = Vector2i(x, y)
+				result[front] = Vector2i(1, y)
+	for key in result.keys():
+		var cell: Vector2i = key
+		var left := result.has(cell + Vector2i.LEFT)
+		var right := result.has(cell + Vector2i.RIGHT)
+		var x := 0 if not left and right else 2 if left and not right else 1
+		result[cell] = Vector2i(x, result[cell].y)
 	return result
 
 func _space_free(cells: Dictionary) -> bool:
