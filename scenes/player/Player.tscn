@@ -1371,9 +1371,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_r564e")
-}, {
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_5vsji")
 }, {
 "duration": 1.0,
@@ -1722,7 +1719,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="Shape_feet"]
-size = Vector2(12, 8)
+size = Vector2(12, 6)
 
 [node name="Player" type="CharacterBody2D" unique_id=1227715951 groups=["player"]]
 texture_filter = 1
@@ -1733,10 +1730,10 @@ script = ExtResource("1_player")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=745536399]
 position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_player")
-animation = &"walk_left"
+animation = &"idle_down"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1074705834]
-position = Vector2(0, -5)
+position = Vector2(0, -3)
 shape = SubResource("Shape_feet")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=491850381]
@@ -1745,8 +1742,9 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
 [node name="InteractionRay" type="RayCast2D" parent="." unique_id=162378466]
-target_position = Vector2(0, 15)
+target_position = Vector2(0, 24)
 collision_mask = 4
 collide_with_areas = true
 
 [node name="ToolOrigin" type="Marker2D" parent="." unique_id=435340110]
+position = Vector2(0, 16)
