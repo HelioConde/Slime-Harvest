@@ -422,9 +422,31 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			pending[edge] = true
 		if pending.is_empty():
 			break
+		# Add only the most useful floor, then recompute the wall contour.
+		# Filling every conflict simultaneously may add an unnecessary neighbour.
+		var best: Vector2i = pending.keys()[0]
+		var best_score: int = 2147483647
+		var best_distance: int = 2147483647
 		for key in pending:
-			proposed[key] = true
-			addition[key] = true
+			var candidate: Vector2i = key
+			var trial: Dictionary = proposed.duplicate()
+			trial[candidate] = true
+			var remaining: Dictionary = _wall_conflicts(trial)
+			var score: int = 0
+			for conflict_cell in remaining:
+				var trial_mask: int = int(remaining[conflict_cell])
+				if previous.has(conflict_cell):
+					var old_mask: int = int(previous[conflict_cell])
+					if old_mask == trial_mask or _face_count(trial_mask) < _face_count(old_mask):
+						continue
+				score += 1
+			var distance: int = absi(candidate.x - cell.x) + absi(candidate.y - cell.y)
+			if score < best_score or (score == best_score and (distance < best_distance or (distance == best_distance and (candidate.y < best.y or (candidate.y == best.y and candidate.x < best.x))))):
+				best = candidate
+				best_score = score
+				best_distance = distance
+		proposed[best] = true
+		addition[best] = true
 		if addition.size() > 1024:
 			break
 	return addition
