@@ -1,16 +1,7 @@
 [gd_scene format=4 uid="uid://dy8e7rclxsk6i"]
 
-[ext_resource type="Texture2D" uid="uid://6gwcwhx3v6fy" path="res://assets/tilesets/ground tiles/New tiles/Grass_Tile_Layers.png" id="1_7o7oy"]
+[ext_resource type="TileSet" path="res://data/tilesets/world_tileset.tres" id="1_7o7oy"]
 [ext_resource type="PackedScene" uid="uid://e41u5bfsawlk" path="res://scenes/player/Player.tscn" id="2_1druj"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1druj"]
-texture = ExtResource("1_7o7oy")
-
-[sub_resource type="TileSet" id="TileSet_jdkxt"]
-terrain_set_0/mode = 1
-terrain_set_0/terrain_0/name = "grass"
-terrain_set_0/terrain_0/color = Color(0.041622907, 0.44246846, 0.053347573, 1)
-sources/1 = SubResource("TileSetAtlasSource_1druj")
 
 [node name="World2" type="Node2D" unique_id=2045392138]
 
@@ -22,6 +13,6 @@ sources/1 = SubResource("TileSetAtlasSource_1druj")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="Actors/Map/grass" unique_id=633426789]
 tile_map_data = PackedByteArray("AAACAAMAAAABAAEAAAADAAMAAAABAAEAAAADAAIAAAABAAEAAAACAAIAAAAGAAIAAAAEAAIAAAABAAEAAAAFAAIAAAABAAEAAAAFAAMAAAABAAEAAAAEAAMAAAABAAEAAAAGAAMAAAABAAEAAAAGAAIAAAAFAAIAAAAGAAEAAAACAAAAAAAFAAEAAAABAAAAAAAHAAIAAAABAAAAAAAHAAMAAAABAAEAAAAHAAQAAAABAAEAAAAGAAQAAAABAAEAAAAFAAQAAAABAAEAAAAFAAUAAAABAAEAAAAEAAUAAAABAAEAAAAEAAQAAAABAAEAAAADAAQAAAABAAEAAAACAAQAAAABAAEAAAABAAQAAAABAAEAAAABAAUAAAABAAIAAAAAAAUAAAABAAIAAAAAAAQAAAABAAEAAAABAAMAAAAGAAIAAAACAAUAAAAGAAEAAAADAAUAAAABAAEAAAADAAYAAAABAAIAAAACAAYAAAAAAAIAAAAFAAYAAAABAAIAAAAGAAYAAAACAAIAAAAEAAYAAAABAAIAAAAGAAUAAAAFAAEAAAAIAAMAAAAFAAIAAAAIAAQAAAAFAAEAAAAHAAUAAAABAAIAAAAIAAUAAAACAAIAAAAIAAIAAAACAAAAAAAJAAQAAAACAAIAAAAJAAMAAAACAAAAAAADAAEAAAABAAAAAAAEAAEAAAABAAAAAAABAAIAAAAAAAAAAAAAAAMAAAABAAAAAAD//wMAAAAAAAAAAAD//wQAAAAAAAEAAAACAAEAAAAAAAAAAAD//wUAAAAAAAIAAAA=")
-tile_set = SubResource("TileSet_jdkxt")
+tile_set = ExtResource("1_7o7oy")
 
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("2_1druj")]
