@@ -90,7 +90,7 @@ func _build_ui() -> void:
 	box.add_child(balance)
 	var brushes := HBoxContainer.new()
 	box.add_child(brushes)
-	for name in ["Piso", "Parede", "Telhado"]:
+	for name in ["Piso", "Parede"]:
 		_button(brushes, name, _select_brush.bind(name))
 	var tools := HBoxContainer.new()
 	box.add_child(tools)
@@ -103,7 +103,7 @@ func _build_ui() -> void:
 	status = Label.new()
 	status.custom_minimum_size.x = 210
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.text = "Escolha Piso, Parede ou Telhado."
+	status.text = "Pinte piso e paredes; telhado automático."
 	box.add_child(status)
 	var help := Label.new()
 	help.text = "Esquerdo: pintar / expandir\nDireito: apagar nesta camada\nB / Esc: sair"
@@ -264,11 +264,16 @@ func _rebuild() -> void:
 	for cell in wall_cells.keys():
 		if not _supported(cell, "Parede"):
 			wall_cells.erase(cell)
-	for cell in roof_cells.keys():
-		if not _supported(cell, "Telhado"):
-			roof_cells.erase(cell)
+	# Coverage is derived; it never needs a roof brush or extra materials.
+	roof_cells = footprint.duplicate()
+	for cell in wall_cells:
+		roof_cells[cell] = true
 	roof.clear()
 	roof_underlay.clear()
+	for child in roof.get_children():
+		if child != roof_underlay:
+			roof.remove_child(child)
+			child.queue_free()
 	walls.clear()
 	floor_layer.clear()
 	for body in bodies:
@@ -300,8 +305,39 @@ func _rebuild() -> void:
 				var slope := 2 if cell.y == ridge else 1 if cell.y < ridge else 3
 				roof_underlay.set_cell(cell, roof_tiles.get_source_id(0), Vector2i(1, slope))
 			roof.set_cell(cell, roof_tiles.get_source_id(0), atlas)
+			_add_roof_overhang(cell, atlas)
 	_update_roof_visibility()
 	_refresh_balance()
+
+func _add_roof_overhang(cell: Vector2i, atlas: Vector2i) -> void:
+	# Exactly one screen-world pixel outside the upper/lower wall boundary.
+	# The atlas top edge includes transparent padding; use its first opaque
+	# pixel row to keep the extension visible without stretching the roof.
+	var source_image := terrain_source.texture.get_image()
+	for direction in [Vector2i.UP, Vector2i.DOWN]:
+		if roof_cells.has(cell + direction):
+			continue
+		var row := 0 if direction == Vector2i.UP else 15
+		var step := 1 if direction == Vector2i.UP else -1
+		for candidate in range(16):
+			var test_row := candidate if step == 1 else 15 - candidate
+			var opaque := false
+			for x in range(16):
+				if source_image.get_pixel(atlas.x * 16 + x, atlas.y * 16 + test_row).a > 0.0:
+					opaque = true
+					break
+			if opaque:
+				row = test_row
+				break
+		var texture := AtlasTexture.new()
+		texture.atlas = terrain_source.texture
+		texture.region = Rect2(atlas.x * 16, atlas.y * 16 + row, 16, 1)
+		texture.filter_clip = true
+		var edge := Sprite2D.new()
+		edge.texture = texture
+		edge.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		edge.position = roof.map_to_local(cell) + Vector2(0, direction.y * 8.5)
+		roof.add_child(edge)
 
 func _add_block(cell: Vector2i) -> void:
 	var body := StaticBody2D.new()
@@ -338,7 +374,7 @@ func _toggle_roof() -> void:
 func _update_roof_visibility() -> void:
 	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
 	var inside := footprint.has(cell) and not wall_cells.has(cell)
-	roof.visible = not manually_hide_roof and (brush == "Telhado" if building else not inside)
+	roof.visible = not manually_hide_roof and (not building and not inside)
 
 func _refresh_balance() -> void:
 	balance.text = "Piso: %d / %d materiais livres" % [material_limit - footprint.size(), material_limit]
@@ -354,7 +390,7 @@ func _save_house() -> void:
 	if file == null:
 		status.text = "Não foi possível salvar."
 		return
-	file.store_string(JSON.stringify({"version": 2, "floor": _encode_cells(footprint), "walls": _encode_cells(wall_cells), "roof": _encode_cells(roof_cells)}))
+	file.store_string(JSON.stringify({"version": 2, "floor": _encode_cells(footprint), "walls": _encode_cells(wall_cells), "roof": []}))
 	file.flush()
 	var error := file.get_error()
 	file.close()
