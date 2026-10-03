@@ -370,6 +370,15 @@ func _rebuild() -> void:
 		roof_cells[cell] = true
 	if not footprint.is_empty():
 		roof_cells[entrance_cell] = true
+	# Leave the front wall visible: the eave ends at the floor boundary.
+	# Remove one exterior lower row simultaneously, including stepped edges.
+	var lower_wall_row: Array[Vector2i] = []
+	for key in roof_cells:
+		var cell: Vector2i = key
+		if not footprint.has(cell) and not roof_cells.has(cell + Vector2i.DOWN):
+			lower_wall_row.append(cell)
+	for cell in lower_wall_row:
+		roof_cells.erase(cell)
 	roof.clear()
 	roof_underlay.clear()
 	for child in roof.get_children():
