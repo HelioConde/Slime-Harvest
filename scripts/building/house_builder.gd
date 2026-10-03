@@ -390,8 +390,8 @@ func _rebuild() -> void:
 	_refresh_balance()
 
 func _refresh_tile_numbers() -> void:
-	for layer in [floor_layer, walls, roof]:
-		var previous := layer.get_node_or_null("TileNumbers")
+	for layer: TileMapLayer in [floor_layer, walls, roof]:
+		var previous: Node = layer.get_node_or_null("TileNumbers")
 		if previous != null:
 			layer.remove_child(previous)
 			previous.queue_free()
@@ -401,13 +401,13 @@ func _refresh_tile_numbers() -> void:
 		overlay.name = "TileNumbers"
 		overlay.z_index = 100
 		layer.add_child(overlay)
-		var prefix := "P" if layer == floor_layer else "W" if layer == walls else "T"
-		var cells := layer.get_used_cells()
+		var prefix: String = "P" if layer == floor_layer else "W" if layer == walls else "T"
+		var cells: Array[Vector2i] = layer.get_used_cells()
 		cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.y < b.y or a.y == b.y and a.x < b.x)
 		var index := 0
 		for cell in cells:
 			index += 1
-			var atlas := layer.get_cell_atlas_coords(cell)
+			var atlas: Vector2i = layer.get_cell_atlas_coords(cell)
 			var label := Label.new()
 			label.text = "%s%d\n%d,%d" % [prefix, index, atlas.x, atlas.y]
 			label.position = layer.map_to_local(cell) - Vector2(8, 8)
