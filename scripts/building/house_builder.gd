@@ -392,11 +392,20 @@ func _is_exterior(cell: Vector2i, patios: Dictionary) -> bool:
 func _floor_addition(cell: Vector2i) -> Dictionary:
 	var addition: Dictionary = {cell: true}
 	var patios: Dictionary = _enclosed_empty_cells(footprint)
-	if not patios.has(cell):
-		return addition
+	var seed: Vector2i = cell
+	if not patios.has(seed):
+		var found: bool = false
+		if wall_cells.has(cell):
+			for direction in DIRECTIONS:
+				if patios.has(cell + direction):
+					seed = cell + direction
+					found = true
+					break
+		if not found:
+			return addition
 	# Close a complete 2x2 courtyard in one transaction, not one tile at a time.
-	var component: Dictionary = {cell: true}
-	var queue: Array[Vector2i] = [cell]
+	var component: Dictionary = {seed: true}
+	var queue: Array[Vector2i] = [seed]
 	var index: int = 0
 	while index < queue.size():
 		var current: Vector2i = queue[index]
@@ -410,17 +419,22 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 		for key in component:
 			var corner: Vector2i = key
 			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
-				return component
+				var closure: Dictionary = component.duplicate()
+				closure[cell] = true
+				return closure
 	# Expanded courtyards may have no valid single-tile intermediate state.
 	# Validate a complete closure instead of leaving an incompatible narrow gap.
 	var proposed: Dictionary = footprint.duplicate()
 	proposed[cell] = true
 	if not _house_layout_error(proposed).is_empty() or not _contour_change_error(proposed).is_empty():
 		var closed: Dictionary = footprint.duplicate()
+		closed[cell] = true
 		for key in component:
 			closed[key] = true
 		if _house_layout_error(closed).is_empty() and _contour_change_error(closed).is_empty():
-			return component
+			var closure: Dictionary = component.duplicate()
+			closure[cell] = true
+			return closure
 	return addition
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
