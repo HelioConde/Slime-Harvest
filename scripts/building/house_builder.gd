@@ -15,6 +15,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
+var perimeter: Node2D
 var floor_layer: TileMapLayer
 var door_cells: Dictionary = {}
 var manually_hide_roof := false
@@ -45,6 +46,10 @@ func _ready() -> void:
 	floor_layer.z_index = 4
 	floor_layer.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(floor_layer)
+	perimeter = Node2D.new()
+	perimeter.name = "InteriorWalls"
+	perimeter.z_index = 6
+	add_child(perimeter)
 	roof.position.y += roof_drop_pixels
 	walls.tile_set = wall_tiles
 	_make_roof_terrain()
@@ -283,6 +288,9 @@ func _rebuild() -> void:
 	walls.clear()
 	floor_layer.clear()
 	door_cells.clear()
+	for part in perimeter.get_children():
+		perimeter.remove_child(part)
+		part.queue_free()
 	for body in bodies:
 		body.collision_layer = 0
 		body.queue_free()
@@ -291,7 +299,14 @@ func _rebuild() -> void:
 	for cell in footprint:
 		cells.append(cell)
 	if not cells.is_empty():
-		roof.set_cells_terrain_connect(cells, 0, 0, false)
+		var coverage: Dictionary = footprint.duplicate()
+		for cell in cells:
+			coverage[cell + Vector2i.UP] = true
+			coverage[cell + Vector2i.DOWN] = true
+		var roof_cells: Array[Vector2i] = []
+		for cell in coverage:
+			roof_cells.append(cell)
+		roof.set_cells_terrain_connect(roof_cells, 0, 0, false)
 	var facade := _facade(footprint)
 	var source := wall_tiles.get_source_id(0)
 	# One entrance at the lowest front edge; it moves with the footprint.
@@ -318,8 +333,33 @@ func _rebuild() -> void:
 			continue
 		walls.set_cell(cell, source, facade[cell])
 		_add_block(cell)
+	_draw_interior_walls(facade)
 	_update_roof_visibility()
 	_refresh_balance()
+
+func _draw_interior_walls(facade: Dictionary) -> void:
+	# Outline the whole room, including the entrance corridor and stepped edges.
+	# Physics and roof visibility stay independent of these visible wall trims.
+	var room := footprint.duplicate()
+	for cell in facade:
+		room[cell] = true
+	for key in room:
+		var cell: Vector2i = key
+		var center := to_local(floor_layer.to_global(floor_layer.map_to_local(cell)))
+		for direction in DIRECTIONS:
+			if room.has(cell + direction):
+				continue
+			if direction == Vector2i.DOWN and door_cells.has(cell):
+				continue
+			var tangent := Vector2(8, 0) if direction.y != 0 else Vector2(0, 8)
+			var edge := center + Vector2(direction) * 8.0
+			for width in [6.0, 4.0]:
+				var line := Line2D.new()
+				line.points = PackedVector2Array([edge - tangent, edge + tangent])
+				line.width = width
+				line.default_color = Color("69505c") if width == 6.0 else Color("b78c62")
+				line.antialiased = false
+				perimeter.add_child(line)
 
 func _add_block(cell: Vector2i) -> void:
 	var body := StaticBody2D.new()
