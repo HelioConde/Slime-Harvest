@@ -14,6 +14,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
+var show_tile_numbers := false
 var entrance_cell := Vector2i(99999, 99999)
 var roof_underlay: TileMapLayer
 var wall_cells: Dictionary = {}
@@ -103,7 +104,7 @@ func _build_ui() -> void:
 	canvas.layer = 20
 	add_child(canvas)
 	hint = Label.new()
-	hint.text = "B: construir casa (%d materiais)" % material_limit
+	hint.text = "B: construir (%d materiais) | N: números" % material_limit
 	hint.position = Vector2(8, 8)
 	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(hint)
@@ -149,6 +150,11 @@ func _button(parent: Node, text: String, action: Callable) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if event.physical_keycode == KEY_N:
+		show_tile_numbers = not show_tile_numbers
+		_refresh_tile_numbers()
+		get_viewport().set_input_as_handled()
 		return
 	if event.physical_keycode == KEY_B or building and event.physical_keycode == KEY_ESCAPE:
 		if not building:
@@ -380,7 +386,37 @@ func _rebuild() -> void:
 			roof.set_cell(cell, roof_tiles.get_source_id(0), atlas)
 			_add_roof_overhang(cell, atlas)
 	_update_roof_visibility()
+	_refresh_tile_numbers()
 	_refresh_balance()
+
+func _refresh_tile_numbers() -> void:
+	for layer in [floor_layer, walls, roof]:
+		var previous := layer.get_node_or_null("TileNumbers")
+		if previous != null:
+			layer.remove_child(previous)
+			previous.queue_free()
+		if not show_tile_numbers:
+			continue
+		var overlay := Node2D.new()
+		overlay.name = "TileNumbers"
+		overlay.z_index = 100
+		layer.add_child(overlay)
+		var prefix := "P" if layer == floor_layer else "W" if layer == walls else "T"
+		var cells := layer.get_used_cells()
+		cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.y < b.y or a.y == b.y and a.x < b.x)
+		var index := 0
+		for cell in cells:
+			index += 1
+			var atlas := layer.get_cell_atlas_coords(cell)
+			var label := Label.new()
+			label.text = "%s%d\n%d,%d" % [prefix, index, atlas.x, atlas.y]
+			label.position = layer.map_to_local(cell) - Vector2(8, 8)
+			label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			label.add_theme_font_size_override("font_size", 7)
+			label.add_theme_constant_override("outline_size", 2)
+			label.add_theme_color_override("font_outline_color", Color.BLACK)
+			label.add_theme_color_override("font_color", Color.YELLOW if layer == walls else Color.WHITE)
+			overlay.add_child(label)
 
 func _add_roof_overhang(cell: Vector2i, atlas: Vector2i) -> void:
 	# Exactly one screen-world pixel outside the upper/lower wall boundary.
