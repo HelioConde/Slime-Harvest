@@ -228,6 +228,8 @@ func _add_reason(cell: Vector2i) -> String:
 	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 		return "Pinte sobre o solo."
 	if brush == "Parede":
+		if footprint.has(cell):
+			return "Pinte a parede fora do piso, no contorno da casa."
 		var shape := RectangleShape2D.new()
 		shape.size = Vector2(16, 16)
 		var query := PhysicsShapeQueryParameters2D.new()
@@ -299,7 +301,7 @@ func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 func _rebuild() -> void:
 	# Remove orphan pieces when shrinking the floor or loading an old test.
 	for cell in wall_cells.keys():
-		if not _supported(cell, "Parede"):
+		if footprint.has(cell) or not _supported(cell, "Parede"):
 			wall_cells.erase(cell)
 	# Close only diagonal wall junctions, leaving straight entrance gaps open.
 	var junctions: Dictionary = {}
