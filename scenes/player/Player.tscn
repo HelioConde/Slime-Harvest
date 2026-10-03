@@ -515,10 +515,6 @@ region = Rect2(288, 624, 48, 48)
 atlas = ExtResource("2_gfjak")
 region = Rect2(336, 624, 48, 48)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_r564e"]
-atlas = ExtResource("2_gfjak")
-region = Rect2(48, 0, 48, 48)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_5vsji"]
 atlas = ExtResource("2_gfjak")
 region = Rect2(0, 384, 48, 48)
@@ -1164,7 +1160,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"idle_down",
-"speed": 4.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1728,7 +1724,6 @@ motion_mode = 1
 script = ExtResource("1_player")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=745536399]
-position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_player")
 animation = &"idle_down"
 
