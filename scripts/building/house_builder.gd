@@ -41,6 +41,9 @@ var cursor := Vector2i(99999, 99999)
 var last_button := 0
 var terrain_source: TileSetAtlasSource
 var previous_cell := Vector2i(99999, 99999)
+var removing_area: bool = false
+var removal_start: Vector2i
+var removal_outline: Line2D
 
 func _ready() -> void:
 	if player == null or ground == null or wall_tiles == null or roof_tiles == null:
@@ -76,6 +79,11 @@ func _ready() -> void:
 	entrance_door.player = player
 	entrance_door.hide()
 	add_child(entrance_door)
+	removal_outline = Line2D.new()
+	removal_outline.width = 1.0
+	removal_outline.default_color = Color(1.0, 0.3, 0.2, 0.9)
+	removal_outline.z_index = 31
+	add_child(removal_outline)
 	ghost.hide()
 
 func _make_roof_terrain() -> void:
@@ -167,7 +175,7 @@ func _build_ui() -> void:
 	status.text = "Pinte o piso; paredes e telhado automáticos."
 	box.add_child(status)
 	var help := Label.new()
-	help.text = "Esquerdo: pintar / expandir\nDireito: apagar nesta camada\nB / Esc: sair"
+	help.text = "Esquerdo: pintar / expandir\nDireito: arrastar área para apagar\nB / Esc: sair"
 	box.add_child(help)
 	_refresh_balance()
 	panel.hide()
@@ -191,6 +199,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			previous_controls = bool(player.get("controls_enabled"))
 		building = not building
 		preview_roof = false
+		removing_area = false
+		removal_outline.clear_points()
 		player.call("set_controls_enabled", false if building else previous_controls)
 		panel.visible = building
 		hint.visible = not building
@@ -207,6 +217,20 @@ func _process(_delta: float) -> void:
 	var over_panel := panel.get_global_rect().has_point(get_viewport().get_mouse_position())
 	ghost.visible = not over_panel
 	ghost.global_position = floor_layer.to_global(floor_layer.map_to_local(cursor))
+	var right_pressed: bool = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+	if right_pressed:
+		if not removing_area and not over_panel:
+			removing_area = true
+			removal_start = cursor
+		if removing_area:
+			_preview_removal(cursor)
+		return
+	if removing_area:
+		removing_area = false
+		removal_outline.clear_points()
+		if not over_panel:
+			_remove_floor_area(removal_start, cursor)
+		return
 	var selected := _selected_cells()
 	var reason := _add_reason(cursor)
 	ghost.modulate = Color(1, 1, 1, 0.6) if reason.is_empty() else Color(1, 0.3, 0.3, 0.6)
@@ -233,6 +257,100 @@ func _process(_delta: float) -> void:
 		selected.erase(cursor)
 	_rebuild()
 	status.text = "%s atualizado. Salve para guardar." % brush
+
+func _preview_removal(end: Vector2i) -> void:
+	var low: Vector2i = Vector2i(mini(removal_start.x, end.x), mini(removal_start.y, end.y))
+	var high: Vector2i = Vector2i(maxi(removal_start.x, end.x), maxi(removal_start.y, end.y))
+	var a: Vector2 = to_local(floor_layer.to_global(floor_layer.map_to_local(low) - Vector2(8, 8)))
+	var b: Vector2 = to_local(floor_layer.to_global(floor_layer.map_to_local(high) + Vector2(8, 8)))
+	removal_outline.points = PackedVector2Array([a, Vector2(b.x, a.y), b, Vector2(a.x, b.y), a])
+
+func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
+	var low: Vector2i = Vector2i(mini(start.x, end.x), mini(start.y, end.y))
+	var high: Vector2i = Vector2i(maxi(start.x, end.x), maxi(start.y, end.y))
+	var proposed: Dictionary = footprint.duplicate()
+	# Only existing floor cells matter, even when the drag extends off-map.
+	for key in footprint:
+		var cell: Vector2i = key
+		if cell.x >= low.x and cell.x <= high.x and cell.y >= low.y and cell.y <= high.y:
+			proposed.erase(cell)
+	if proposed.size() == footprint.size():
+		return
+	var reason: String = _house_layout_error(proposed)
+	if not reason.is_empty():
+		status.text = reason
+		return
+	_remember()
+	footprint = proposed
+	_rebuild()
+	status.text = "Área removida; materiais devolvidos. Salve para guardar."
+
+func _house_layout_error(cells: Dictionary) -> String:
+	if cells.is_empty():
+		return ""
+	# The remaining floor must still form one connected house.
+	var first: Vector2i = cells.keys()[0]
+	var visited: Dictionary = {first: true}
+	var queue: Array[Vector2i] = [first]
+	var index: int = 0
+	while index < queue.size():
+		var cell: Vector2i = queue[index]
+		index += 1
+		for direction in DIRECTIONS:
+			var next: Vector2i = cell + direction
+			if cells.has(next) and not visited.has(next):
+				visited[next] = true
+				queue.append(next)
+	if visited.size() != cells.size():
+		return "A remoção não pode separar a casa em partes."
+	var low: Vector2i = first
+	var high: Vector2i = first
+	for key in cells:
+		var cell: Vector2i = key
+		low = Vector2i(mini(low.x, cell.x), mini(low.y, cell.y))
+		high = Vector2i(maxi(high.x, cell.x), maxi(high.y, cell.y))
+	low -= Vector2i.ONE
+	high += Vector2i.ONE
+	# Flood the empty exterior. Every remaining empty component is a courtyard.
+	var exterior: Dictionary = {low: true}
+	queue = [low]
+	index = 0
+	while index < queue.size():
+		var cell: Vector2i = queue[index]
+		index += 1
+		for direction in DIRECTIONS:
+			var next: Vector2i = cell + direction
+			if next.x < low.x or next.y < low.y or next.x > high.x or next.y > high.y:
+				continue
+			if not cells.has(next) and not exterior.has(next):
+				exterior[next] = true
+				queue.append(next)
+	var checked: Dictionary = exterior.duplicate()
+	for y in range(low.y, high.y + 1):
+		for x in range(low.x, high.x + 1):
+			var seed: Vector2i = Vector2i(x, y)
+			if cells.has(seed) or checked.has(seed):
+				continue
+			var hole_low: Vector2i = seed
+			var hole_high: Vector2i = seed
+			queue = [seed]
+			checked[seed] = true
+			index = 0
+			while index < queue.size():
+				var cell: Vector2i = queue[index]
+				index += 1
+				hole_low = Vector2i(mini(hole_low.x, cell.x), mini(hole_low.y, cell.y))
+				hole_high = Vector2i(maxi(hole_high.x, cell.x), maxi(hole_high.y, cell.y))
+				for direction in DIRECTIONS:
+					var next: Vector2i = cell + direction
+					if not cells.has(next) and not checked.has(next):
+						checked[next] = true
+						queue.append(next)
+			var width: int = hole_high.x - hole_low.x + 1
+			var height: int = hole_high.y - hole_low.y + 1
+			if width != height or width < 3 or queue.size() != width * height:
+				return "Pátio interno: arraste um quadrado de pelo menos 3×3, deixando espaço para paredes e área verde."
+	return ""
 
 func _selected_cells() -> Dictionary:
 	if brush == "Parede":
@@ -278,6 +396,12 @@ func _add_reason(cell: Vector2i) -> String:
 	var point := floor_layer.to_global(floor_layer.map_to_local(cell))
 	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 		return "Pinte sobre o solo."
+	if brush == "Piso":
+		var proposed: Dictionary = footprint.duplicate()
+		proposed[cell] = true
+		var layout_error: String = _house_layout_error(proposed)
+		if not layout_error.is_empty():
+			return layout_error
 	if brush == "Piso" and not _has_house_space(cell):
 		return "Deixe espaço para as paredes e uma célula de margem até a borda do mapa."
 	if brush == "Parede":
@@ -658,6 +782,10 @@ func _load_house() -> void:
 		decoded[name] = cells
 	if decoded.floor.size() > material_limit:
 		status.text = "Piso ultrapassa o limite de materiais."
+		return
+	var layout_error: String = _house_layout_error(decoded.floor)
+	if not layout_error.is_empty():
+		status.text = layout_error
 		return
 	for key in decoded.floor:
 		var cell: Vector2i = key
