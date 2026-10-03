@@ -1189,7 +1189,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"idle_left",
-"speed": 4.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1218,7 +1218,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"idle_right",
-"speed": 4.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1247,7 +1247,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"idle_up",
-"speed": 4.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1508,7 +1508,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walk_down",
-"speed": 8.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1537,7 +1537,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walk_left",
-"speed": 8.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1566,7 +1566,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walk_right",
-"speed": 8.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1595,7 +1595,7 @@ animations = [{
 }],
 "loop": 1,
 "name": &"walk_up",
-"speed": 8.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -1732,9 +1732,6 @@ position = Vector2(0, -3)
 shape = SubResource("Shape_feet")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=491850381]
-zoom = Vector2(3, 3)
-position_smoothing_enabled = true
-position_smoothing_speed = 8.0
 
 [node name="InteractionRay" type="RayCast2D" parent="." unique_id=162378466]
 target_position = Vector2(0, 24)
