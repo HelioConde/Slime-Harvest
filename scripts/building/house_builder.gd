@@ -236,6 +236,8 @@ func _process(_delta: float) -> void:
 	var selected := _selected_cells()
 	var reason := _add_reason(cursor)
 	ghost.modulate = Color(1, 1, 1, 0.6) if reason.is_empty() else Color(1, 0.3, 0.3, 0.6)
+	if not over_panel and not reason.is_empty():
+		status.text = reason
 	var button := 1 if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) else 2 if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else 0
 	if button == 0 or over_panel:
 		last_button = 0
@@ -396,16 +398,16 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 	if not patios.has(seed):
 		var found: bool = false
 		if wall_cells.has(cell):
-			for direction in DIRECTIONS:
-				if patios.has(cell + direction):
-					seed = cell + direction
-					found = true
-					break
-				var between: Vector2i = cell + direction
-				var inside: Vector2i = cell + direction * 2
-				if not footprint.has(between) and wall_cells.has(between) and patios.has(inside):
-					seed = inside
-					found = true
+			# An outer-wall click may be separated from the courtyard by room flooring.
+			# Select the nearest courtyard along a cardinal ray, within three cells.
+			for step in range(1, 4):
+				for direction in DIRECTIONS:
+					var inside: Vector2i = cell + direction * step
+					if patios.has(inside):
+						seed = inside
+						found = true
+						break
+				if found:
 					break
 		if not found:
 			return addition
