@@ -453,15 +453,22 @@ func _wall_conflicts(cells: Dictionary) -> Dictionary:
 		var right: bool = cells.has(cell + Vector2i.RIGHT)
 		var up: bool = cells.has(cell + Vector2i.UP)
 		var down: bool = cells.has(cell + Vector2i.DOWN)
-		# One atlas tile cannot represent two opposite interior wall faces.
-		if (left and right) or (up and down):
-			var mask: int = (1 if left else 0) | (2 if right else 0) | (4 if up else 0) | (8 if down else 0)
+		var mask: int = (1 if left else 0) | (2 if right else 0) | (4 if up else 0) | (8 if down else 0)
+		var northwest: bool = cells.has(cell + Vector2i(-1, -1))
+		var northeast: bool = cells.has(cell + Vector2i(1, -1))
+		var southwest: bool = cells.has(cell + Vector2i(-1, 1))
+		var southeast: bool = cells.has(cell + Vector2i(1, 1))
+		# Opposite diagonal corners also compete for the same wall tile.
+		# Two adjacent cardinal faces provide the support of an ordinary concave cap.
+		var diagonal_conflict: bool = _face_count(mask) <= 1 and ((northwest and southeast) or (northeast and southwest))
+		if (left and right) or (up and down) or diagonal_conflict:
+			mask |= (16 if northwest else 0) | (32 if northeast else 0) | (64 if southwest else 0) | (128 if southeast else 0)
 			conflicts[cell] = mask
 	return conflicts
 
 func _face_count(mask: int) -> int:
 	var count: int = 0
-	for bit in [1, 2, 4, 8]:
+	for bit in [1, 2, 4, 8, 16, 32, 64, 128]:
 		if mask & bit:
 			count += 1
 	return count
@@ -476,7 +483,7 @@ func _contour_change_error(proposed: Dictionary) -> String:
 			var old_mask: int = int(previous[key])
 			if old_mask == mask or _face_count(mask) < _face_count(old_mask):
 				continue
-		return "Esse desenho cria duas faces opostas na mesma parede. Alargue ou feche o espaço."
+		return "Esse desenho sobrepõe faces ou cantos opostos na mesma parede. Alargue ou feche o espaço."
 	return ""
 
 func _house_layout_error(cells: Dictionary) -> String:
