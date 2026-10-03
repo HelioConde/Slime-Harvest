@@ -7,7 +7,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export_range(1, 100) var material_limit: int = 25
-@export_range(0, 8) var roof_bottom_inset_px: int = 4
+@export_range(0, 8) var roof_bottom_inset_px: int = 0
 
 @onready var player: CharacterBody2D = get_node_or_null(player_path) as CharacterBody2D
 @onready var ground: TileMapLayer = get_node_or_null(ground_path) as TileMapLayer
@@ -72,19 +72,14 @@ func _make_roof_terrain() -> void:
 	# over the transparent padding or extending the border colour.
 	for tile_x in range(3):
 		var first := 16
-		var last := -1
 		for y in range(16):
 			for x in range(16):
 				if original.get_pixel(tile_x * 16 + x, y).a > 0:
 					first = mini(first, y)
-				if original.get_pixel(tile_x * 16 + x, 64 + y).a > 0:
-					last = maxi(last, y)
 		image.blit_rect(original, Rect2i(tile_x * 16, 16, 16, 16), Vector2i(tile_x * 16, 0))
 		if first < 16:
 			image.blit_rect(original, Rect2i(tile_x * 16, first, 16, 16 - first), Vector2i(tile_x * 16, 0))
-		image.blit_rect(original, Rect2i(tile_x * 16, 48, 16, 16), Vector2i(tile_x * 16, 64))
-		if last >= 0:
-			image.blit_rect(original, Rect2i(tile_x * 16, 64, 16, last + 1), Vector2i(tile_x * 16, 79 - last))
+		# Keep the original lower edge: its transparent area reveals the front wall.
 	# Concave top pieces must use the same edge height as the straight top.
 	var top_padding: int = 16
 	for y in range(16):
@@ -480,9 +475,7 @@ func _add_roof_overhang(cell: Vector2i, atlas: Vector2i) -> void:
 		var edge := Sprite2D.new()
 		edge.texture = texture
 		edge.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		var edge_y: float = direction.y * 8.5
-		if direction == Vector2i.DOWN:
-			edge_y -= clampi(roof_bottom_inset_px, 0, 8)
+		var edge_y: float = float(row) - 8.5 if direction == Vector2i.UP else float(row) - 6.5
 		edge.position = roof.map_to_local(cell) + Vector2(0, edge_y)
 		roof.add_child(edge)
 
