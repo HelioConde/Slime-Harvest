@@ -435,23 +435,15 @@ func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
 	status.text = "Área removida; materiais devolvidos. Salve para guardar."
 
 func _curve_add_error(cell: Vector2i, addition: Dictionary) -> String:
-	# Restrict only a new vertical turn on the top/bottom edge.
-	# Lateral painting and repairs must not be blocked by existing narrow corners.
+	# Closing a complete courtyard is a single valid operation.
 	if addition.size() != 1:
 		return ""
-	if footprint.has(cell + Vector2i.LEFT) or footprint.has(cell + Vector2i.RIGHT):
-		return ""
-	for vertical in [Vector2i.UP, Vector2i.DOWN]:
-		var pivot: Vector2i = cell + vertical
-		if not footprint.has(pivot):
-			continue
-		for horizontal in [Vector2i.LEFT, Vector2i.RIGHT]:
-			if not footprint.has(pivot + horizontal):
-				continue
-			if footprint.has(cell + horizontal):
-				continue
-			if not footprint.has(pivot + horizontal * 2):
-				return "Na curva da parede de cima ou de baixo, avance dois blocos na horizontal antes de virar."
+	# Use the actual generated corner tile, including the front-wall layer.
+	var atlas: Vector2i = walls.get_cell_atlas_coords(cell)
+	if atlas == Vector2i(-1, -1):
+		atlas = front_walls.get_cell_atlas_coords(cell)
+	if (atlas.x == 3 or atlas.x == 4) and (atlas.y == 0 or atlas.y == 1):
+		return "Não construa sobre o canto interno da curva. Expanda por outra borda."
 	return ""
 
 func _house_layout_error(cells: Dictionary) -> String:
