@@ -346,10 +346,17 @@ func _house_layout_error(cells: Dictionary) -> String:
 					if not cells.has(next) and not checked.has(next):
 						checked[next] = true
 						queue.append(next)
-			var width: int = hole_high.x - hole_low.x + 1
-			var height: int = hole_high.y - hole_low.y + 1
-			if width != height or width < 2 or queue.size() != width * height:
-				return "Pátio interno: arraste um quadrado de pelo menos 2×2, deixando espaço para paredes e área verde."
+			# A 2x2 core is required; its boundary may grow freely afterwards.
+			var hole: Dictionary = {}
+			for cell in queue:
+				hole[cell] = true
+			var has_core: bool = false
+			for cell in queue:
+				if hole.has(cell + Vector2i.RIGHT) and hole.has(cell + Vector2i.DOWN) and hole.has(cell + Vector2i.ONE):
+					has_core = true
+					break
+			if not has_core:
+				return "Pátio interno precisa manter pelo menos um espaço 2×2. Depois, recorte em volta para ampliar."
 	return ""
 
 func _selected_cells() -> Dictionary:
