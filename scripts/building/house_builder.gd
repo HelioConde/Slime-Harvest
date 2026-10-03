@@ -348,8 +348,8 @@ func _house_layout_error(cells: Dictionary) -> String:
 						queue.append(next)
 			var width: int = hole_high.x - hole_low.x + 1
 			var height: int = hole_high.y - hole_low.y + 1
-			if width != height or width < 3 or queue.size() != width * height:
-				return "Pátio interno: arraste um quadrado de pelo menos 3×3, deixando espaço para paredes e área verde."
+			if width != height or width < 2 or queue.size() != width * height:
+				return "Pátio interno: arraste um quadrado de pelo menos 2×2, deixando espaço para paredes e área verde."
 	return ""
 
 func _selected_cells() -> Dictionary:
