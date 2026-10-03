@@ -7,7 +7,6 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export_range(1, 100) var material_limit: int = 25
-@export_range(0, 16) var roof_drop_pixels: int = 8
 
 @onready var player: CharacterBody2D = get_node_or_null(player_path) as CharacterBody2D
 @onready var ground: TileMapLayer = get_node_or_null(ground_path) as TileMapLayer
@@ -15,9 +14,10 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
-var perimeter: Node2D
+var wall_cells: Dictionary = {}
+var roof_cells: Dictionary = {}
+var brush := "Piso"
 var floor_layer: TileMapLayer
-var door_cells: Dictionary = {}
 var manually_hide_roof := false
 var footprint: Dictionary = {}
 var history: Array[Dictionary] = []
@@ -46,63 +46,21 @@ func _ready() -> void:
 	floor_layer.z_index = 4
 	floor_layer.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(floor_layer)
-	perimeter = Node2D.new()
-	perimeter.name = "InteriorWalls"
-	perimeter.z_index = 6
-	add_child(perimeter)
-	roof.position.y += roof_drop_pixels
+	roof.position = floor_layer.position
 	walls.tile_set = wall_tiles
 	_make_roof_terrain()
 	var texture := AtlasTexture.new()
 	texture.atlas = terrain_source.texture
-	texture.region = Rect2(15 * 16, 0, 16, 16)
+	texture.region = Rect2(16, 16, 16, 16)
 	texture.filter_clip = true
 	ghost.texture = texture
 	_build_ui()
 	ghost.hide()
 
 func _make_roof_terrain() -> void:
-	var original := roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
-	var source_image := original.texture.get_image()
-	var atlas_image := Image.create(16 * 16, 16, false, Image.FORMAT_RGBA8)
-	# The vertical roof at x=0..2 contains transparent margins and a ridge.
-	# Use the opaque horizontal roof filling instead; each neighbour pattern
-	# receives only the exterior trim, so interior cells join without seams.
-	var border := Color("69505c")
-	for mask in range(16):
-		var origin := Vector2i(mask * 16, 0)
-		atlas_image.blit_rect(source_image, Rect2i(64, 48, 16, 16), origin)
-		if (mask & 1) == 0:
-			atlas_image.blit_rect(source_image, Rect2i(64, 32, 16, 3), origin)
-			atlas_image.fill_rect(Rect2i(origin, Vector2i(16, 1)), border)
-		if (mask & 4) == 0:
-			atlas_image.blit_rect(source_image, Rect2i(64, 64, 16, 3), origin + Vector2i(0, 13))
-			atlas_image.fill_rect(Rect2i(origin + Vector2i(0, 15), Vector2i(16, 1)), border)
-		if (mask & 8) == 0:
-			atlas_image.fill_rect(Rect2i(origin, Vector2i(1, 16)), border)
-		if (mask & 2) == 0:
-			atlas_image.fill_rect(Rect2i(origin + Vector2i(15, 0), Vector2i(1, 16)), border)
-	var tiles := TileSet.new()
-	tiles.tile_size = Vector2i(16, 16)
-	tiles.add_terrain_set()
-	tiles.set_terrain_set_mode(0, TileSet.TERRAIN_MODE_MATCH_SIDES)
-	tiles.add_terrain(0)
-	tiles.set_terrain_name(0, 0, "Casa")
-	terrain_source = TileSetAtlasSource.new()
-	terrain_source.texture = ImageTexture.create_from_image(atlas_image)
-	terrain_source.texture_region_size = Vector2i(16, 16)
-	tiles.add_source(terrain_source, 0)
-	var peers: Array[int] = [TileSet.CELL_NEIGHBOR_TOP_SIDE, TileSet.CELL_NEIGHBOR_RIGHT_SIDE, TileSet.CELL_NEIGHBOR_BOTTOM_SIDE, TileSet.CELL_NEIGHBOR_LEFT_SIDE]
-	for mask in range(16):
-		var atlas := Vector2i(mask, 0)
-		terrain_source.create_tile(atlas)
-		var data := terrain_source.get_tile_data(atlas, 0)
-		data.terrain_set = 0
-		data.terrain = 0
-		for index in range(4):
-			data.set_terrain_peering_bit(peers[index], 0 if (mask & (1 << index)) != 0 else -1)
-	roof.tile_set = tiles
+	roof.tile_set = roof_tiles
 	roof.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	terrain_source = roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
 
 func _build_ui() -> void:
 	var canvas := CanvasLayer.new()
@@ -124,6 +82,10 @@ func _build_ui() -> void:
 	box.add_child(title)
 	balance = Label.new()
 	box.add_child(balance)
+	var brushes := HBoxContainer.new()
+	box.add_child(brushes)
+	for name in ["Piso", "Parede", "Telhado"]:
+		_button(brushes, name, _select_brush.bind(name))
 	var tools := HBoxContainer.new()
 	box.add_child(tools)
 	_button(tools, "Desfazer", _undo)
@@ -135,10 +97,10 @@ func _build_ui() -> void:
 	status = Label.new()
 	status.custom_minimum_size.x = 210
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.text = "Primeiro clique inicia sua casa."
+	status.text = "Escolha Piso, Parede ou Telhado."
 	box.add_child(status)
 	var help := Label.new()
-	help.text = "Esquerdo: pintar / expandir\nDireito: remover e devolver\nB / Esc: sair"
+	help.text = "Esquerdo: pintar / expandir\nDireito: apagar nesta camada\nB / Esc: sair"
 	box.add_child(help)
 	_refresh_balance()
 	panel.hide()
@@ -171,6 +133,7 @@ func _process(_delta: float) -> void:
 	var over_panel := panel.get_global_rect().has_point(get_viewport().get_mouse_position())
 	ghost.visible = not over_panel
 	ghost.global_position = floor_layer.to_global(floor_layer.map_to_local(cursor))
+	var selected := _selected_cells()
 	var reason := _add_reason(cursor)
 	ghost.modulate = Color(1, 1, 1, 0.6) if reason.is_empty() else Color(1, 0.3, 0.3, 0.6)
 	var button := 1 if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) else 2 if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else 0
@@ -182,184 +145,98 @@ func _process(_delta: float) -> void:
 	last_button = button
 	previous_cell = cursor
 	if button == 1:
-		if footprint.has(cursor):
+		if selected.has(cursor):
 			return
 		if not reason.is_empty():
 			status.text = reason
 			return
 		_remember()
-		footprint[cursor] = true
-		_rebuild()
-		status.text = "Área construída. Salve para guardar."
+		selected[cursor] = true
 	else:
-		if not footprint.has(cursor):
-			return
-		var next := footprint.duplicate()
-		next.erase(cursor)
-		if not _connected(next):
-			status.text = "Não pode separar a casa em duas partes."
-			return
-		if not _space_free(next):
-			status.text = "Libere o espaço das novas paredes."
+		if not selected.has(cursor):
 			return
 		_remember()
-		footprint = next
-		_rebuild()
-		status.text = "Célula removida: 1 material devolvido."
+		selected.erase(cursor)
+	_rebuild()
+	status.text = "%s atualizado. Salve para guardar." % brush
+
+func _selected_cells() -> Dictionary:
+	if brush == "Parede":
+		return wall_cells
+	if brush == "Telhado":
+		return roof_cells
+	return footprint
+
+func _select_brush(name: String) -> void:
+	brush = name
+	last_button = 0
+	status.text = "Pintando: %s" % name
+	var texture := ghost.texture as AtlasTexture
+	texture.atlas = terrain_source.texture if name == "Telhado" else (wall_tiles.get_source(wall_tiles.get_source_id(0)) as TileSetAtlasSource).texture
+	texture.region = Rect2(16, 16 if name != "Telhado" else 0, 16, 16)
+	_update_roof_visibility()
 
 func _add_reason(cell: Vector2i) -> String:
-	if footprint.has(cell):
+	if _selected_cells().has(cell):
 		return ""
-	if footprint.size() >= material_limit:
-		return "Materiais esgotados: limite de %d células." % material_limit
-	if not footprint.is_empty():
-		var adjacent := false
-		for direction in DIRECTIONS:
-			if footprint.has(cell + direction):
-				adjacent = true
-		if not adjacent:
-			return "Pinte ao lado da casa para expandir."
-	var next := footprint.duplicate()
-	next[cell] = true
-	if not _space_free(next):
-		return "Use solo livre, longe da água e dos objetos."
-	return ""
-
-func _connected(cells: Dictionary) -> bool:
-	if cells.is_empty():
-		return true
-	var pending: Array[Vector2i] = []
-	pending.append(cells.keys()[0])
-	var visited: Dictionary = {}
-	while not pending.is_empty():
-		var cell: Vector2i = pending.pop_back()
-		if visited.has(cell):
-			continue
-		visited[cell] = true
-		for direction in DIRECTIONS:
-			if cells.has(cell + direction) and not visited.has(cell + direction):
-				pending.append(cell + direction)
-	return visited.size() == cells.size()
-
-func _facade(cells: Dictionary) -> Dictionary:
-	var result: Dictionary = {}
-	for key in cells:
-		var cell: Vector2i = key
-		if cells.has(cell + Vector2i.DOWN):
-			continue
-		for y in range(1, 3):
-			var front := cell + Vector2i(0, y)
-			if not cells.has(front):
-				result[front] = Vector2i(1, y)
-	for key in result.keys():
-		var cell: Vector2i = key
-		var left := result.has(cell + Vector2i.LEFT)
-		var right := result.has(cell + Vector2i.RIGHT)
-		var x := 0 if not left and right else 2 if left and not right else 1
-		result[cell] = Vector2i(x, result[cell].y)
-	return result
-
-func _space_free(cells: Dictionary) -> bool:
-	var occupied := cells.duplicate()
-	for cell in _facade(cells):
-		occupied[cell] = true
-	var exclusions: Array[RID] = []
-	for body in bodies:
-		if is_instance_valid(body):
-			exclusions.append(body.get_rid())
-	var shape := RectangleShape2D.new()
-	shape.size = Vector2(14, 14)
-	for key in occupied:
-		var cell: Vector2i = key
-		var point := floor_layer.to_global(floor_layer.map_to_local(cell))
-		if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
-			return false
+	if brush == "Piso" and footprint.size() >= material_limit:
+		return "Materiais esgotados: limite de %d células de piso." % material_limit
+	var point := floor_layer.to_global(floor_layer.map_to_local(cell))
+	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
+		return "Pinte sobre o solo."
+	if brush == "Parede":
+		var shape := RectangleShape2D.new()
+		shape.size = Vector2(16, 16)
 		var query := PhysicsShapeQueryParameters2D.new()
 		query.shape = shape
 		query.transform = Transform2D(0, point)
-		query.collision_mask = 3
-		query.exclude = exclusions
+		query.collision_mask = 2
 		if not get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty():
-			return false
-	return true
+			return "Não coloque uma parede sobre o jogador."
+	return ""
 
 func _rebuild() -> void:
 	roof.clear()
 	walls.clear()
 	floor_layer.clear()
-	door_cells.clear()
-	for part in perimeter.get_children():
-		perimeter.remove_child(part)
-		part.queue_free()
 	for body in bodies:
 		body.collision_layer = 0
 		body.queue_free()
 	bodies.clear()
-	var cells: Array[Vector2i] = []
+	var wall_source := wall_tiles.get_source_id(0)
 	for cell in footprint:
-		cells.append(cell)
-	if not cells.is_empty():
-		var coverage: Dictionary = footprint.duplicate()
-		for cell in cells:
-			coverage[cell + Vector2i.UP] = true
-			coverage[cell + Vector2i.DOWN] = true
-		var roof_cells: Array[Vector2i] = []
-		for cell in coverage:
-			roof_cells.append(cell)
-		roof.set_cells_terrain_connect(roof_cells, 0, 0, false)
-	var facade := _facade(footprint)
-	var source := wall_tiles.get_source_id(0)
-	# One entrance at the lowest front edge; it moves with the footprint.
-	if not cells.is_empty():
-		var bottom := cells[0]
-		var mean_x := 0.0
-		for cell in cells:
-			mean_x += cell.x
-		mean_x /= cells.size()
-		for cell in cells:
-			if cell.y > bottom.y or cell.y == bottom.y and absf(cell.x - mean_x) < absf(bottom.x - mean_x):
-				bottom = cell
-		door_cells[bottom + Vector2i.DOWN] = true
-		door_cells[bottom + Vector2i.DOWN * 2] = true
-	for cell in cells:
-		floor_layer.set_cell(cell, source, Vector2i(1, 1))
-		for direction in [Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT]:
-			if not footprint.has(cell + direction):
-				_add_room_edge(cell, direction)
-
-	for cell in facade:
-		if door_cells.has(cell):
-			floor_layer.set_cell(cell, source, Vector2i(1, 1))
-			continue
-		walls.set_cell(cell, source, facade[cell])
+		floor_layer.set_cell(cell, wall_source, Vector2i(1, 1))
+	for key in wall_cells:
+		var cell: Vector2i = key
+		var left := wall_cells.has(cell + Vector2i.LEFT)
+		var right := wall_cells.has(cell + Vector2i.RIGHT)
+		var up := wall_cells.has(cell + Vector2i.UP)
+		var down := wall_cells.has(cell + Vector2i.DOWN)
+		var atlas := Vector2i(1, 0)
+		if up or down:
+			atlas = Vector2i(0 if not footprint.has(cell + Vector2i.LEFT) else 4, 1)
+			if right and not left:
+				atlas = Vector2i(0, 0 if down else 2)
+			elif left and not right:
+				atlas = Vector2i(4, 0 if down else 1)
+		walls.set_cell(cell, wall_source, atlas)
 		_add_block(cell)
-	_draw_interior_walls(facade)
+	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
+	# A single ridge spans the painted roof, rather than repeating every tile.
+	if not roof_cells.is_empty():
+		var min_y := 2147483647
+		var max_y := -2147483647
+		for cell in roof_cells:
+			min_y = mini(min_y, cell.y)
+			max_y = maxi(max_y, cell.y)
+		var ridge := floori((min_y + max_y) / 2.0)
+		for key in roof_cells:
+			var cell: Vector2i = key
+			var x := 0 if not roof_cells.has(cell + Vector2i.LEFT) else 2 if not roof_cells.has(cell + Vector2i.RIGHT) else 1
+			var y := 0 if not roof_cells.has(cell + Vector2i.UP) else 4 if not roof_cells.has(cell + Vector2i.DOWN) else 2 if cell.y == ridge else 1 if cell.y < ridge else 3
+			roof.set_cell(cell, roof_tiles.get_source_id(0), Vector2i(x, y))
 	_update_roof_visibility()
 	_refresh_balance()
-
-func _draw_interior_walls(facade: Dictionary) -> void:
-	# Outline the whole room, including the entrance corridor and stepped edges.
-	# Physics and roof visibility stay independent of these visible wall trims.
-	var room := footprint.duplicate()
-	for cell in facade:
-		room[cell] = true
-	for key in room:
-		var cell: Vector2i = key
-		var center := to_local(floor_layer.to_global(floor_layer.map_to_local(cell)))
-		for direction in DIRECTIONS:
-			if room.has(cell + direction):
-				continue
-			if direction == Vector2i.DOWN and door_cells.has(cell):
-				continue
-			var tangent := Vector2(8, 0) if direction.y != 0 else Vector2(0, 8)
-			var edge := center + Vector2(direction) * 8.0
-			for width in [6.0, 4.0]:
-				var line := Line2D.new()
-				line.points = PackedVector2Array([edge - tangent, edge + tangent])
-				line.width = width
-				line.default_color = Color("69505c") if width == 6.0 else Color("b78c62")
-				line.antialiased = false
-				perimeter.add_child(line)
 
 func _add_block(cell: Vector2i) -> void:
 	var body := StaticBody2D.new()
@@ -375,19 +252,17 @@ func _add_block(cell: Vector2i) -> void:
 	bodies.append(body)
 
 func _remember() -> void:
-	history.append(footprint.duplicate())
+	history.append({"floor": footprint.duplicate(), "walls": wall_cells.duplicate(), "roof": roof_cells.duplicate()})
 	if history.size() > 100:
 		history.pop_front()
 
 func _undo() -> void:
 	if history.is_empty():
 		return
-	var previous: Dictionary = history.back()
-	if not _space_free(previous):
-		status.text = "Libere o espaço antes de desfazer."
-		return
-	history.pop_back()
-	footprint = previous
+	var previous: Dictionary = history.pop_back()
+	footprint = previous.floor
+	wall_cells = previous.walls
+	roof_cells = previous.roof
 	_rebuild()
 	status.text = "Última pintura desfeita."
 
@@ -397,73 +272,69 @@ func _toggle_roof() -> void:
 
 func _update_roof_visibility() -> void:
 	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
-	var inside := footprint.has(cell) or door_cells.has(cell)
-	roof.visible = not manually_hide_roof and (building or not inside)
-
-func _add_room_edge(cell: Vector2i, direction: Vector2i) -> void:
-	var body := StaticBody2D.new()
-	body.collision_layer = 1
-	body.collision_mask = 2
-	body.position = floor_layer.map_to_local(cell) + Vector2(direction) * 8.0
-	var collider := CollisionShape2D.new()
-	var shape := RectangleShape2D.new()
-	shape.size = Vector2(16, 2) if direction == Vector2i.UP else Vector2(2, 16)
-	collider.shape = shape
-	body.add_child(collider)
-	floor_layer.add_child(body)
-	bodies.append(body)
+	var inside := footprint.has(cell) and not wall_cells.has(cell)
+	roof.visible = not manually_hide_roof and (brush == "Telhado" if building else not inside)
 
 func _refresh_balance() -> void:
-	balance.text = "Materiais: %d / %d" % [material_limit - footprint.size(), material_limit]
+	balance.text = "Piso: %d / %d materiais livres" % [material_limit - footprint.size(), material_limit]
+
+func _encode_cells(cells: Dictionary) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for cell in cells:
+		result.append({"x": cell.x, "y": cell.y})
+	return result
 
 func _save_house() -> void:
-	var cells: Array[Dictionary] = []
-	for cell in footprint:
-		cells.append({"x": cell.x, "y": cell.y})
 	var file := FileAccess.open(SAVE_PATH + ".tmp", FileAccess.WRITE)
 	if file == null:
 		status.text = "Não foi possível salvar."
 		return
-	file.store_string(JSON.stringify({"version": 1, "cells": cells}))
+	file.store_string(JSON.stringify({"version": 2, "floor": _encode_cells(footprint), "walls": _encode_cells(wall_cells), "roof": _encode_cells(roof_cells)}))
 	file.flush()
 	var error := file.get_error()
 	file.close()
 	if error == OK:
 		error = DirAccess.rename_absolute(SAVE_PATH + ".tmp", SAVE_PATH)
-	status.text = "Casa e materiais salvos." if error == OK else "Falha ao salvar."
+	status.text = "Três camadas salvas." if error == OK else "Falha ao salvar."
 
 func _load_house() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
-		status.text = "Ainda não há casa salva neste modo."
+		status.text = "Ainda não há casa salva."
 		return
 	if FileAccess.get_file_as_bytes(SAVE_PATH).size() > 65536:
 		status.text = "Arquivo inválido."
 		return
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
-	if not data is Dictionary or data.get("version") != 1 or not data.get("cells") is Array:
-		status.text = "Arquivo inválido."
+	if not data is Dictionary or data.get("version") != 2:
+		status.text = "Save antigo: redesenhe nas três camadas."
 		return
-	if data.cells.size() > material_limit:
-		status.text = "A casa ultrapassa os materiais disponíveis."
-		return
-	var next: Dictionary = {}
-	for entry in data.cells:
-		if not entry is Dictionary:
-			status.text = "Célula inválida."
+	var decoded: Dictionary = {}
+	for name in ["floor", "walls", "roof"]:
+		if not data.get(name) is Array or data[name].size() > 1024:
+			status.text = "Camada inválida."
 			return
-		for axis in ["x", "y"]:
-			if not entry.has(axis) or not (entry[axis] is int or entry[axis] is float) or float(entry[axis]) != floorf(float(entry[axis])) or absf(float(entry[axis])) > 4096:
-				status.text = "Coordenada inválida."
+		var cells: Dictionary = {}
+		for entry in data[name]:
+			if not entry is Dictionary:
 				return
-		var cell := Vector2i(int(entry.x), int(entry.y))
-		if next.has(cell):
-			status.text = "Célula repetida no arquivo."
-			return
-		next[cell] = true
-	if not _connected(next) or not _space_free(next):
-		status.text = "Casa desconectada ou espaço ocupado."
+			for axis in ["x", "y"]:
+				if not entry.get(axis) is float and not entry.get(axis) is int:
+					return
+				if not is_finite(float(entry[axis])) or float(entry[axis]) != floorf(float(entry[axis])) or absf(float(entry[axis])) > 4096:
+					return
+			cells[Vector2i(int(entry.x), int(entry.y))] = true
+		decoded[name] = cells
+	if decoded.floor.size() > material_limit:
+		status.text = "Piso ultrapassa o limite de materiais."
 		return
+	for cell in decoded.walls:
+		var player_cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
+		if cell == player_cell:
+			status.text = "Afaste o jogador da parede salva."
+			return
+	footprint = decoded.floor
+	wall_cells = decoded.walls
+	roof_cells = decoded.roof
 	history.clear()
-	footprint = next
 	_rebuild()
-	status.text = "Casa e saldo de materiais carregados."
+	status.text = "Três camadas carregadas."
