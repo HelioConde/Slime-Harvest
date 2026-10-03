@@ -404,6 +404,7 @@ func _rebuild() -> void:
 			walls.set_cell(cell, wall_source, Vector2i(4, 0))
 		elif left and up and not right and not down:
 			walls.set_cell(cell, wall_source, Vector2i(3, 0))
+	_add_front_windows(wall_source)
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
 	# A single ridge spans the painted roof, rather than repeating every tile.
 	if not roof_cells.is_empty():
@@ -430,6 +431,28 @@ func _rebuild() -> void:
 	_update_roof_visibility()
 	_refresh_tile_numbers()
 	_refresh_balance()
+
+func _add_front_windows(wall_source: int) -> void:
+	# Only straight front walls; doors and corners break each run.
+	var front_cells: Array[Vector2i] = []
+	for key in wall_cells:
+		var cell: Vector2i = key
+		if footprint.has(cell + Vector2i.UP) and not footprint.has(cell + Vector2i.DOWN) and walls.get_cell_atlas_coords(cell) == Vector2i(1, 2):
+			front_cells.append(cell)
+	front_cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return a.y < b.y or (a.y == b.y and a.x < b.x))
+	var group: Array[Vector2i] = []
+	var previous: Vector2i = Vector2i(2147483647, 2147483647)
+	for cell in front_cells:
+		if cell != previous + Vector2i.RIGHT:
+			group.clear()
+		group.append(cell)
+		previous = cell
+		if group.size() == 3:
+			var window_cell: Vector2i = group[1]
+			floor_layer.set_cell(window_cell, wall_source, Vector2i(1, 1))
+			walls.set_cell(window_cell, wall_source, Vector2i(3, 2))
+			group.clear()
 
 func _refresh_tile_numbers() -> void:
 	for layer: TileMapLayer in [floor_layer, walls, roof]:
