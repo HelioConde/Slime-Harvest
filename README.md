@@ -4,7 +4,7 @@ Jogo de fazenda 2D inspirado em Stardew Valley, com cultivo, criação de slimes
 
 ## Estado inicial
 
-Projeto novo, criado do zero e independente do GameSlime antigo. Esta etapa organiza apenas as pastas; a engine e sua versão ainda precisam ser definidas. Ainda não há jogo executável.
+Projeto novo, criado do zero e independente do GameSlime antigo. Projeto Godot 4.7, conforme project.godot enviado pelo proprietário. O Player está preparado para receber sprites: movimentação, corrida, colisão, câmera e animações direcionais. Ainda não há mapa de fazenda. Veja [como configurar os sprites e testar](docs/player_setup.md).
 
 ## Organização
 
@@ -24,7 +24,7 @@ Veja [a estrutura completa](docs/project_structure.md).
 
 ## Próxima etapa
 
-Definir a engine e criar o primeiro protótipo: movimentação, mapa pequeno e ciclo de preparar a terra, plantar, regar e colher.
+Adicionar os frames do Player e validar a cena com F6. Depois, criar um mapa pequeno e o ciclo de preparar a terra, plantar, regar e colher.
 
 ## Sincronização local
 
