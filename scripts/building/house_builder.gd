@@ -14,6 +14,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
+var roof_underlay: TileMapLayer
 var wall_cells: Dictionary = {}
 var roof_cells: Dictionary = {}
 var brush := "Piso"
@@ -59,6 +60,11 @@ func _ready() -> void:
 
 func _make_roof_terrain() -> void:
 	roof.tile_set = roof_tiles
+	roof_underlay = TileMapLayer.new()
+	roof_underlay.name = "CornerBacking"
+	roof_underlay.tile_set = roof_tiles
+	roof_underlay.z_index = -1
+	roof.add_child(roof_underlay)
 	roof.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	terrain_source = roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
 
@@ -218,6 +224,15 @@ func _wall_atlas(cell: Vector2i) -> Vector2i:
 	var down := wall_cells.has(cell + Vector2i.DOWN)
 	var inner_left := footprint.has(cell + Vector2i.LEFT)
 	var inner_right := footprint.has(cell + Vector2i.RIGHT)
+	# Concave corners: horizontal and vertical walls meet around the floor.
+	if up and left and footprint.has(cell + Vector2i(1, 1)) and not inner_left:
+		return Vector2i(2, 2)
+	if up and right and footprint.has(cell + Vector2i(-1, 1)) and not inner_right:
+		return Vector2i(0, 2)
+	if down and left and footprint.has(cell + Vector2i(1, -1)) and not inner_left:
+		return Vector2i(2, 0)
+	if down and right and footprint.has(cell + Vector2i(-1, -1)) and not inner_right:
+		return Vector2i(0, 0)
 	var x := 2 if inner_left and not inner_right else 0
 	if up or down:
 		if right and not left:
@@ -253,6 +268,7 @@ func _rebuild() -> void:
 		if not _supported(cell, "Telhado"):
 			roof_cells.erase(cell)
 	roof.clear()
+	roof_underlay.clear()
 	walls.clear()
 	floor_layer.clear()
 	for body in bodies:
@@ -277,7 +293,13 @@ func _rebuild() -> void:
 		var ridge := floori((min_y + max_y) / 2.0)
 		for key in roof_cells:
 			var cell: Vector2i = key
-			roof.set_cell(cell, roof_tiles.get_source_id(0), _roof_atlas(cell, ridge))
+			var atlas := _roof_atlas(cell, ridge)
+			if atlas.x >= 3:
+				# Junction pieces contain transparent pixels; preserve the slope
+				# beneath them instead of exposing the floor through the roof.
+				var slope := 2 if cell.y == ridge else 1 if cell.y < ridge else 3
+				roof_underlay.set_cell(cell, roof_tiles.get_source_id(0), Vector2i(1, slope))
+			roof.set_cell(cell, roof_tiles.get_source_id(0), atlas)
 	_update_roof_visibility()
 	_refresh_balance()
 
