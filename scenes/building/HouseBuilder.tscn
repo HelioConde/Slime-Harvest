@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/building/house_builder.gd" id="1_script"]
+[ext_resource type="TileSet" path="res://data/tilesets/palettes/14_Wooden_House_Walls_Tilset.tres" id="2_walls"]
+[ext_resource type="TileSet" path="res://data/tilesets/palettes/13_Wooden_House_Roof_Tilset.tres" id="3_roof"]
+
+[node name="HouseBuilder" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_script")
+wall_tiles = ExtResource("2_walls")
+roof_tiles = ExtResource("3_roof")
+
+[node name="Walls" type="TileMapLayer" parent="."]
+z_index = 5
+tile_set = ExtResource("2_walls")
+
+[node name="Roof" type="TileMapLayer" parent="."]
+z_index = 20
+tile_set = ExtResource("3_roof")
+
+[node name="Preview" type="Sprite2D" parent="."]
+z_index = 30
