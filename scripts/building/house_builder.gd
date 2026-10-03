@@ -59,14 +59,46 @@ func _ready() -> void:
 	ghost.hide()
 
 func _make_roof_terrain() -> void:
-	roof.tile_set = roof_tiles
+	# Make a private atlas so padding does not reveal the wall underneath.
+	# Keep the source asset and the manually painted world2 unchanged.
+	var source := roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
+	var image := source.texture.get_image().duplicate() as Image
+	for tile_x in range(3):
+		for x in range(16):
+			var column := tile_x * 16 + x
+			var first := -1
+			for y in range(16):
+				if image.get_pixel(column, y).a > 0.0:
+					first = y
+					break
+			if first >= 0:
+				var color := image.get_pixel(column, first)
+				for y in range(first):
+					image.set_pixel(column, y, color)
+			var last := -1
+			for y in range(79, 63, -1):
+				if image.get_pixel(column, y).a > 0.0:
+					last = y
+					break
+			if last >= 0:
+				var color := image.get_pixel(column, last)
+				for y in range(last + 1, 80):
+					image.set_pixel(column, y, color)
+	var private_tiles := TileSet.new()
+	private_tiles.tile_size = roof_tiles.tile_size
+	terrain_source = TileSetAtlasSource.new()
+	terrain_source.texture = ImageTexture.create_from_image(image)
+	terrain_source.texture_region_size = Vector2i(16, 16)
+	for index in range(source.get_tiles_count()):
+		terrain_source.create_tile(source.get_tile_id(index))
+	private_tiles.add_source(terrain_source, roof_tiles.get_source_id(0))
+	roof.tile_set = private_tiles
+	roof.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	roof_underlay = TileMapLayer.new()
 	roof_underlay.name = "CornerBacking"
-	roof_underlay.tile_set = roof_tiles
+	roof_underlay.tile_set = private_tiles
 	roof_underlay.z_index = -1
 	roof.add_child(roof_underlay)
-	roof.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	terrain_source = roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
 
 func _build_ui() -> void:
 	var canvas := CanvasLayer.new()
