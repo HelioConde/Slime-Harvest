@@ -411,6 +411,16 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			var corner: Vector2i = key
 			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
 				return component
+	# Expanded courtyards may have no valid single-tile intermediate state.
+	# Validate a complete closure instead of leaving an incompatible narrow gap.
+	var proposed: Dictionary = footprint.duplicate()
+	proposed[cell] = true
+	if not _house_layout_error(proposed).is_empty() or not _contour_change_error(proposed).is_empty():
+		var closed: Dictionary = footprint.duplicate()
+		for key in component:
+			closed[key] = true
+		if _house_layout_error(closed).is_empty() and _contour_change_error(closed).is_empty():
+			return component
 	return addition
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
@@ -595,11 +605,13 @@ func _add_reason(cell: Vector2i) -> String:
 		return ""
 	var addition: Dictionary = _floor_addition(cell) if brush == "Piso" else {cell: true}
 	if brush == "Piso" and footprint.size() + addition.size() > material_limit:
-		return "Materiais esgotados: limite de %d células de piso." % material_limit
+		return "Esta ação precisa de %d materiais; você tem %d disponíveis." % [addition.size(), maxi(0, material_limit - footprint.size())]
 	if brush == "Piso" and not footprint.is_empty():
 		var connected := false
-		for direction in DIRECTIONS:
-			connected = connected or footprint.has(cell + direction)
+		for key in addition:
+			var added_cell: Vector2i = key
+			for direction in DIRECTIONS:
+				connected = connected or footprint.has(added_cell + direction)
 		if not connected:
 			return "Expanda o piso ao lado da casa."
 	if brush != "Piso" and not _supported(cell, brush):
