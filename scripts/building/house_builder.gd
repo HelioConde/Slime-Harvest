@@ -7,6 +7,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export_range(1, 100) var material_limit: int = 25
+@export_range(0, 16) var roof_drop_pixels: int = 8
 
 @onready var player: CharacterBody2D = get_node_or_null(player_path) as CharacterBody2D
 @onready var ground: TileMapLayer = get_node_or_null(ground_path) as TileMapLayer
@@ -14,6 +15,9 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
+var floor_layer: TileMapLayer
+var door_cells: Dictionary = {}
+var manually_hide_roof := false
 var footprint: Dictionary = {}
 var history: Array[Dictionary] = []
 var bodies: Array[StaticBody2D] = []
@@ -34,6 +38,14 @@ func _ready() -> void:
 		set_process(false)
 		set_process_unhandled_key_input(false)
 		return
+	floor_layer = TileMapLayer.new()
+	floor_layer.name = "InteriorFloor"
+	floor_layer.tile_set = wall_tiles
+	floor_layer.position = roof.position
+	floor_layer.z_index = 4
+	floor_layer.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	add_child(floor_layer)
+	roof.position.y += roof_drop_pixels
 	walls.tile_set = wall_tiles
 	_make_roof_terrain()
 	var texture := AtlasTexture.new()
@@ -147,12 +159,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _process(_delta: float) -> void:
+	_update_roof_visibility()
 	if not building:
 		return
-	cursor = roof.local_to_map(roof.get_local_mouse_position())
+	cursor = floor_layer.local_to_map(floor_layer.get_local_mouse_position())
 	var over_panel := panel.get_global_rect().has_point(get_viewport().get_mouse_position())
 	ghost.visible = not over_panel
-	ghost.global_position = roof.to_global(roof.map_to_local(cursor))
+	ghost.global_position = floor_layer.to_global(floor_layer.map_to_local(cursor))
 	var reason := _add_reason(cursor)
 	ghost.modulate = Color(1, 1, 1, 0.6) if reason.is_empty() else Color(1, 0.3, 0.3, 0.6)
 	var button := 1 if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) else 2 if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else 0
@@ -253,7 +266,7 @@ func _space_free(cells: Dictionary) -> bool:
 	shape.size = Vector2(14, 14)
 	for key in occupied:
 		var cell: Vector2i = key
-		var point := roof.to_global(roof.map_to_local(cell))
+		var point := floor_layer.to_global(floor_layer.map_to_local(cell))
 		if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 			return false
 		var query := PhysicsShapeQueryParameters2D.new()
@@ -268,6 +281,8 @@ func _space_free(cells: Dictionary) -> bool:
 func _rebuild() -> void:
 	roof.clear()
 	walls.clear()
+	floor_layer.clear()
+	door_cells.clear()
 	for body in bodies:
 		body.collision_layer = 0
 		body.queue_free()
@@ -279,9 +294,31 @@ func _rebuild() -> void:
 		roof.set_cells_terrain_connect(cells, 0, 0, false)
 	var facade := _facade(footprint)
 	var source := wall_tiles.get_source_id(0)
+	# One entrance at the lowest front edge; it moves with the footprint.
+	if not cells.is_empty():
+		var bottom := cells[0]
+		var mean_x := 0.0
+		for cell in cells:
+			mean_x += cell.x
+		mean_x /= cells.size()
+		for cell in cells:
+			if cell.y > bottom.y or cell.y == bottom.y and absf(cell.x - mean_x) < absf(bottom.x - mean_x):
+				bottom = cell
+		door_cells[bottom + Vector2i.DOWN] = true
+		door_cells[bottom + Vector2i.DOWN * 2] = true
+	for cell in cells:
+		floor_layer.set_cell(cell, source, Vector2i(1, 1))
+		for direction in [Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT]:
+			if not footprint.has(cell + direction):
+				_add_room_edge(cell, direction)
+
 	for cell in facade:
+		if door_cells.has(cell):
+			floor_layer.set_cell(cell, source, Vector2i(1, 1))
+			continue
 		walls.set_cell(cell, source, facade[cell])
 		_add_block(cell)
+	_update_roof_visibility()
 	_refresh_balance()
 
 func _add_block(cell: Vector2i) -> void:
@@ -315,7 +352,26 @@ func _undo() -> void:
 	status.text = "Última pintura desfeita."
 
 func _toggle_roof() -> void:
-	roof.visible = not roof.visible
+	manually_hide_roof = not manually_hide_roof
+	_update_roof_visibility()
+
+func _update_roof_visibility() -> void:
+	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
+	var inside := footprint.has(cell) or door_cells.has(cell)
+	roof.visible = not manually_hide_roof and (building or not inside)
+
+func _add_room_edge(cell: Vector2i, direction: Vector2i) -> void:
+	var body := StaticBody2D.new()
+	body.collision_layer = 1
+	body.collision_mask = 2
+	body.position = floor_layer.map_to_local(cell) + Vector2(direction) * 8.0
+	var collider := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(16, 2) if direction == Vector2i.UP else Vector2(2, 16)
+	collider.shape = shape
+	body.add_child(collider)
+	floor_layer.add_child(body)
+	bodies.append(body)
 
 func _refresh_balance() -> void:
 	balance.text = "Materiais: %d / %d" % [material_limit - footprint.size(), material_limit]
