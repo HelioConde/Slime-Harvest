@@ -264,8 +264,88 @@ func _preview_removal(end: Vector2i) -> void:
 	var a: Vector2 = to_local(floor_layer.to_global(floor_layer.map_to_local(low) - Vector2(8, 8)))
 	var b: Vector2 = to_local(floor_layer.to_global(floor_layer.map_to_local(high) + Vector2(8, 8)))
 	removal_outline.points = PackedVector2Array([a, Vector2(b.x, a.y), b, Vector2(a.x, b.y), a])
+	var reason: String = _removal_reason(removal_start, end)
+	removal_outline.default_color = Color(0.2, 1.0, 0.3, 0.9) if reason.is_empty() else Color(1.0, 0.25, 0.2, 0.9)
+	status.text = "Solte para cortar." if reason.is_empty() else reason
+
+func _enclosed_empty_cells(cells: Dictionary) -> Dictionary:
+	if cells.is_empty():
+		return {}
+	var low: Vector2i = cells.keys()[0]
+	var high: Vector2i = low
+	for key in cells:
+		var cell: Vector2i = key
+		low = Vector2i(mini(low.x, cell.x), mini(low.y, cell.y))
+		high = Vector2i(maxi(high.x, cell.x), maxi(high.y, cell.y))
+	low -= Vector2i.ONE
+	high += Vector2i.ONE
+	var exterior: Dictionary = {low: true}
+	var queue: Array[Vector2i] = [low]
+	var index: int = 0
+	while index < queue.size():
+		var cell: Vector2i = queue[index]
+		index += 1
+		for direction in DIRECTIONS:
+			var next: Vector2i = cell + direction
+			if next.x < low.x or next.y < low.y or next.x > high.x or next.y > high.y:
+				continue
+			if not cells.has(next) and not exterior.has(next):
+				exterior[next] = true
+				queue.append(next)
+	var patios: Dictionary = {}
+	for y in range(low.y, high.y + 1):
+		for x in range(low.x, high.x + 1):
+			var cell: Vector2i = Vector2i(x, y)
+			if not cells.has(cell) and not exterior.has(cell):
+				patios[cell] = true
+	return patios
+
+func _removal_reason(start: Vector2i, end: Vector2i) -> String:
+	var low: Vector2i = Vector2i(mini(start.x, end.x), mini(start.y, end.y))
+	var high: Vector2i = Vector2i(maxi(start.x, end.x), maxi(start.y, end.y))
+	var width: int = high.x - low.x + 1
+	var height: int = high.y - low.y + 1
+	var cut: Array[Vector2i] = []
+	var proposed: Dictionary = footprint.duplicate()
+	for key in footprint:
+		var cell: Vector2i = key
+		if cell.x >= low.x and cell.x <= high.x and cell.y >= low.y and cell.y <= high.y:
+			cut.append(cell)
+			proposed.erase(cell)
+	if cut.is_empty():
+		return "Selecione uma área com piso."
+	var patios: Dictionary = _enclosed_empty_cells(footprint)
+	var touches_patio: bool = false
+	for cell in cut:
+		for direction in DIRECTIONS:
+			touches_patio = touches_patio or patios.has(cell + direction)
+	if touches_patio:
+		if cut.size() != 2 or not ((width == 2 and height == 1) or (width == 1 and height == 2)):
+			return "Amplie o pátio com uma faixa 2×1 ligada pelos dois tiles à borda."
+		var directions: Array[Vector2i] = [Vector2i.UP, Vector2i.DOWN] if width == 2 else [Vector2i.LEFT, Vector2i.RIGHT]
+		var attached: bool = false
+		for direction in directions:
+			if patios.has(cut[0] + direction) and patios.has(cut[1] + direction):
+				attached = true
+		if not attached:
+			return "Os dois tiles da faixa precisam encostar na mesma borda do pátio."
+		var expanded: Dictionary = _enclosed_empty_cells(proposed)
+		if not expanded.has(cut[0]) or not expanded.has(cut[1]):
+			return "Mantenha o pátio fechado pelas paredes da casa."
+	else:
+		var new_patios: Dictionary = _enclosed_empty_cells(proposed)
+		var creates_patio: bool = false
+		for cell in cut:
+			creates_patio = creates_patio or new_patios.has(cell)
+		if creates_patio and (width != height or width < 2 or cut.size() != width * height):
+			return "Para criar um pátio, selecione um quadrado de pelo menos 2×2."
+	return _house_layout_error(proposed)
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
+	var cut_error: String = _removal_reason(start, end)
+	if not cut_error.is_empty():
+		status.text = cut_error
+		return
 	var low: Vector2i = Vector2i(mini(start.x, end.x), mini(start.y, end.y))
 	var high: Vector2i = Vector2i(maxi(start.x, end.x), maxi(start.y, end.y))
 	var proposed: Dictionary = footprint.duplicate()
