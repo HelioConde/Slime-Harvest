@@ -362,7 +362,7 @@ func _rebuild() -> void:
 			floor_layer.set_cell(cell, wall_source, Vector2i(1, 1))
 		walls.set_cell(cell, wall_source, _wall_atlas(cell))
 		_add_block(cell)
-	# Resolve concave junctions after the vertical walls, without overwrites.
+	# Place concave caps at the junction; adjacent cells keep their ordinary walls.
 	for key in wall_cells:
 		var cell: Vector2i = key
 		var left := footprint.has(cell + Vector2i.LEFT)
@@ -370,17 +370,13 @@ func _rebuild() -> void:
 		var up := footprint.has(cell + Vector2i.UP)
 		var down := footprint.has(cell + Vector2i.DOWN)
 		if right and down and not left and not up:
-			walls.set_cell(cell, wall_source, Vector2i(1, 0))
-			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(4, 1))
+			walls.set_cell(cell, wall_source, Vector2i(4, 1))
 		elif left and down and not right and not up:
-			walls.set_cell(cell, wall_source, Vector2i(1, 0))
-			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(3, 1))
+			walls.set_cell(cell, wall_source, Vector2i(3, 1))
 		elif right and up and not left and not down:
-			walls.set_cell(cell, wall_source, Vector2i(1, 2))
-			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(4, 0))
+			walls.set_cell(cell, wall_source, Vector2i(4, 0))
 		elif left and up and not right and not down:
-			walls.set_cell(cell, wall_source, Vector2i(1, 2))
-			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(3, 0))
+			walls.set_cell(cell, wall_source, Vector2i(3, 0))
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
 	# A single ridge spans the painted roof, rather than repeating every tile.
 	if not roof_cells.is_empty():
