@@ -260,15 +260,11 @@ func _wall_atlas(cell: Vector2i) -> Vector2i:
 	var right := footprint.has(cell + Vector2i.RIGHT)
 	var up := footprint.has(cell + Vector2i.UP)
 	var down := footprint.has(cell + Vector2i.DOWN)
-	# Inner joins use the opposite vertical corner row, as in the wall atlas.
-	if right and down and not left and not up:
-		return Vector2i(0, 2)
-	if left and down and not right and not up:
-		return Vector2i(2, 2)
-	if right and up and not left and not down:
-		return Vector2i(0, 0)
-	if left and up and not right and not down:
-		return Vector2i(2, 0)
+	# Shifted corners are placed after the ordinary wall cells.
+	if (right or left) and down and not up:
+		return Vector2i(1, 0)
+	if (right or left) and up and not down:
+		return Vector2i(1, 2)
 	if right and not left:
 		return Vector2i(0, 1)
 	if left and not right:
@@ -366,6 +362,25 @@ func _rebuild() -> void:
 			floor_layer.set_cell(cell, wall_source, Vector2i(1, 1))
 		walls.set_cell(cell, wall_source, _wall_atlas(cell))
 		_add_block(cell)
+	# Resolve concave junctions after the vertical walls, without overwrites.
+	for key in wall_cells:
+		var cell: Vector2i = key
+		var left := footprint.has(cell + Vector2i.LEFT)
+		var right := footprint.has(cell + Vector2i.RIGHT)
+		var up := footprint.has(cell + Vector2i.UP)
+		var down := footprint.has(cell + Vector2i.DOWN)
+		if right and down and not left and not up:
+			walls.set_cell(cell, wall_source, Vector2i(1, 0))
+			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(2, 2))
+		elif left and down and not right and not up:
+			walls.set_cell(cell, wall_source, Vector2i(1, 0))
+			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(0, 2))
+		elif right and up and not left and not down:
+			walls.set_cell(cell, wall_source, Vector2i(1, 2))
+			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(2, 0))
+		elif left and up and not right and not down:
+			walls.set_cell(cell, wall_source, Vector2i(1, 2))
+			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(0, 0))
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
 	# A single ridge spans the painted roof, rather than repeating every tile.
 	if not roof_cells.is_empty():
