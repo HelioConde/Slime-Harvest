@@ -1,0 +1,109 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/world.gd" id="1_world"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/world/decoration.gd" id="3_decoration"]
+
+[node name="World" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1_world")
+
+[node name="Actors" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Player" parent="Actors" instance=ExtResource("2_player")]
+position = Vector2(648, 352)
+
+[node name="Camera2D" parent="Actors/Player" index="2"]
+limit_left = 0
+limit_top = 0
+limit_right = 1280
+limit_bottom = 960
+position_smoothing_enabled = false
+
+[node name="Tree1" type="Node2D" parent="Actors"]
+position = Vector2(128, 144)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree2" type="Node2D" parent="Actors"]
+position = Vector2(224, 128)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree3" type="Node2D" parent="Actors"]
+position = Vector2(368, 160)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree4" type="Node2D" parent="Actors"]
+position = Vector2(688, 128)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree5" type="Node2D" parent="Actors"]
+position = Vector2(800, 160)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree6" type="Node2D" parent="Actors"]
+position = Vector2(1152, 160)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree7" type="Node2D" parent="Actors"]
+position = Vector2(112, 400)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree8" type="Node2D" parent="Actors"]
+position = Vector2(144, 640)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree9" type="Node2D" parent="Actors"]
+position = Vector2(240, 784)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree10" type="Node2D" parent="Actors"]
+position = Vector2(752, 736)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree11" type="Node2D" parent="Actors"]
+position = Vector2(1040, 704)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Tree12" type="Node2D" parent="Actors"]
+position = Vector2(1152, 816)
+script = ExtResource("3_decoration")
+kind = 0
+
+[node name="Rock1" type="Node2D" parent="Actors"]
+position = Vector2(208, 320)
+script = ExtResource("3_decoration")
+kind = 1
+
+[node name="Rock2" type="Node2D" parent="Actors"]
+position = Vector2(736, 352)
+script = ExtResource("3_decoration")
+kind = 1
+
+[node name="Rock3" type="Node2D" parent="Actors"]
+position = Vector2(816, 560)
+script = ExtResource("3_decoration")
+kind = 1
+
+[node name="Rock4" type="Node2D" parent="Actors"]
+position = Vector2(928, 640)
+script = ExtResource("3_decoration")
+kind = 1
+
+[node name="Rock5" type="Node2D" parent="Actors"]
+position = Vector2(432, 768)
+script = ExtResource("3_decoration")
+kind = 1
+
+[editable path="Actors/Player"]
