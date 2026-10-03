@@ -72,18 +72,16 @@ func _make_roof_terrain() -> void:
 					first = y
 					break
 			if first >= 0:
-				var color := image.get_pixel(column, first)
 				for y in range(first):
-					image.set_pixel(column, y, color)
+					image.set_pixel(column, y, source.texture.get_image().get_pixel(16 + x, 16 + y))
 			var last := -1
 			for y in range(79, 63, -1):
 				if image.get_pixel(column, y).a > 0.0:
 					last = y
 					break
 			if last >= 0:
-				var color := image.get_pixel(column, last)
 				for y in range(last + 1, 80):
-					image.set_pixel(column, y, color)
+					image.set_pixel(column, y, source.texture.get_image().get_pixel(16 + x, 48 + y - 64))
 	var private_tiles := TileSet.new()
 	private_tiles.tile_size = roof_tiles.tile_size
 	terrain_source = TileSetAtlasSource.new()
@@ -296,6 +294,19 @@ func _rebuild() -> void:
 	for cell in wall_cells.keys():
 		if not _supported(cell, "Parede"):
 			wall_cells.erase(cell)
+	# Close only diagonal wall junctions, leaving straight entrance gaps open.
+	var junctions: Dictionary = {}
+	for wall in wall_cells:
+		for direction in DIRECTIONS:
+			var cell: Vector2i = wall + direction
+			if wall_cells.has(cell) or footprint.has(cell) or not _supported(cell, "Parede"):
+				continue
+			var horizontal := wall_cells.has(cell + Vector2i.LEFT) or wall_cells.has(cell + Vector2i.RIGHT)
+			var vertical := wall_cells.has(cell + Vector2i.UP) or wall_cells.has(cell + Vector2i.DOWN)
+			if horizontal and vertical:
+				junctions[cell] = true
+	for cell in junctions:
+		wall_cells[cell] = true
 	# Coverage is derived; it never needs a roof brush or extra materials.
 	roof_cells = footprint.duplicate()
 	for cell in wall_cells:
