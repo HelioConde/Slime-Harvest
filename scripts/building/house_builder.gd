@@ -430,9 +430,30 @@ func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
 	_rebuild()
 	status.text = "Área removida; materiais devolvidos. Salve para guardar."
 
+func _curve_layout_error(cells: Dictionary) -> String:
+	# A one-tile elbow has two perpendicular neighbours but no inner support.
+	# Straight provisional extensions remain possible; turns need two tiles of width.
+	for key in cells:
+		var cell: Vector2i = key
+		var neighbours: Array[Vector2i] = []
+		for direction in DIRECTIONS:
+			if cells.has(cell + direction):
+				neighbours.append(direction)
+		if neighbours.size() != 2:
+			continue
+		var diagonal: Vector2i = neighbours[0] + neighbours[1]
+		if diagonal == Vector2i.ZERO:
+			continue
+		if not cells.has(cell + diagonal):
+			return "Nas curvas, mantenha pelo menos dois blocos de largura no piso."
+	return ""
+
 func _house_layout_error(cells: Dictionary) -> String:
 	if cells.is_empty():
 		return ""
+	var curve_error: String = _curve_layout_error(cells)
+	if not curve_error.is_empty():
+		return curve_error
 	# The remaining floor must still form one connected house.
 	var first: Vector2i = cells.keys()[0]
 	var visited: Dictionary = {first: true}
