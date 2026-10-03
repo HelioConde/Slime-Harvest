@@ -1,5 +1,6 @@
 [gd_scene format=4 uid="uid://dy8e7rclxsk6i"]
 
+[ext_resource type="PackedScene" path="res://scenes/building/HouseBuilder.tscn" id="1_1druj"]
 [ext_resource type="TileSet" uid="uid://d2u83cq3s7ay3" path="res://data/tilesets/world_tileset.tres" id="1_7o7oy"]
 [ext_resource type="PackedScene" uid="uid://e41u5bfsawlk" path="res://scenes/player/Player.tscn" id="2_1druj"]
 
@@ -8,6 +9,10 @@
 [node name="Actors" type="Node2D" parent="." unique_id=564082091]
 
 [node name="Map" type="Node2D" parent="Actors" unique_id=1658055105]
+
+[node name="HouseBuilder" parent="Actors/Map" unique_id=277812168 instance=ExtResource("1_1druj")]
+player_path = NodePath("../../Player")
+ground_path = NodePath("../grass2")
 
 [node name="water" type="TileMapLayer" parent="Actors/Map" unique_id=222847836]
 z_index = -1
