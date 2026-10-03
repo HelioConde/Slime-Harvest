@@ -18,7 +18,6 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var ghost: Sprite2D = $Preview
 
 var entrance_door: AutomaticDoor
-var show_tile_numbers := false
 var entrance_cell := Vector2i(99999, 99999)
 var front_walls: TileMapLayer
 var roof_underlay: TileMapLayer
@@ -33,10 +32,8 @@ var history: Array[Dictionary] = []
 var bodies: Array[StaticBody2D] = []
 var building := false
 var previous_controls := true
-var panel: PanelContainer
 var balance: Label
 var status: Label
-var hint: Label
 var cursor := Vector2i(99999, 99999)
 var last_button := 0
 var terrain_source: TileSetAtlasSource
@@ -141,57 +138,51 @@ func _build_ui() -> void:
 	var canvas := CanvasLayer.new()
 	canvas.layer = 20
 	add_child(canvas)
-	hint = Label.new()
-	hint.text = "B: construir (%d materiais) | N: números" % material_limit
-	hint.position = Vector2(8, 8)
-	hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	canvas.add_child(hint)
-	panel = PanelContainer.new()
-	panel.position = Vector2(8, 8)
-	panel.custom_minimum_size = Vector2(210, 0)
-	canvas.add_child(panel)
-	var box := VBoxContainer.new()
-	panel.add_child(box)
-	var title := Label.new()
-	title.text = "Construir casa"
-	box.add_child(title)
+	var tooltip := VBoxContainer.new()
+	tooltip.name = "ConstructionCursor"
+	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(tooltip)
 	balance = Label.new()
-	box.add_child(balance)
-	var brushes := HBoxContainer.new()
-	box.add_child(brushes)
-	for name in ["Piso"]:
-		_button(brushes, name, _select_brush.bind(name))
-	var tools := HBoxContainer.new()
-	box.add_child(tools)
-	_button(tools, "Desfazer", _undo)
-	_button(tools, "Ver telhado", _toggle_roof)
-	var storage := HBoxContainer.new()
-	box.add_child(storage)
-	_button(storage, "Salvar", _save_house)
-	_button(storage, "Carregar", _load_house)
+	balance.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tooltip.add_child(balance)
 	status = Label.new()
-	status.custom_minimum_size.x = 210
+	status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	status.custom_minimum_size.x = 220
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.text = "Pinte o piso; paredes e telhado automáticos."
-	box.add_child(status)
-	var help := Label.new()
-	help.text = "Esquerdo: pintar / expandir\nDireito: arrastar área para apagar\nB / Esc: sair"
-	box.add_child(help)
+	tooltip.add_child(status)
+	for label: Label in [balance, status]:
+		label.add_theme_font_size_override("font_size", 12)
+		label.add_theme_constant_override("outline_size", 3)
+		label.add_theme_color_override("font_outline_color", Color.BLACK)
+	tooltip.hide()
 	_refresh_balance()
-	panel.hide()
 
-func _button(parent: Node, text: String, action: Callable) -> void:
-	var button := Button.new()
-	button.text = text
-	button.pressed.connect(action)
-	parent.add_child(button)
+func _update_cursor_ui() -> void:
+	var tooltip := balance.get_parent() as Control
+	tooltip.visible = building
+	if not building:
+		return
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var position_hint: Vector2 = get_viewport().get_mouse_position() + Vector2(16, 20)
+	tooltip.position = Vector2(clampf(position_hint.x, 0.0, maxf(0.0, viewport_size.x - tooltip.size.x)), clampf(position_hint.y, 0.0, maxf(0.0, viewport_size.y - tooltip.size.y)))
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	if event.physical_keycode == KEY_N:
-		show_tile_numbers = not show_tile_numbers
-		_refresh_tile_numbers()
+	# Construction tools remain available without a fixed panel.
+	if building and event.ctrl_pressed:
+		if event.physical_keycode == KEY_Z:
+			_undo()
+		elif event.physical_keycode == KEY_S:
+			_save_house()
+		elif event.physical_keycode == KEY_L:
+			_load_house()
+		else:
+			return
+		get_viewport().set_input_as_handled()
+		return
+	if building and event.physical_keycode == KEY_R:
+		_toggle_roof()
 		get_viewport().set_input_as_handled()
 		return
 	if event.physical_keycode == KEY_B or building and event.physical_keycode == KEY_ESCAPE:
@@ -204,8 +195,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		removing_area = false
 		removal_outline.clear_points()
 		player.call("set_controls_enabled", false if building else previous_controls)
-		panel.visible = building
-		hint.visible = not building
+		_update_cursor_ui()
 		ghost.visible = building
 		last_button = 0
 		get_viewport().set_input_as_handled()
@@ -213,15 +203,15 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	entrance_door.construction_mode = building
 	_update_roof_visibility()
+	_update_cursor_ui()
 	if not building:
 		return
 	cursor = floor_layer.local_to_map(floor_layer.get_local_mouse_position())
-	var over_panel := panel.get_global_rect().has_point(get_viewport().get_mouse_position())
-	ghost.visible = not over_panel
+	ghost.visible = true
 	ghost.global_position = floor_layer.to_global(floor_layer.map_to_local(cursor))
 	var right_pressed: bool = Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
 	if right_pressed:
-		if not removing_area and not over_panel:
+		if not removing_area:
 			removing_area = true
 			removal_start = cursor
 		if removing_area:
@@ -230,16 +220,18 @@ func _process(_delta: float) -> void:
 	if removing_area:
 		removing_area = false
 		removal_outline.clear_points()
-		if not over_panel:
-			_remove_floor_area(removal_start, cursor)
+		_remove_floor_area(removal_start, cursor)
 		return
 	var selected := _selected_cells()
-	var reason := _add_reason(cursor)
+	var addition: Dictionary = {} if selected.has(cursor) else _floor_addition(cursor)
+	var reason: String = _add_reason(cursor, addition)
+	_refresh_balance()
+	if not addition.is_empty():
+		balance.text += " | Custo: %d" % addition.size()
 	ghost.modulate = Color(1, 1, 1, 0.6) if reason.is_empty() else Color(1, 0.3, 0.3, 0.6)
-	if not over_panel and not reason.is_empty():
-		status.text = reason
+	status.text = reason
 	var button := 1 if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) else 2 if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else 0
-	if button == 0 or over_panel:
+	if button == 0:
 		last_button = 0
 		return
 	if button == last_button and cursor == previous_cell:
@@ -254,7 +246,6 @@ func _process(_delta: float) -> void:
 			return
 		_remember()
 		if brush == "Piso":
-			var addition: Dictionary = _floor_addition(cursor)
 			for key in addition:
 				footprint[key] = true
 		else:
@@ -409,14 +400,9 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 	# Never auto-grow outside the existing house bounds or change unrelated old joins.
 	for iteration in range(1024):
 		var pending: Dictionary = {}
-		var conflicts: Dictionary = _wall_conflicts(proposed)
+		var conflicts: Dictionary = _new_wall_conflicts(proposed, previous)
 		for key in conflicts:
 			var edge: Vector2i = key
-			var mask: int = int(conflicts[key])
-			if previous.has(edge):
-				var old_mask: int = int(previous[edge])
-				if old_mask == mask or _face_count(mask) < _face_count(old_mask):
-					continue
 			if edge.x < low.x or edge.y < low.y or edge.x > high.x or edge.y > high.y:
 				continue
 			pending[edge] = true
@@ -431,15 +417,7 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			var candidate: Vector2i = key
 			var trial: Dictionary = proposed.duplicate()
 			trial[candidate] = true
-			var remaining: Dictionary = _wall_conflicts(trial)
-			var score: int = 0
-			for conflict_cell in remaining:
-				var trial_mask: int = int(remaining[conflict_cell])
-				if previous.has(conflict_cell):
-					var old_mask: int = int(previous[conflict_cell])
-					if old_mask == trial_mask or _face_count(trial_mask) < _face_count(old_mask):
-						continue
-				score += 1
+			var score: int = _new_wall_conflicts(trial, previous).size()
 			var distance: int = absi(candidate.x - cell.x) + absi(candidate.y - cell.y)
 			if score < best_score or (score == best_score and (distance < best_distance or (distance == best_distance and (candidate.y < best.y or (candidate.y == best.y and candidate.x < best.x))))):
 				best = candidate
@@ -562,16 +540,20 @@ func _face_count(mask: int) -> int:
 			count += 1
 	return count
 
-func _contour_change_error(proposed: Dictionary) -> String:
-	var previous: Dictionary = _wall_conflicts(footprint)
-	var conflicts: Dictionary = _wall_conflicts(proposed)
+func _new_wall_conflicts(cells: Dictionary, previous: Dictionary) -> Dictionary:
+	var conflicts: Dictionary = _wall_conflicts(cells)
+	var result: Dictionary = {}
 	for key in conflicts:
 		var mask: int = int(conflicts[key])
-		# Existing bad joins must not prevent unrelated work or repairs.
 		if previous.has(key):
 			var old_mask: int = int(previous[key])
 			if old_mask == mask or _face_count(mask) < _face_count(old_mask):
 				continue
+		result[key] = mask
+	return result
+
+func _contour_change_error(proposed: Dictionary) -> String:
+	if not _new_wall_conflicts(proposed, _wall_conflicts(footprint)).is_empty():
 		return "Esse desenho sobrepõe faces ou cantos opostos na mesma parede. Alargue ou feche o espaço."
 	return ""
 
@@ -679,10 +661,9 @@ func _has_house_space(floor_cell: Vector2i) -> bool:
 				return false
 	return true
 
-func _add_reason(cell: Vector2i) -> String:
+func _add_reason(cell: Vector2i, addition: Dictionary) -> String:
 	if _selected_cells().has(cell):
 		return ""
-	var addition: Dictionary = _floor_addition(cell) if brush == "Piso" else {cell: true}
 	if brush == "Piso" and footprint.size() + addition.size() > material_limit:
 		return "Esta ação precisa de %d materiais; você tem %d disponíveis." % [addition.size(), maxi(0, material_limit - footprint.size())]
 	if brush == "Piso" and not footprint.is_empty():
@@ -893,7 +874,6 @@ func _rebuild() -> void:
 		entrance_door.position = to_local(floor_layer.to_global(floor_layer.map_to_local(entrance_cell)))
 		floor_layer.set_cell(entrance_cell, wall_source, Vector2i(1, 1))
 	_update_roof_visibility()
-	_refresh_tile_numbers()
 	_refresh_balance()
 
 func _add_roof_chimney() -> void:
@@ -938,35 +918,6 @@ func _add_front_windows(wall_source: int) -> void:
 			floor_layer.set_cell(window_cell, wall_source, Vector2i(1, 1))
 			walls.set_cell(window_cell, wall_source, Vector2i(3, 2))
 			group.clear()
-
-func _refresh_tile_numbers() -> void:
-	for layer: TileMapLayer in [floor_layer, walls, front_walls, roof]:
-		var previous: Node = layer.get_node_or_null("TileNumbers")
-		if previous != null:
-			layer.remove_child(previous)
-			previous.queue_free()
-		if not show_tile_numbers:
-			continue
-		var overlay := Node2D.new()
-		overlay.name = "TileNumbers"
-		overlay.z_index = 100
-		layer.add_child(overlay)
-		var prefix: String = "P" if layer == floor_layer else "W" if layer == walls or layer == front_walls else "T"
-		var cells: Array[Vector2i] = layer.get_used_cells()
-		cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.y < b.y or a.y == b.y and a.x < b.x)
-		var index := 0
-		for cell in cells:
-			index += 1
-			var atlas: Vector2i = layer.get_cell_atlas_coords(cell)
-			var label := Label.new()
-			label.text = "%s%d\n%d,%d" % [prefix, index, atlas.x, atlas.y]
-			label.position = layer.map_to_local(cell) - Vector2(8, 8)
-			label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			label.add_theme_font_size_override("font_size", 7)
-			label.add_theme_constant_override("outline_size", 2)
-			label.add_theme_color_override("font_outline_color", Color.BLACK)
-			label.add_theme_color_override("font_color", Color.YELLOW if layer == walls or layer == front_walls else Color.WHITE)
-			overlay.add_child(label)
 
 func _add_roof_overhang(cell: Vector2i, atlas: Vector2i) -> void:
 	# Exactly one screen-world pixel outside the upper/lower wall boundary.
@@ -1041,7 +992,7 @@ func _update_roof_visibility() -> void:
 	roof.modulate.a = (1.0 if preview_roof else construction_roof_opacity) if building else 1.0
 
 func _refresh_balance() -> void:
-	balance.text = "Piso: %d / %d materiais livres" % [material_limit - footprint.size(), material_limit]
+	balance.text = "Materiais restantes: %d / %d" % [maxi(0, material_limit - footprint.size()), material_limit]
 
 func _encode_cells(cells: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
