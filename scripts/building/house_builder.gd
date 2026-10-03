@@ -102,17 +102,6 @@ func _make_roof_terrain() -> void:
 			var bottom_tile: Image = image.get_region(Rect2i(tile_x * 16, 64, 16, 16))
 			image.fill_rect(Rect2i(tile_x * 16, 64, 16, 16), Color.TRANSPARENT)
 			image.blit_rect(bottom_tile, Rect2i(0, bottom_inset, 16, 16 - bottom_inset), Vector2i(tile_x * 16, 64))
-	# Lower concave corners follow the same edge height as the straight eave.
-	var lower_edge_last: int = -1
-	for y in range(16):
-		for x in range(16):
-			if original.get_pixel(16 + x, 64 + y).a > 0.0:
-				lower_edge_last = maxi(lower_edge_last, y)
-	if lower_edge_last >= 0:
-		var lower_corner_shift: int = maxi(0, 15 - lower_edge_last - bottom_inset)
-		for corner_x in [3, 4]:
-			image.blit_rect(original, Rect2i(16, 48, 16, 16), Vector2i(corner_x * 16, 16))
-			image.blit_rect(original, Rect2i(corner_x * 16, 16, 16, 16 - lower_corner_shift), Vector2i(corner_x * 16, 16 + lower_corner_shift))
 	var private_tiles := TileSet.new()
 	private_tiles.tile_size = roof_tiles.tile_size
 	terrain_source = TileSetAtlasSource.new()
@@ -320,10 +309,6 @@ func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 	var right := roof_cells.has(cell + Vector2i.RIGHT)
 	var up := roof_cells.has(cell + Vector2i.UP)
 	var down := roof_cells.has(cell + Vector2i.DOWN)
-	# The ridge must stay continuous through side branches and junctions.
-	if cell.y == ridge and up and down:
-		var ridge_x: int = 0 if not left else 2 if not right else 1
-		return Vector2i(ridge_x, 2)
 	if up and left and not roof_cells.has(cell + Vector2i(-1, -1)):
 		return Vector2i(3, 0)
 	if up and right and not roof_cells.has(cell + Vector2i(1, -1)):
@@ -332,6 +317,10 @@ func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 		return Vector2i(3, 1)
 	if down and right and not roof_cells.has(cell + Vector2i(1, 1)):
 		return Vector2i(4, 1)
+	# The ridge must stay continuous through side branches and junctions.
+	if cell.y == ridge and up and down:
+		var ridge_x: int = 0 if not left else 2 if not right else 1
+		return Vector2i(ridge_x, 2)
 	var x := 0 if not left else 2 if not right else 1
 	var y := 0 if not up else 4 if not down else 2 if cell.y == ridge else 1 if cell.y < ridge else 3
 	return Vector2i(x, y)
@@ -370,21 +359,6 @@ func _rebuild() -> void:
 		roof_cells[cell] = true
 	if not footprint.is_empty():
 		roof_cells[entrance_cell] = true
-	# End each column at its lowest floor cell, preserving stepped front walls.
-	var column_bottom: Dictionary = {}
-	for key in footprint:
-		var cell: Vector2i = key
-		column_bottom[cell.x] = maxi(int(column_bottom.get(cell.x, -2147483647)), cell.y)
-	var lower_wall_row: Array[Vector2i] = []
-	for key in roof_cells:
-		var cell: Vector2i = key
-		var bottom: int = int(column_bottom.get(cell.x, -2147483647))
-		if bottom == -2147483647:
-			bottom = maxi(int(column_bottom.get(cell.x - 1, -2147483647)), int(column_bottom.get(cell.x + 1, -2147483647)))
-		if cell.y > bottom and not footprint.has(cell):
-			lower_wall_row.append(cell)
-	for cell in lower_wall_row:
-		roof_cells.erase(cell)
 	roof.clear()
 	roof_underlay.clear()
 	for child in roof.get_children():
@@ -439,7 +413,7 @@ func _rebuild() -> void:
 		for key in roof_cells:
 			var cell: Vector2i = key
 			var atlas := _roof_atlas(cell, ridge)
-			if atlas.x >= 3:
+			if atlas.x >= 3 and atlas.y == 0:
 				# Junction pieces contain transparent pixels; preserve the slope
 				# beneath them instead of exposing the floor through the roof.
 				var slope := 2 if cell.y == ridge else 1 if cell.y < ridge else 3
