@@ -401,6 +401,12 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 					seed = cell + direction
 					found = true
 					break
+				var between: Vector2i = cell + direction
+				var inside: Vector2i = cell + direction * 2
+				if not footprint.has(between) and wall_cells.has(between) and patios.has(inside):
+					seed = inside
+					found = true
+					break
 		if not found:
 			return addition
 	# Close a complete 2x2 courtyard in one transaction, not one tile at a time.
@@ -420,20 +426,17 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			var corner: Vector2i = key
 			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
 				var closure: Dictionary = component.duplicate()
-				closure[cell] = true
 				return closure
 	# Expanded courtyards may have no valid single-tile intermediate state.
 	# Validate a complete closure instead of leaving an incompatible narrow gap.
 	var proposed: Dictionary = footprint.duplicate()
 	proposed[cell] = true
-	if not _house_layout_error(proposed).is_empty() or not _contour_change_error(proposed).is_empty():
+	if not patios.has(cell) or not _house_layout_error(proposed).is_empty() or not _contour_change_error(proposed).is_empty():
 		var closed: Dictionary = footprint.duplicate()
-		closed[cell] = true
 		for key in component:
 			closed[key] = true
 		if _house_layout_error(closed).is_empty() and _contour_change_error(closed).is_empty():
 			var closure: Dictionary = component.duplicate()
-			closure[cell] = true
 			return closure
 	return addition
 
