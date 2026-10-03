@@ -1,19 +1,19 @@
-# Casa construída pelo jogador
+# Construção de casas dentro do jogo
 
-Em scenes/world/world2.tscn, pressione F6. B abre o modo de construção. O Player para durante a edição; B ou Esc restaura seu estado anterior.
+Em scenes/world/world2.tscn, use F6 e pressione B. O modo principal é Casa automática.
 
-Escolha Paredes ou Telhado e clique na miniatura da peça. Botão esquerdo coloca (segurar pinta); direito apaga somente a camada escolhida. Desfazer reverte a última célula (até 256 mudanças). Ver telhado mostra/oculta a cobertura para editar as paredes. Salvar guarda a casa em user://house_world2.json; Carregar restaura após validar formato, peças, limites e espaço livre. Carregar substitui somente a casa atual. Não há carregamento automático ao iniciar.
+Escolha largura (3 a 12 tiles) e altura do telhado (5, 7 ou 9 tiles). Uma prévia da casa completa acompanha o mouse. Clique esquerdo constrói uma fachada retangular com cobertura e abertura na frente. Bordas, peças centrais, faixa central e extremidades do telhado são escolhidas automaticamente conforme a posição. Clique direito numa casa automática para removê-la. Desfazer reverte a construção/remoção inteira. Ver telhado oculta a cobertura para inspeção. B ou Esc sai.
 
-São camadas TileMapLayer independentes com tiles de 16 × 16. Paredes: z_index 5 e colisão World por célula. Telhado: z_index 20, acima do Player, sem colisão. Não altera os TileSets compartilhados nem os tiles pintados do terreno.
+Peças ativa a edição manual por camada (Paredes/Telhado): esquerdo coloca, direito apaga. As duas camadas usam TileMapLayer de 16 × 16. A montagem automática usa um modelo retangular compatível com os sprites, sem exigir escolher cantos individualmente. Não é um terrain para casas de contorno irregular.
 
-Construção permitida em células presentes em soil_water, com limite de 2048 peças. O terreno base funciona como área permitida; água sem chão não aceita construção. A prévia vermelha identifica posições bloqueadas. Todas as peças da categoria Paredes são sólidas: deixe uma abertura para entrar. Não há portas operáveis, interior separado, custos de materiais ou encaixe automático de telhado nesta primeira versão.
+A área inteira da casa precisa estar sobre solo livre em soil_water. Bloqueia sobreposição com casas existentes, Player e corpos físicos. Paredes têm colisão World; a peça de abertura (3,2) não bloqueia a passagem. A cobertura não tem colisão. Não há interior separado ou porta que abre/fecha nesta etapa.
+
+Salvar guarda células e regiões das casas em user://house_world2.json. Carregar valida antes de substituir as células da construção. Saves anteriores com somente peças continuam aceitos; peças antigas não se tornam casas automáticas. Não carrega automaticamente ao iniciar. Alterações só persistem quando Salvar é acionado. Limite de 2048 peças e histórico de 256 ações.
 
 ## Validação
 
-Sintaxe GDScript verificada com gdparse. Referências, identificação das peças e preservação dos dados pintados verificadas antes do commit. Execução real no Godot ainda pendente.
+Sintaxe verificada com gdparse; peças de todas as 30 combinações de dimensões conferidas nos TileSets; montagem visual examinada em prévia local. Execução real no Godot pendente.
 
-Teste local: B → escolher paredes → desenhar contorno com entrada → selecionar telhado → pintar → esconder cobertura → apagar e desfazer → salvar → mudar uma peça → carregar → B para sair → conferir colisões. Tente colocar sobre o Player, água sem solo e um obstáculo. Reinicie e carregue para conferir persistência. Se estiver usando F5 na cena World original, abra world2 e use F6.
+Teste: B → ajustar tamanho → construir em área livre → tentar sobrepor → ocultar cobertura → remover com direito → desfazer → salvar → reiniciar → carregar. Se não houver HouseBuilder em Actors/Map, instancie scenes/building/HouseBuilder.tscn ali com player_path ../../Player e ground_path ../soil_water.
 
-## Próxima etapa
-
-Porta funcional, piso e móveis, ocultação do telhado quando o Player estiver dentro e validação de um contorno fechado.
+Próxima etapa: piso, móveis, porta funcional e interior da casa.
