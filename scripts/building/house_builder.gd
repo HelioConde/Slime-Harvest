@@ -151,7 +151,7 @@ func _build_ui() -> void:
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tooltip.add_child(status)
 	for label: Label in [balance, status]:
-		label.add_theme_font_size_override("font_size", 12)
+		label.add_theme_font_size_override("font_size", 10)
 		label.add_theme_constant_override("outline_size", 3)
 		label.add_theme_color_override("font_outline_color", Color.BLACK)
 	tooltip.hide()
@@ -226,8 +226,6 @@ func _process(_delta: float) -> void:
 	var addition: Dictionary = {} if selected.has(cursor) else _floor_addition(cursor)
 	var reason: String = _add_reason(cursor, addition)
 	_refresh_balance()
-	if not addition.is_empty():
-		balance.text += " | Custo: %d" % addition.size()
 	ghost.modulate = Color(1, 1, 1, 0.6) if reason.is_empty() else Color(1, 0.3, 0.3, 0.6)
 	status.text = reason
 	var button := 1 if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) else 2 if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) else 0
@@ -992,7 +990,7 @@ func _update_roof_visibility() -> void:
 	roof.modulate.a = (1.0 if preview_roof else construction_roof_opacity) if building else 1.0
 
 func _refresh_balance() -> void:
-	balance.text = "Materiais restantes: %d / %d" % [maxi(0, material_limit - footprint.size()), material_limit]
+	balance.text = "%d/%d" % [maxi(0, material_limit - footprint.size()), material_limit]
 
 func _encode_cells(cells: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
