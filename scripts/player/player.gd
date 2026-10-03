@@ -11,10 +11,15 @@ signal tool_use_requested(origin: Vector2, direction: Vector2)
 var facing: Vector2 = Vector2.DOWN
 var _tool_remaining: float = 0.0
 
-@onready var animation: AnimatedSprite2D = $AnimatedSprite2D
-@onready var placeholder: Polygon2D = $Placeholder
+@onready var animation: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+@onready var placeholder: Polygon2D = get_node_or_null("Placeholder") as Polygon2D
 @onready var interaction_ray: RayCast2D = $InteractionRay
 @onready var tool_origin: Marker2D = $ToolOrigin
+
+func _ready() -> void:
+	if animation == null:
+		push_error("Player: mantenha o nó AnimatedSprite2D como filho direto do Player.")
+		set_physics_process(false)
 
 func _physics_process(delta: float) -> void:
 	_tool_remaining = maxf(0.0, _tool_remaining - delta)
@@ -67,10 +72,12 @@ func _update_animation(moving: bool, running: bool) -> void:
 			animation.flip_h = true
 	if not _has_frames(name_to_play):
 		animation.visible = false
-		placeholder.visible = true
+		if is_instance_valid(placeholder):
+			placeholder.visible = true
 		return
 	animation.visible = true
-	placeholder.visible = false
+	if is_instance_valid(placeholder):
+		placeholder.visible = false
 	animation.speed_scale = run_multiplier if moving and running and not String(name_to_play).begins_with("run_") else 1.0
 	if animation.animation != name_to_play:
 		animation.play(name_to_play)
