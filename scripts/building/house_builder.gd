@@ -408,6 +408,10 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			var corner: Vector2i = key
 			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
 				return component
+	# Painting against the lower courtyard wall must replace its full vertical face.
+	# Place the clicked floor and the floor immediately above it together.
+	if footprint.has(cell + Vector2i.DOWN) and patios.has(cell + Vector2i.UP):
+		addition[cell + Vector2i.UP] = true
 	return addition
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
