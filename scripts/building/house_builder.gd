@@ -434,21 +434,30 @@ func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
 	_rebuild()
 	status.text = "Área removida; materiais devolvidos. Salve para guardar."
 
+func _is_inner_wall_corner(cell: Vector2i) -> bool:
+	if footprint.has(cell):
+		return false
+	var left: bool = footprint.has(cell + Vector2i.LEFT)
+	var right: bool = footprint.has(cell + Vector2i.RIGHT)
+	var up: bool = footprint.has(cell + Vector2i.UP)
+	var down: bool = footprint.has(cell + Vector2i.DOWN)
+	# Same geometry as the four generated concave wall caps, before door/window overrides.
+	return left != right and up != down
+
 func _curve_add_error(cell: Vector2i, addition: Dictionary) -> String:
-	# Closing a complete courtyard is a single valid operation.
 	if addition.size() != 1:
 		return ""
-	# Use the actual generated corner tile, including the front-wall layer.
-	var atlas: Vector2i = walls.get_cell_atlas_coords(cell)
-	if atlas == Vector2i(-1, -1):
-		atlas = front_walls.get_cell_atlas_coords(cell)
-	if (atlas.x == 3 or atlas.x == 4) and (atlas.y == 0 or atlas.y == 1):
-		# A corner alone is valid. Block only a one-cell gap to opposing floor.
-		for direction in DIRECTIONS:
-			var between: Vector2i = cell + direction
-			var opposite: Vector2i = cell + direction * 2
-			if not footprint.has(between) and footprint.has(opposite):
-				return "Essa curva deixaria apenas um bloco de espaço entre os pisos."
+	# Include the adjacent junction: advancing the entrance may shift the visible cap.
+	var near_corner: bool = _is_inner_wall_corner(cell)
+	for direction in DIRECTIONS:
+		near_corner = near_corner or _is_inner_wall_corner(cell + direction)
+	if not near_corner:
+		return ""
+	for direction in DIRECTIONS:
+		var between: Vector2i = cell + direction
+		var opposite: Vector2i = cell + direction * 2
+		if not footprint.has(between) and footprint.has(opposite):
+			return "Essa curva deixaria apenas um bloco de espaço entre os pisos."
 	return ""
 
 func _house_layout_error(cells: Dictionary) -> String:
