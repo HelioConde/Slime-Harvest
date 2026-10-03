@@ -3,8 +3,6 @@
 [ext_resource type="TileSet" uid="uid://d2u83cq3s7ay3" path="res://data/tilesets/world_tileset.tres" id="1_7o7oy"]
 [ext_resource type="PackedScene" uid="uid://e41u5bfsawlk" path="res://scenes/player/Player.tscn" id="2_1druj"]
 
-[ext_resource type="PackedScene" path="res://scenes/building/HouseBuilder.tscn" id="3_builder"]
-
 [node name="World2" type="Node2D" unique_id=2045392138]
 
 [node name="Actors" type="Node2D" parent="." unique_id=564082091]
@@ -27,7 +25,3 @@ tile_set = ExtResource("1_7o7oy")
 
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("2_1druj")]
 z_index = 10
-
-[node name="HouseBuilder" parent="Actors/Map" instance=ExtResource("3_builder")]
-player_path = NodePath("../../Player")
-ground_path = NodePath("../soil_water")
