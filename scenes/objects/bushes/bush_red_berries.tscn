@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://data/objects/bushes/bush_red_berries.tres" id="1_texture"]
+
+[sub_resource type="RectangleShape2D" id="Shape_base"]
+size = Vector2(14, 8)
+
+[node name="bush_red_berries" type="StaticBody2D" groups=["world_objects"]]
+texture_filter = 1
+collision_layer = 1
+collision_mask = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -8.0)
+texture = ExtResource("1_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -4.0)
+shape = SubResource("Shape_base")

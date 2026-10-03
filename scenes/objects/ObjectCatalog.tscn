@@ -1,0 +1,320 @@
+[gd_scene load_steps=79 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_small.tscn" id="object_0"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree.tscn" id="object_1"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_apple.tscn" id="object_2"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_orange.tscn" id="object_3"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_pear.tscn" id="object_4"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_peach.tscn" id="object_5"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_large.tscn" id="object_6"]
+[ext_resource type="PackedScene" path="res://scenes/objects/bushes/bush_small.tscn" id="object_7"]
+[ext_resource type="PackedScene" path="res://scenes/objects/bushes/bush.tscn" id="object_8"]
+[ext_resource type="PackedScene" path="res://scenes/objects/bushes/bush_red_berries.tscn" id="object_9"]
+[ext_resource type="PackedScene" path="res://scenes/objects/bushes/bush_purple_berries.tscn" id="object_10"]
+[ext_resource type="PackedScene" path="res://scenes/objects/bushes/bush_blue_berries.tscn" id="object_11"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/apple.tscn" id="object_12"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/apple_leaf.tscn" id="object_13"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/orange.tscn" id="object_14"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/orange_leaf.tscn" id="object_15"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/pear.tscn" id="object_16"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/pear_leaf.tscn" id="object_17"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/peach.tscn" id="object_18"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/peach_leaf.tscn" id="object_19"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry.tscn" id="object_20"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry_leaf.tscn" id="object_21"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/purple_berry.tscn" id="object_22"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/purple_berry_leaf.tscn" id="object_23"]
+[ext_resource type="PackedScene" path="res://scenes/objects/fruit/blue_berry.tscn" id="object_24"]
+[ext_resource type="PackedScene" path="res://scenes/objects/logs/log_large.tscn" id="object_25"]
+[ext_resource type="PackedScene" path="res://scenes/objects/logs/log_small.tscn" id="object_26"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump_small.tscn" id="object_27"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump.tscn" id="object_28"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump_large.tscn" id="object_29"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump_sprout.tscn" id="object_30"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump_flat.tscn" id="object_31"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump_leaf.tscn" id="object_32"]
+[ext_resource type="PackedScene" path="res://scenes/objects/stumps/stump_mushroom.tscn" id="object_33"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_01.tscn" id="object_34"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_02.tscn" id="object_35"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_03.tscn" id="object_36"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_04.tscn" id="object_37"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_06.tscn" id="object_38"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_07.tscn" id="object_39"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_05_small_a.tscn" id="object_40"]
+[ext_resource type="PackedScene" path="res://scenes/objects/mushrooms/mushroom_05_small_b.tscn" id="object_41"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_01.tscn" id="object_42"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_02.tscn" id="object_43"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_03.tscn" id="object_44"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_04.tscn" id="object_45"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_05.tscn" id="object_46"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_06.tscn" id="object_47"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_large.tscn" id="object_48"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_round.tscn" id="object_49"]
+[ext_resource type="PackedScene" path="res://scenes/objects/rocks/rock_sprout.tscn" id="object_50"]
+[ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_01.tscn" id="object_51"]
+[ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_02.tscn" id="object_52"]
+[ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_03.tscn" id="object_53"]
+[ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_04.tscn" id="object_54"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_01.tscn" id="object_55"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_02.tscn" id="object_56"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_03.tscn" id="object_57"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_04.tscn" id="object_58"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_05.tscn" id="object_59"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_06.tscn" id="object_60"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_07.tscn" id="object_61"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_08.tscn" id="object_62"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_09.tscn" id="object_63"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_10.tscn" id="object_64"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_11.tscn" id="object_65"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_12.tscn" id="object_66"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_01.tscn" id="object_67"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_02.tscn" id="object_68"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_03.tscn" id="object_69"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_05.tscn" id="object_70"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_06.tscn" id="object_71"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_07.tscn" id="object_72"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_08.tscn" id="object_73"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_09.tscn" id="object_74"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_10.tscn" id="object_75"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_11.tscn" id="object_76"]
+[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_12.tscn" id="object_77"]
+
+[node name="ObjectCatalog" type="Node2D"]
+texture_filter = 1
+
+[node name="Objects" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="tree_small" parent="Objects" instance=ExtResource("object_0")]
+position = Vector2(48, 80)
+
+[node name="tree" parent="Objects" instance=ExtResource("object_1")]
+position = Vector2(120, 80)
+
+[node name="tree_apple" parent="Objects" instance=ExtResource("object_2")]
+position = Vector2(192, 80)
+
+[node name="tree_orange" parent="Objects" instance=ExtResource("object_3")]
+position = Vector2(264, 80)
+
+[node name="tree_pear" parent="Objects" instance=ExtResource("object_4")]
+position = Vector2(336, 80)
+
+[node name="tree_peach" parent="Objects" instance=ExtResource("object_5")]
+position = Vector2(408, 80)
+
+[node name="tree_large" parent="Objects" instance=ExtResource("object_6")]
+position = Vector2(480, 80)
+
+[node name="bush_small" parent="Objects" instance=ExtResource("object_7")]
+position = Vector2(552, 80)
+
+[node name="bush" parent="Objects" instance=ExtResource("object_8")]
+position = Vector2(624, 80)
+
+[node name="bush_red_berries" parent="Objects" instance=ExtResource("object_9")]
+position = Vector2(696, 80)
+
+[node name="bush_purple_berries" parent="Objects" instance=ExtResource("object_10")]
+position = Vector2(48, 176)
+
+[node name="bush_blue_berries" parent="Objects" instance=ExtResource("object_11")]
+position = Vector2(120, 176)
+
+[node name="apple" parent="Objects" instance=ExtResource("object_12")]
+position = Vector2(192, 176)
+
+[node name="apple_leaf" parent="Objects" instance=ExtResource("object_13")]
+position = Vector2(264, 176)
+
+[node name="orange" parent="Objects" instance=ExtResource("object_14")]
+position = Vector2(336, 176)
+
+[node name="orange_leaf" parent="Objects" instance=ExtResource("object_15")]
+position = Vector2(408, 176)
+
+[node name="pear" parent="Objects" instance=ExtResource("object_16")]
+position = Vector2(480, 176)
+
+[node name="pear_leaf" parent="Objects" instance=ExtResource("object_17")]
+position = Vector2(552, 176)
+
+[node name="peach" parent="Objects" instance=ExtResource("object_18")]
+position = Vector2(624, 176)
+
+[node name="peach_leaf" parent="Objects" instance=ExtResource("object_19")]
+position = Vector2(696, 176)
+
+[node name="red_berry" parent="Objects" instance=ExtResource("object_20")]
+position = Vector2(48, 272)
+
+[node name="red_berry_leaf" parent="Objects" instance=ExtResource("object_21")]
+position = Vector2(120, 272)
+
+[node name="purple_berry" parent="Objects" instance=ExtResource("object_22")]
+position = Vector2(192, 272)
+
+[node name="purple_berry_leaf" parent="Objects" instance=ExtResource("object_23")]
+position = Vector2(264, 272)
+
+[node name="blue_berry" parent="Objects" instance=ExtResource("object_24")]
+position = Vector2(336, 272)
+
+[node name="log_large" parent="Objects" instance=ExtResource("object_25")]
+position = Vector2(408, 272)
+
+[node name="log_small" parent="Objects" instance=ExtResource("object_26")]
+position = Vector2(480, 272)
+
+[node name="stump_small" parent="Objects" instance=ExtResource("object_27")]
+position = Vector2(552, 272)
+
+[node name="stump" parent="Objects" instance=ExtResource("object_28")]
+position = Vector2(624, 272)
+
+[node name="stump_large" parent="Objects" instance=ExtResource("object_29")]
+position = Vector2(696, 272)
+
+[node name="stump_sprout" parent="Objects" instance=ExtResource("object_30")]
+position = Vector2(48, 368)
+
+[node name="stump_flat" parent="Objects" instance=ExtResource("object_31")]
+position = Vector2(120, 368)
+
+[node name="stump_leaf" parent="Objects" instance=ExtResource("object_32")]
+position = Vector2(192, 368)
+
+[node name="stump_mushroom" parent="Objects" instance=ExtResource("object_33")]
+position = Vector2(264, 368)
+
+[node name="mushroom_01" parent="Objects" instance=ExtResource("object_34")]
+position = Vector2(336, 368)
+
+[node name="mushroom_02" parent="Objects" instance=ExtResource("object_35")]
+position = Vector2(408, 368)
+
+[node name="mushroom_03" parent="Objects" instance=ExtResource("object_36")]
+position = Vector2(480, 368)
+
+[node name="mushroom_04" parent="Objects" instance=ExtResource("object_37")]
+position = Vector2(552, 368)
+
+[node name="mushroom_06" parent="Objects" instance=ExtResource("object_38")]
+position = Vector2(624, 368)
+
+[node name="mushroom_07" parent="Objects" instance=ExtResource("object_39")]
+position = Vector2(696, 368)
+
+[node name="mushroom_05_small_a" parent="Objects" instance=ExtResource("object_40")]
+position = Vector2(48, 464)
+
+[node name="mushroom_05_small_b" parent="Objects" instance=ExtResource("object_41")]
+position = Vector2(120, 464)
+
+[node name="rock_01" parent="Objects" instance=ExtResource("object_42")]
+position = Vector2(192, 464)
+
+[node name="rock_02" parent="Objects" instance=ExtResource("object_43")]
+position = Vector2(264, 464)
+
+[node name="rock_03" parent="Objects" instance=ExtResource("object_44")]
+position = Vector2(336, 464)
+
+[node name="rock_04" parent="Objects" instance=ExtResource("object_45")]
+position = Vector2(408, 464)
+
+[node name="rock_05" parent="Objects" instance=ExtResource("object_46")]
+position = Vector2(480, 464)
+
+[node name="rock_06" parent="Objects" instance=ExtResource("object_47")]
+position = Vector2(552, 464)
+
+[node name="rock_large" parent="Objects" instance=ExtResource("object_48")]
+position = Vector2(624, 464)
+
+[node name="rock_round" parent="Objects" instance=ExtResource("object_49")]
+position = Vector2(696, 464)
+
+[node name="rock_sprout" parent="Objects" instance=ExtResource("object_50")]
+position = Vector2(48, 560)
+
+[node name="sprout_01" parent="Objects" instance=ExtResource("object_51")]
+position = Vector2(120, 560)
+
+[node name="sprout_02" parent="Objects" instance=ExtResource("object_52")]
+position = Vector2(192, 560)
+
+[node name="sprout_03" parent="Objects" instance=ExtResource("object_53")]
+position = Vector2(264, 560)
+
+[node name="sprout_04" parent="Objects" instance=ExtResource("object_54")]
+position = Vector2(336, 560)
+
+[node name="flower_warm_01" parent="Objects" instance=ExtResource("object_55")]
+position = Vector2(408, 560)
+
+[node name="flower_warm_02" parent="Objects" instance=ExtResource("object_56")]
+position = Vector2(480, 560)
+
+[node name="flower_warm_03" parent="Objects" instance=ExtResource("object_57")]
+position = Vector2(552, 560)
+
+[node name="flower_warm_04" parent="Objects" instance=ExtResource("object_58")]
+position = Vector2(624, 560)
+
+[node name="flower_warm_05" parent="Objects" instance=ExtResource("object_59")]
+position = Vector2(696, 560)
+
+[node name="flower_warm_06" parent="Objects" instance=ExtResource("object_60")]
+position = Vector2(48, 656)
+
+[node name="flower_warm_07" parent="Objects" instance=ExtResource("object_61")]
+position = Vector2(120, 656)
+
+[node name="flower_warm_08" parent="Objects" instance=ExtResource("object_62")]
+position = Vector2(192, 656)
+
+[node name="flower_warm_09" parent="Objects" instance=ExtResource("object_63")]
+position = Vector2(264, 656)
+
+[node name="flower_warm_10" parent="Objects" instance=ExtResource("object_64")]
+position = Vector2(336, 656)
+
+[node name="flower_warm_11" parent="Objects" instance=ExtResource("object_65")]
+position = Vector2(408, 656)
+
+[node name="flower_warm_12" parent="Objects" instance=ExtResource("object_66")]
+position = Vector2(480, 656)
+
+[node name="flower_cool_01" parent="Objects" instance=ExtResource("object_67")]
+position = Vector2(552, 656)
+
+[node name="flower_cool_02" parent="Objects" instance=ExtResource("object_68")]
+position = Vector2(624, 656)
+
+[node name="flower_cool_03" parent="Objects" instance=ExtResource("object_69")]
+position = Vector2(696, 656)
+
+[node name="flower_cool_05" parent="Objects" instance=ExtResource("object_70")]
+position = Vector2(48, 752)
+
+[node name="flower_cool_06" parent="Objects" instance=ExtResource("object_71")]
+position = Vector2(120, 752)
+
+[node name="flower_cool_07" parent="Objects" instance=ExtResource("object_72")]
+position = Vector2(192, 752)
+
+[node name="flower_cool_08" parent="Objects" instance=ExtResource("object_73")]
+position = Vector2(264, 752)
+
+[node name="flower_cool_09" parent="Objects" instance=ExtResource("object_74")]
+position = Vector2(336, 752)
+
+[node name="flower_cool_10" parent="Objects" instance=ExtResource("object_75")]
+position = Vector2(408, 752)
+
+[node name="flower_cool_11" parent="Objects" instance=ExtResource("object_76")]
+position = Vector2(480, 752)
+
+[node name="flower_cool_12" parent="Objects" instance=ExtResource("object_77")]
+position = Vector2(552, 752)
