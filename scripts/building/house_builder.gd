@@ -14,6 +14,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
+var entrance_cell := Vector2i(99999, 99999)
 var roof_underlay: TileMapLayer
 var wall_cells: Dictionary = {}
 var roof_cells: Dictionary = {}
@@ -301,6 +302,7 @@ func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 func _rebuild() -> void:
 	# Generate the exterior ring from the floor, including diagonal corners.
 	wall_cells.clear()
+	entrance_cell = Vector2i(99999, 99999)
 	for key in footprint:
 		var cell: Vector2i = key
 		for y in range(-1, 2):
@@ -323,11 +325,14 @@ func _rebuild() -> void:
 			if cell.y == bottom and absf(cell.x - mean_x) < distance:
 				entrance = cell
 				distance = absf(cell.x - mean_x)
-		wall_cells.erase(entrance + Vector2i.DOWN)
+		entrance_cell = entrance + Vector2i.DOWN
+		wall_cells.erase(entrance_cell)
 	# Coverage is derived; it never needs a roof brush or extra materials.
 	roof_cells = footprint.duplicate()
 	for cell in wall_cells:
 		roof_cells[cell] = true
+	if not footprint.is_empty():
+		roof_cells[entrance_cell] = true
 	roof.clear()
 	roof_underlay.clear()
 	for child in roof.get_children():
@@ -345,6 +350,14 @@ func _rebuild() -> void:
 		floor_layer.set_cell(cell, wall_source, Vector2i(1, 1))
 	for key in wall_cells:
 		var cell: Vector2i = key
+		var touches := 0
+		for direction in DIRECTIONS:
+			if footprint.has(cell + direction):
+				touches += 1
+		if touches >= 2:
+			# Inner corner tiles expose the room floor through their alpha.
+			# Back them with flooring so stepped side joins do not show grass.
+			floor_layer.set_cell(cell, wall_source, Vector2i(1, 1))
 		walls.set_cell(cell, wall_source, _wall_atlas(cell))
 		_add_block(cell)
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
@@ -433,7 +446,7 @@ func _toggle_roof() -> void:
 
 func _update_roof_visibility() -> void:
 	var cell := floor_layer.local_to_map(floor_layer.to_local(player.global_position))
-	var inside := footprint.has(cell) and not wall_cells.has(cell)
+	var inside := (footprint.has(cell) or cell == entrance_cell) and not wall_cells.has(cell)
 	roof.visible = not manually_hide_roof and (not building and not inside)
 
 func _refresh_balance() -> void:
