@@ -371,16 +371,16 @@ func _rebuild() -> void:
 		var down := footprint.has(cell + Vector2i.DOWN)
 		if right and down and not left and not up:
 			walls.set_cell(cell, wall_source, Vector2i(1, 0))
-			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(2, 2))
+			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(4, 0))
 		elif left and down and not right and not up:
 			walls.set_cell(cell, wall_source, Vector2i(1, 0))
-			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(0, 2))
+			walls.set_cell(cell + Vector2i.UP, wall_source, Vector2i(3, 0))
 		elif right and up and not left and not down:
 			walls.set_cell(cell, wall_source, Vector2i(1, 2))
-			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(2, 0))
+			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(4, 1))
 		elif left and up and not right and not down:
 			walls.set_cell(cell, wall_source, Vector2i(1, 2))
-			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(0, 0))
+			walls.set_cell(cell + Vector2i.DOWN, wall_source, Vector2i(3, 1))
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
 	# A single ridge spans the painted roof, rather than repeating every tile.
 	if not roof_cells.is_empty():
