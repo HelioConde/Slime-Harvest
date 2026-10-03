@@ -1,0 +1,12 @@
+# Arquivos locais
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+.env
+.env.*
+!.env.example
+/builds/
+/dist/
+/tmp/
+/temp/
