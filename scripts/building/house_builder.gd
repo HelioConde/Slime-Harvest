@@ -1,5 +1,6 @@
 extends Node2D
 ## Test construction: one connected house, one material per painted area cell.
+const AutomaticDoor = preload("res://scripts/building/automatic_house_door.gd")
 const SAVE_PATH := "user://house_terrain_test.json"
 const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
 @export var player_path: NodePath
@@ -15,6 +16,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @onready var roof: TileMapLayer = $Roof
 @onready var ghost: Sprite2D = $Preview
 
+var entrance_door: AutomaticDoor
 var show_tile_numbers := false
 var entrance_cell := Vector2i(99999, 99999)
 var roof_underlay: TileMapLayer
@@ -60,6 +62,11 @@ func _ready() -> void:
 	texture.filter_clip = true
 	ghost.texture = texture
 	_build_ui()
+	entrance_door = AutomaticDoor.new()
+	entrance_door.name = "EntranceDoor"
+	entrance_door.player = player
+	entrance_door.hide()
+	add_child(entrance_door)
 	ghost.hide()
 
 func _make_roof_terrain() -> void:
@@ -183,6 +190,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _process(_delta: float) -> void:
+	entrance_door.construction_mode = building
 	_update_roof_visibility()
 	if not building:
 		return
@@ -415,6 +423,10 @@ func _rebuild() -> void:
 				roof_underlay.set_cell(cell, roof_tiles.get_source_id(0), Vector2i(1, slope))
 			roof.set_cell(cell, roof_tiles.get_source_id(0), atlas)
 			_add_roof_overhang(cell, atlas)
+	entrance_door.visible = not footprint.is_empty()
+	if entrance_door.visible:
+		entrance_door.position = to_local(floor_layer.to_global(floor_layer.map_to_local(entrance_cell)))
+		floor_layer.set_cell(entrance_cell, wall_source, Vector2i(1, 1))
 	_update_roof_visibility()
 	_refresh_tile_numbers()
 	_refresh_balance()
