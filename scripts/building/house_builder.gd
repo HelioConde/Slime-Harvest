@@ -251,7 +251,12 @@ func _process(_delta: float) -> void:
 			status.text = reason
 			return
 		_remember()
-		selected[cursor] = true
+		if brush == "Piso":
+			var addition: Dictionary = _floor_addition(cursor)
+			for key in addition:
+				footprint[key] = true
+		else:
+			selected[cursor] = true
 	else:
 		if not selected.has(cursor):
 			return
@@ -316,6 +321,9 @@ func _removal_reason(start: Vector2i, end: Vector2i) -> String:
 			proposed.erase(cell)
 	if cut.is_empty():
 		return "Selecione uma área com piso."
+	# A complete demolition bypasses courtyard and edge restrictions.
+	if proposed.is_empty():
+		return ""
 	var patios: Dictionary = _enclosed_empty_cells(footprint)
 	var touches_patio: bool = false
 	for cell in cut:
@@ -347,7 +355,56 @@ func _removal_reason(start: Vector2i, end: Vector2i) -> String:
 			creates_patio = creates_patio or new_patios.has(cell)
 		if creates_patio and (width != height or width < 2 or cut.size() != width * height):
 			return "Para criar um pátio, selecione um quadrado de pelo menos 2×2."
+		if not creates_patio and not _valid_exterior_cut(cut, width, height, patios):
+			return "Remova pelas pontas ou selecione uma faixa 2×1 na mesma borda da casa."
 	return _house_layout_error(proposed)
+
+func _valid_exterior_cut(cut: Array[Vector2i], width: int, height: int, patios: Dictionary) -> bool:
+	if cut.size() == 1:
+		var cell: Vector2i = cut[0]
+		var horizontal: bool = _is_exterior(cell + Vector2i.LEFT, patios) or _is_exterior(cell + Vector2i.RIGHT, patios)
+		var vertical: bool = _is_exterior(cell + Vector2i.UP, patios) or _is_exterior(cell + Vector2i.DOWN, patios)
+		return horizontal and vertical
+	if cut.size() != 2 or not ((width == 2 and height == 1) or (width == 1 and height == 2)):
+		return false
+	var directions: Array[Vector2i] = []
+	if width == 2:
+		directions.append(Vector2i.UP)
+		directions.append(Vector2i.DOWN)
+	else:
+		directions.append(Vector2i.LEFT)
+		directions.append(Vector2i.RIGHT)
+	for direction in directions:
+		if _is_exterior(cut[0] + direction, patios) and _is_exterior(cut[1] + direction, patios):
+			return true
+	return false
+
+func _is_exterior(cell: Vector2i, patios: Dictionary) -> bool:
+	return not footprint.has(cell) and not patios.has(cell)
+
+func _floor_addition(cell: Vector2i) -> Dictionary:
+	var addition: Dictionary = {cell: true}
+	var patios: Dictionary = _enclosed_empty_cells(footprint)
+	if not patios.has(cell):
+		return addition
+	# Close a complete 2x2 courtyard in one transaction, not one tile at a time.
+	var component: Dictionary = {cell: true}
+	var queue: Array[Vector2i] = [cell]
+	var index: int = 0
+	while index < queue.size():
+		var current: Vector2i = queue[index]
+		index += 1
+		for direction in DIRECTIONS:
+			var next: Vector2i = current + direction
+			if patios.has(next) and not component.has(next):
+				component[next] = true
+				queue.append(next)
+	if component.size() == 4:
+		for key in component:
+			var corner: Vector2i = key
+			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
+				return component
+	return addition
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
 	var cut_error: String = _removal_reason(start, end)
@@ -480,7 +537,8 @@ func _has_house_space(floor_cell: Vector2i) -> bool:
 func _add_reason(cell: Vector2i) -> String:
 	if _selected_cells().has(cell):
 		return ""
-	if brush == "Piso" and footprint.size() >= material_limit:
+	var addition: Dictionary = _floor_addition(cell) if brush == "Piso" else {cell: true}
+	if brush == "Piso" and footprint.size() + addition.size() > material_limit:
 		return "Materiais esgotados: limite de %d células de piso." % material_limit
 	if brush == "Piso" and not footprint.is_empty():
 		var connected := false
@@ -495,7 +553,11 @@ func _add_reason(cell: Vector2i) -> String:
 		return "Pinte sobre o solo."
 	if brush == "Piso":
 		var proposed: Dictionary = footprint.duplicate()
-		proposed[cell] = true
+		for key in addition:
+			var added_cell: Vector2i = key
+			if not _has_house_space(added_cell):
+				return "Deixe espaço para as paredes e uma célula de margem até a borda do mapa."
+			proposed[added_cell] = true
 		var layout_error: String = _house_layout_error(proposed)
 		if not layout_error.is_empty():
 			return layout_error
