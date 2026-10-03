@@ -62,26 +62,25 @@ func _make_roof_terrain() -> void:
 	# Make a private atlas so padding does not reveal the wall underneath.
 	# Keep the source asset and the manually painted world2 unchanged.
 	var source := roof_tiles.get_source(roof_tiles.get_source_id(0)) as TileSetAtlasSource
-	var image := source.texture.get_image().duplicate() as Image
+	var original := source.texture.get_image()
+	var image := original.duplicate() as Image
+	# Move the actual scalloped edge to the boundary, rather than painting
+	# over the transparent padding or extending the border colour.
 	for tile_x in range(3):
-		for x in range(16):
-			var column := tile_x * 16 + x
-			var first := -1
-			for y in range(16):
-				if image.get_pixel(column, y).a > 0.0:
-					first = y
-					break
-			if first >= 0:
-				for y in range(first):
-					image.set_pixel(column, y, source.texture.get_image().get_pixel(16 + x, 16 + y))
-			var last := -1
-			for y in range(79, 63, -1):
-				if image.get_pixel(column, y).a > 0.0:
-					last = y
-					break
-			if last >= 0:
-				for y in range(last + 1, 80):
-					image.set_pixel(column, y, source.texture.get_image().get_pixel(16 + x, 48 + y - 64))
+		var first := 16
+		var last := -1
+		for y in range(16):
+			for x in range(16):
+				if original.get_pixel(tile_x * 16 + x, y).a > 0:
+					first = mini(first, y)
+				if original.get_pixel(tile_x * 16 + x, 64 + y).a > 0:
+					last = maxi(last, y)
+		image.blit_rect(original, Rect2i(tile_x * 16, 16, 16, 16), Vector2i(tile_x * 16, 0))
+		if first < 16:
+			image.blit_rect(original, Rect2i(tile_x * 16, first, 16, 16 - first), Vector2i(tile_x * 16, 0))
+		image.blit_rect(original, Rect2i(tile_x * 16, 48, 16, 16), Vector2i(tile_x * 16, 64))
+		if last >= 0:
+			image.blit_rect(original, Rect2i(tile_x * 16, 64, 16, last + 1), Vector2i(tile_x * 16, 79 - last))
 	var private_tiles := TileSet.new()
 	private_tiles.tile_size = roof_tiles.tile_size
 	terrain_source = TileSetAtlasSource.new()
@@ -248,29 +247,37 @@ func _supported(cell: Vector2i, layer: String) -> bool:
 	return false
 
 func _wall_atlas(cell: Vector2i) -> Vector2i:
-	var left := wall_cells.has(cell + Vector2i.LEFT)
-	var right := wall_cells.has(cell + Vector2i.RIGHT)
-	var up := wall_cells.has(cell + Vector2i.UP)
-	var down := wall_cells.has(cell + Vector2i.DOWN)
-	var inner_left := footprint.has(cell + Vector2i.LEFT)
-	var inner_right := footprint.has(cell + Vector2i.RIGHT)
-	# Concave corners: horizontal and vertical walls meet around the floor.
-	if up and left and footprint.has(cell + Vector2i(1, 1)) and not inner_left:
+	var left := footprint.has(cell + Vector2i.LEFT)
+	var right := footprint.has(cell + Vector2i.RIGHT)
+	var up := footprint.has(cell + Vector2i.UP)
+	var down := footprint.has(cell + Vector2i.DOWN)
+	# Interior corners surround floor on two perpendicular sides.
+	if right and down and not left and not up:
 		return Vector2i(2, 2)
-	if up and right and footprint.has(cell + Vector2i(-1, 1)) and not inner_right:
+	if left and down and not right and not up:
 		return Vector2i(0, 2)
-	if down and left and footprint.has(cell + Vector2i(1, -1)) and not inner_left:
+	if right and up and not left and not down:
 		return Vector2i(2, 0)
-	if down and right and footprint.has(cell + Vector2i(-1, -1)) and not inner_right:
+	if left and up and not right and not down:
 		return Vector2i(0, 0)
-	var x := 2 if inner_left and not inner_right else 0
-	if up or down:
-		if right and not left:
-			return Vector2i(0, 0 if down else 2)
-		if left and not right:
-			return Vector2i(2, 0 if down else 2)
-		return Vector2i(x, 1)
-	return Vector2i(1, 2 if footprint.has(cell + Vector2i.UP) else 0)
+	if right and not left:
+		return Vector2i(0, 1)
+	if left and not right:
+		return Vector2i(2, 1)
+	if down and not up:
+		return Vector2i(1, 0)
+	if up and not down:
+		return Vector2i(1, 2)
+	# Convex corners have floor diagonally inside, not on either side.
+	if footprint.has(cell + Vector2i(1, 1)):
+		return Vector2i(0, 0)
+	if footprint.has(cell + Vector2i(-1, 1)):
+		return Vector2i(2, 0)
+	if footprint.has(cell + Vector2i(1, -1)):
+		return Vector2i(0, 2)
+	if footprint.has(cell + Vector2i(-1, -1)):
+		return Vector2i(2, 2)
+	return Vector2i(1, 0)
 
 func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
 	var left := roof_cells.has(cell + Vector2i.LEFT)
