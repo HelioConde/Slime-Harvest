@@ -390,7 +390,7 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 	var addition: Dictionary = {cell: true}
 	var patios: Dictionary = _enclosed_empty_cells(footprint)
 	if not patios.has(cell):
-		return addition
+		return _complete_vertical_wall_addition(cell, addition, patios)
 	# Close a complete 2x2 courtyard in one transaction, not one tile at a time.
 	var component: Dictionary = {cell: true}
 	var queue: Array[Vector2i] = [cell]
@@ -408,10 +408,23 @@ func _floor_addition(cell: Vector2i) -> Dictionary:
 			var corner: Vector2i = key
 			if component.has(corner + Vector2i.RIGHT) and component.has(corner + Vector2i.DOWN) and component.has(corner + Vector2i.ONE):
 				return component
-	# Painting against the lower courtyard wall must replace its full vertical face.
-	# Place the clicked floor and the floor immediately above it together.
-	if footprint.has(cell + Vector2i.DOWN) and patios.has(cell + Vector2i.UP):
-		addition[cell + Vector2i.UP] = true
+	return _complete_vertical_wall_addition(cell, addition, patios)
+
+func _complete_vertical_wall_addition(cell: Vector2i, addition: Dictionary, patios: Dictionary) -> Dictionary:
+	if not footprint.has(cell + Vector2i.DOWN) or footprint.has(cell + Vector2i.UP):
+		return addition
+	var junction: bool = patios.has(cell) or _is_inner_wall_corner(cell)
+	for direction in DIRECTIONS:
+		junction = junction or _is_inner_wall_corner(cell + direction)
+	if not junction:
+		return addition
+	# The horizontal face spans the clicked tile plus two cells above it.
+	# Open exterior notches require the same treatment as enclosed courtyards.
+	for step in range(1, 3):
+		var above: Vector2i = cell + Vector2i.UP * step
+		if footprint.has(above):
+			break
+		addition[above] = true
 	return addition
 
 func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
