@@ -1,19 +1,19 @@
-# Construção de casas dentro do jogo
+# Construção da casa — modo de teste
 
-Em scenes/world/world2.tscn, use F6 e pressione B. O modo principal é Casa automática.
+Execute a cena do mundo que contém HouseBuilder. Pressione **B** para abrir ou fechar a construção; **Esc** também fecha. O jogador fica parado enquanto pinta.
 
-Escolha largura (3 a 12 tiles) e altura do telhado (5, 7 ou 9 tiles). Uma prévia da casa completa acompanha o mouse. Clique esquerdo constrói uma fachada retangular com cobertura e abertura na frente. Bordas, peças centrais, faixa central e extremidades do telhado são escolhidas automaticamente conforme a posição. Clique direito numa casa automática para removê-la. Desfazer reverte a construção/remoção inteira. Ver telhado oculta a cobertura para inspeção. B ou Esc sai.
+- O teste disponibiliza **25 materiais**, sem loja ou compra.
+- O primeiro clique esquerdo inicia a casa no solo livre escolhido.
+- Clique ou arraste com o esquerdo para expandir. Cada célula nova custa **1 material**; pintar a mesma célula novamente não cobra.
+- As novas células devem tocar um lado da casa. Não é permitido construir partes separadas.
+- Clique ou arraste com o direito para remover uma célula e receber **1 material** de volta. Remover uma conexão que separaria a casa é bloqueado.
+- **Desfazer** restaura a última alteração e recalcula os materiais.
+- **Salvar** e **Carregar** guardam a área construída em `user://house_terrain_test.json`. A casa antiga do construtor anterior não é importada.
 
-Peças ativa a edição manual por camada (Paredes/Telhado): esquerdo coloca, direito apaga. As duas camadas usam TileMapLayer de 16 × 16. A montagem automática usa um modelo retangular compatível com os sprites, sem exigir escolher cantos individualmente. Não é um terrain para casas de contorno irregular.
+O telhado usa Terrain com conexão pelos lados e 16 combinações de vizinhos. As paredes da fachada são recalculadas nas bordas inferiores. O custo é pela área pintada: a fachada automática não cobra materiais adicionais. O espaço da área e da fachada deve estar livre, com solo e sem colisões.
 
-A área inteira da casa precisa estar sobre solo livre em soil_water. Bloqueia sobreposição com casas existentes, Player e corpos físicos. Paredes têm colisão World; a peça de abertura (3,2) não bloqueia a passagem. A cobertura não tem colisão. Não há interior separado ou porta que abre/fecha nesta etapa.
+Os sprites disponíveis têm nove peças de borda; combinações estreitas, isoladas e recortes reutilizam essas peças. Para acabamento perfeito em todos os formatos, ainda serão necessárias peças específicas para os recortes. Portas, interior e compra de materiais ficam para uma próxima etapa.
 
-Salvar guarda células e regiões das casas em user://house_world2.json. Carregar valida antes de substituir as células da construção. Saves anteriores com somente peças continuam aceitos; peças antigas não se tornam casas automáticas. Não carrega automaticamente ao iniciar. Alterações só persistem quando Salvar é acionado. Limite de 2048 peças e histórico de 256 ações.
+No Inspector de HouseBuilder, `material_limit` tem valor padrão 25. Os caminhos de Player e da camada de solo precisam apontar para os nós da sua cena.
 
-## Validação
-
-Sintaxe verificada com gdparse; peças de todas as 30 combinações de dimensões conferidas nos TileSets; montagem visual examinada em prévia local. Execução real no Godot pendente.
-
-Teste: B → ajustar tamanho → construir em área livre → tentar sobrepor → ocultar cobertura → remover com direito → desfazer → salvar → reiniciar → carregar. Se não houver HouseBuilder em Actors/Map, instancie scenes/building/HouseBuilder.tscn ali com player_path ../../Player e ground_path ../soil_water.
-
-Próxima etapa: piso, móveis, porta funcional e interior da casa.
+Validação desta alteração: o script passou pelo parser GDScript. A execução e a aparência devem ser conferidas no Godot.
