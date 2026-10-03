@@ -363,8 +363,12 @@ func _valid_exterior_cut(cut: Array[Vector2i], width: int, height: int, patios: 
 	if cut.size() == 1:
 		var cell: Vector2i = cut[0]
 		var horizontal: bool = _is_exterior(cell + Vector2i.LEFT, patios) or _is_exterior(cell + Vector2i.RIGHT, patios)
-		var vertical: bool = _is_exterior(cell + Vector2i.UP, patios) or _is_exterior(cell + Vector2i.DOWN, patios)
-		return horizontal and vertical
+		var neighbours: int = 0
+		for direction in DIRECTIONS:
+			if footprint.has(cell + direction):
+				neighbours += 1
+		# Allow tips and lateral repairs; protect isolated cuts on horizontal walls.
+		return neighbours <= 1 or horizontal
 	if cut.size() != 2 or not ((width == 2 and height == 1) or (width == 1 and height == 2)):
 		return false
 	var directions: Array[Vector2i] = []
@@ -430,30 +434,29 @@ func _remove_floor_area(start: Vector2i, end: Vector2i) -> void:
 	_rebuild()
 	status.text = "Área removida; materiais devolvidos. Salve para guardar."
 
-func _curve_layout_error(cells: Dictionary) -> String:
-	# A one-tile elbow has two perpendicular neighbours but no inner support.
-	# Straight provisional extensions remain possible; turns need two tiles of width.
-	for key in cells:
-		var cell: Vector2i = key
-		var neighbours: Array[Vector2i] = []
-		for direction in DIRECTIONS:
-			if cells.has(cell + direction):
-				neighbours.append(direction)
-		if neighbours.size() != 2:
+func _curve_add_error(cell: Vector2i, addition: Dictionary) -> String:
+	# Restrict only a new vertical turn on the top/bottom edge.
+	# Lateral painting and repairs must not be blocked by existing narrow corners.
+	if addition.size() != 1:
+		return ""
+	if footprint.has(cell + Vector2i.LEFT) or footprint.has(cell + Vector2i.RIGHT):
+		return ""
+	for vertical in [Vector2i.UP, Vector2i.DOWN]:
+		var pivot: Vector2i = cell + vertical
+		if not footprint.has(pivot):
 			continue
-		var diagonal: Vector2i = neighbours[0] + neighbours[1]
-		if diagonal == Vector2i.ZERO:
-			continue
-		if not cells.has(cell + diagonal):
-			return "Nas curvas, mantenha pelo menos dois blocos de largura no piso."
+		for horizontal in [Vector2i.LEFT, Vector2i.RIGHT]:
+			if not footprint.has(pivot + horizontal):
+				continue
+			if footprint.has(cell + horizontal):
+				continue
+			if not footprint.has(pivot + horizontal * 2):
+				return "Na curva da parede de cima ou de baixo, avance dois blocos na horizontal antes de virar."
 	return ""
 
 func _house_layout_error(cells: Dictionary) -> String:
 	if cells.is_empty():
 		return ""
-	var curve_error: String = _curve_layout_error(cells)
-	if not curve_error.is_empty():
-		return curve_error
 	# The remaining floor must still form one connected house.
 	var first: Vector2i = cells.keys()[0]
 	var visited: Dictionary = {first: true}
@@ -573,6 +576,9 @@ func _add_reason(cell: Vector2i) -> String:
 	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 		return "Pinte sobre o solo."
 	if brush == "Piso":
+		var curve_error: String = _curve_add_error(cell, addition)
+		if not curve_error.is_empty():
+			return curve_error
 		var proposed: Dictionary = footprint.duplicate()
 		for key in addition:
 			var added_cell: Vector2i = key
