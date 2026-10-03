@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cqmug74lx73lh"
-path="res://.godot/imported/Grass.png-93b21aeac846e9dbed83d01e56d1481b.ctex"
+uid="uid://dfcbwth2v673j"
+path="res://.godot/imported/chicken blue.png-4366d48d5beb9ea507ffe8db9634c473.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tilesets/Grass.png"
-dest_files=["res://.godot/imported/Grass.png-93b21aeac846e9dbed83d01e56d1481b.ctex"]
+source_file="res://assets/Animals/Chicken/chicken blue.png"
+dest_files=["res://.godot/imported/chicken blue.png-4366d48d5beb9ea507ffe8db9634c473.ctex"]
 
 [params]
 

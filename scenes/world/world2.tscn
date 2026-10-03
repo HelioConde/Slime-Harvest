@@ -1,97 +1,16 @@
-[gd_scene format=3 uid="uid://dy8e7rclxsk6i"]
+[gd_scene format=4 uid="uid://dy8e7rclxsk6i"]
 
-[ext_resource type="Texture2D" uid="uid://cqmug74lx73lh" path="res://assets/tilesets/Grass.png" id="1_7o7oy"]
+[ext_resource type="Texture2D" uid="uid://6gwcwhx3v6fy" path="res://assets/tilesets/ground tiles/New tiles/Grass_Tile_Layers.png" id="1_7o7oy"]
 [ext_resource type="PackedScene" uid="uid://e41u5bfsawlk" path="res://scenes/player/Player.tscn" id="2_1druj"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7o7oy"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1druj"]
 texture = ExtResource("1_7o7oy")
-texture_region_size = Vector2i(16, 16)
-0:0/0 = 0
-0:0/0/terrain_set = 0
-0:0/0/terrain = 0
-0:0/0/terrains_peering_bit/bottom_right_corner = 0
-1:0/0 = 0
-1:0/0/terrain_set = 0
-1:0/0/terrain = 0
-1:0/0/terrains_peering_bit/bottom_left_corner = 0
-1:0/0/terrains_peering_bit/bottom_right_corner = 0
-2:0/0 = 0
-2:0/0/terrain_set = 0
-2:0/0/terrain = 0
-2:0/0/terrains_peering_bit/bottom_left_corner = 0
-0:1/0 = 0
-0:1/0/terrain_set = 0
-0:1/0/terrain = 0
-0:1/0/terrains_peering_bit/top_right_corner = 0
-0:1/0/terrains_peering_bit/bottom_right_corner = 0
-1:1/0 = 0
-1:1/0/terrain_set = 0
-1:1/0/terrain = 0
-1:1/0/terrains_peering_bit/top_left_corner = 0
-1:1/0/terrains_peering_bit/top_right_corner = 0
-1:1/0/terrains_peering_bit/bottom_left_corner = 0
-1:1/0/terrains_peering_bit/bottom_right_corner = 0
-2:1/0 = 0
-2:1/0/terrain_set = 0
-2:1/0/terrain = 0
-2:1/0/terrains_peering_bit/top_left_corner = 0
-2:1/0/terrains_peering_bit/bottom_left_corner = 0
-0:2/0 = 0
-0:2/0/terrain_set = 0
-0:2/0/terrain = 0
-0:2/0/terrains_peering_bit/top_right_corner = 0
-1:2/0 = 0
-1:2/0/terrain_set = 0
-1:2/0/terrain = 0
-1:2/0/terrains_peering_bit/top_left_corner = 0
-1:2/0/terrains_peering_bit/top_right_corner = 0
-2:2/0 = 0
-2:2/0/terrain_set = 0
-2:2/0/terrain = 0
-2:2/0/terrains_peering_bit/top_left_corner = 0
-5:1/0 = 0
-5:1/0/terrain_set = 0
-5:1/0/terrain = 0
-5:1/0/terrains_peering_bit/top_left_corner = 0
-5:1/0/terrains_peering_bit/top_right_corner = 0
-5:1/0/terrains_peering_bit/bottom_left_corner = 0
-6:1/0 = 0
-6:1/0/terrain_set = 0
-6:1/0/terrain = 0
-6:1/0/terrains_peering_bit/top_left_corner = 0
-6:1/0/terrains_peering_bit/top_right_corner = 0
-6:1/0/terrains_peering_bit/bottom_right_corner = 0
-5:2/0 = 0
-5:2/0/terrain_set = 0
-5:2/0/terrain = 0
-5:2/0/terrains_peering_bit/top_left_corner = 0
-5:2/0/terrains_peering_bit/bottom_left_corner = 0
-5:2/0/terrains_peering_bit/bottom_right_corner = 0
-6:2/0 = 0
-6:2/0/terrain_set = 0
-6:2/0/terrain = 0
-6:2/0/terrains_peering_bit/top_right_corner = 0
-6:2/0/terrains_peering_bit/bottom_left_corner = 0
-6:2/0/terrains_peering_bit/bottom_right_corner = 0
-9:0/0 = 0
-9:0/0/terrain_set = 0
-9:0/0/terrain = 0
-9:0/0/terrains_peering_bit/top_right_corner = 0
-9:0/0/terrains_peering_bit/bottom_left_corner = 0
-9:1/0 = 0
-9:1/0/terrain_set = 0
-9:1/0/terrain = 0
-9:1/0/terrains_peering_bit/top_left_corner = 0
-9:1/0/terrains_peering_bit/bottom_right_corner = 0
-3:3/0 = 0
-3:3/0/terrain_set = 0
-3:3/0/terrain = 0
 
 [sub_resource type="TileSet" id="TileSet_jdkxt"]
 terrain_set_0/mode = 1
 terrain_set_0/terrain_0/name = "grass"
 terrain_set_0/terrain_0/color = Color(0.041622907, 0.44246846, 0.053347573, 1)
-sources/0 = SubResource("TileSetAtlasSource_7o7oy")
+sources/1 = SubResource("TileSetAtlasSource_1druj")
 
 [node name="World2" type="Node2D" unique_id=2045392138]
 
@@ -102,6 +21,7 @@ sources/0 = SubResource("TileSetAtlasSource_7o7oy")
 [node name="grass" type="Node2D" parent="Actors/Map" unique_id=313016138]
 
 [node name="TileMapLayer" type="TileMapLayer" parent="Actors/Map/grass" unique_id=633426789]
+tile_map_data = PackedByteArray("AAACAAMAAAABAAEAAAADAAMAAAABAAEAAAADAAIAAAABAAEAAAACAAIAAAAGAAIAAAAEAAIAAAABAAEAAAAFAAIAAAABAAEAAAAFAAMAAAABAAEAAAAEAAMAAAABAAEAAAAGAAMAAAABAAEAAAAGAAIAAAAFAAIAAAAGAAEAAAACAAAAAAAFAAEAAAABAAAAAAAHAAIAAAABAAAAAAAHAAMAAAABAAEAAAAHAAQAAAABAAEAAAAGAAQAAAABAAEAAAAFAAQAAAABAAEAAAAFAAUAAAABAAEAAAAEAAUAAAABAAEAAAAEAAQAAAABAAEAAAADAAQAAAABAAEAAAACAAQAAAABAAEAAAABAAQAAAABAAEAAAABAAUAAAABAAIAAAAAAAUAAAABAAIAAAAAAAQAAAABAAEAAAABAAMAAAAGAAIAAAACAAUAAAAGAAEAAAADAAUAAAABAAEAAAADAAYAAAABAAIAAAACAAYAAAAAAAIAAAAFAAYAAAABAAIAAAAGAAYAAAACAAIAAAAEAAYAAAABAAIAAAAGAAUAAAAFAAEAAAAIAAMAAAAFAAIAAAAIAAQAAAAFAAEAAAAHAAUAAAABAAIAAAAIAAUAAAACAAIAAAAIAAIAAAACAAAAAAAJAAQAAAACAAIAAAAJAAMAAAACAAAAAAADAAEAAAABAAAAAAAEAAEAAAABAAAAAAABAAIAAAAAAAAAAAAAAAMAAAABAAAAAAD//wMAAAAAAAAAAAD//wQAAAAAAAEAAAACAAEAAAAAAAAAAAD//wUAAAAAAAIAAAA=")
 tile_set = SubResource("TileSet_jdkxt")
 
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("2_1druj")]
