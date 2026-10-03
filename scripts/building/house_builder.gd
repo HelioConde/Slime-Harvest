@@ -181,6 +181,14 @@ func _add_reason(cell: Vector2i) -> String:
 		return ""
 	if brush == "Piso" and footprint.size() >= material_limit:
 		return "Materiais esgotados: limite de %d células de piso." % material_limit
+	if brush == "Piso" and not footprint.is_empty():
+		var connected := false
+		for direction in DIRECTIONS:
+			connected = connected or footprint.has(cell + direction)
+		if not connected:
+			return "Expanda o piso ao lado da casa."
+	if brush != "Piso" and not _supported(cell, brush):
+		return "Pinte %s junto do piso da casa." % brush.to_lower()
 	var point := floor_layer.to_global(floor_layer.map_to_local(cell))
 	if ground.get_cell_source_id(ground.local_to_map(ground.to_local(point))) == -1:
 		return "Pinte sobre o solo."
@@ -195,7 +203,55 @@ func _add_reason(cell: Vector2i) -> String:
 			return "Não coloque uma parede sobre o jogador."
 	return ""
 
+func _supported(cell: Vector2i, layer: String) -> bool:
+	var vertical := 2 if layer == "Telhado" else 1
+	for y in range(-vertical, vertical + 1):
+		for x in range(-1, 2):
+			if footprint.has(cell + Vector2i(x, y)):
+				return true
+	return false
+
+func _wall_atlas(cell: Vector2i) -> Vector2i:
+	var left := wall_cells.has(cell + Vector2i.LEFT)
+	var right := wall_cells.has(cell + Vector2i.RIGHT)
+	var up := wall_cells.has(cell + Vector2i.UP)
+	var down := wall_cells.has(cell + Vector2i.DOWN)
+	var inner_left := footprint.has(cell + Vector2i.LEFT)
+	var inner_right := footprint.has(cell + Vector2i.RIGHT)
+	var x := 2 if inner_left and not inner_right else 0
+	if up or down:
+		if right and not left:
+			return Vector2i(0, 0 if down else 2)
+		if left and not right:
+			return Vector2i(2, 0 if down else 2)
+		return Vector2i(x, 1)
+	return Vector2i(1, 2 if footprint.has(cell + Vector2i.UP) else 0)
+
+func _roof_atlas(cell: Vector2i, ridge: int) -> Vector2i:
+	var left := roof_cells.has(cell + Vector2i.LEFT)
+	var right := roof_cells.has(cell + Vector2i.RIGHT)
+	var up := roof_cells.has(cell + Vector2i.UP)
+	var down := roof_cells.has(cell + Vector2i.DOWN)
+	if up and left and not roof_cells.has(cell + Vector2i(-1, -1)):
+		return Vector2i(3, 0)
+	if up and right and not roof_cells.has(cell + Vector2i(1, -1)):
+		return Vector2i(4, 0)
+	if down and left and not roof_cells.has(cell + Vector2i(-1, 1)):
+		return Vector2i(3, 1)
+	if down and right and not roof_cells.has(cell + Vector2i(1, 1)):
+		return Vector2i(4, 1)
+	var x := 0 if not left else 2 if not right else 1
+	var y := 0 if not up else 4 if not down else 2 if cell.y == ridge else 1 if cell.y < ridge else 3
+	return Vector2i(x, y)
+
 func _rebuild() -> void:
+	# Remove orphan pieces when shrinking the floor or loading an old test.
+	for cell in wall_cells.keys():
+		if not _supported(cell, "Parede"):
+			wall_cells.erase(cell)
+	for cell in roof_cells.keys():
+		if not _supported(cell, "Telhado"):
+			roof_cells.erase(cell)
 	roof.clear()
 	walls.clear()
 	floor_layer.clear()
@@ -208,18 +264,7 @@ func _rebuild() -> void:
 		floor_layer.set_cell(cell, wall_source, Vector2i(1, 1))
 	for key in wall_cells:
 		var cell: Vector2i = key
-		var left := wall_cells.has(cell + Vector2i.LEFT)
-		var right := wall_cells.has(cell + Vector2i.RIGHT)
-		var up := wall_cells.has(cell + Vector2i.UP)
-		var down := wall_cells.has(cell + Vector2i.DOWN)
-		var atlas := Vector2i(1, 0)
-		if up or down:
-			atlas = Vector2i(0 if not footprint.has(cell + Vector2i.LEFT) else 4, 1)
-			if right and not left:
-				atlas = Vector2i(0, 0 if down else 2)
-			elif left and not right:
-				atlas = Vector2i(4, 0 if down else 1)
-		walls.set_cell(cell, wall_source, atlas)
+		walls.set_cell(cell, wall_source, _wall_atlas(cell))
 		_add_block(cell)
 	# Original five rows: top edge, upper slope, ridge, lower slope, bottom edge.
 	# A single ridge spans the painted roof, rather than repeating every tile.
@@ -232,9 +277,7 @@ func _rebuild() -> void:
 		var ridge := floori((min_y + max_y) / 2.0)
 		for key in roof_cells:
 			var cell: Vector2i = key
-			var x := 0 if not roof_cells.has(cell + Vector2i.LEFT) else 2 if not roof_cells.has(cell + Vector2i.RIGHT) else 1
-			var y := 0 if not roof_cells.has(cell + Vector2i.UP) else 4 if not roof_cells.has(cell + Vector2i.DOWN) else 2 if cell.y == ridge else 1 if cell.y < ridge else 3
-			roof.set_cell(cell, roof_tiles.get_source_id(0), Vector2i(x, y))
+			roof.set_cell(cell, roof_tiles.get_source_id(0), _roof_atlas(cell, ridge))
 	_update_roof_visibility()
 	_refresh_balance()
 
