@@ -264,7 +264,7 @@ func _on_item_collected(item_id: StringName, amount: int) -> void:
 	_toast.modulate.a = 1.0
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(0.8)
-	_toast_tween.tween_property(_toast, "modulate:a", 0.65)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.65)
 
 
 func _refresh_selection() -> void:
