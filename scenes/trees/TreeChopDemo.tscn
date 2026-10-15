@@ -46,59 +46,74 @@ z_index = -1
 
 [node name="RockNorth" parent="Scenery" instance=ExtResource("5_rock")]
 position = Vector2(158, 126)
+persist_mining = false
 
 [node name="RockEast" parent="Scenery" instance=ExtResource("5_rock")]
 position = Vector2(444, 277)
+persist_mining = false
 
 [node name="RockWestSmall" parent="Scenery" instance=ExtResource("6_rock_small")]
 position = Vector2(90, 267)
+persist_mining = false
 
 [node name="RockSouthSmall" parent="Scenery" instance=ExtResource("6_rock_small")]
 position = Vector2(381, 323)
+persist_mining = false
 
 [node name="GrassWest" parent="Scenery" instance=ExtResource("10_grass")]
 position = Vector2(134, 181)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="GrassSouth" parent="Scenery" instance=ExtResource("10_grass")]
 position = Vector2(198, 316)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="GrassNortheast" parent="Scenery" instance=ExtResource("10_grass")]
 position = Vector2(407, 119)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="FlowerPinkWest" parent="Scenery" instance=ExtResource("7_pink")]
 position = Vector2(183, 233)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="FlowerPinkEast" parent="Scenery" instance=ExtResource("7_pink")]
 position = Vector2(428, 184)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="FlowerBlueNorth" parent="Scenery" instance=ExtResource("8_blue")]
 position = Vector2(206, 133)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="FlowerBlueSouth" parent="Scenery" instance=ExtResource("8_blue")]
 position = Vector2(300, 319)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="FlowerYellowSouth" parent="Scenery" instance=ExtResource("9_yellow")]
 position = Vector2(145, 304)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="FlowerYellowEast" parent="Scenery" instance=ExtResource("9_yellow")]
 position = Vector2(436, 241)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="MushroomWest" parent="Scenery" instance=ExtResource("11_mushroom")]
 position = Vector2(163, 286)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="MushroomEast" parent="Scenery" instance=ExtResource("11_mushroom")]
 position = Vector2(404, 285)
 start_fully_grown = true
+persist_pickup = false
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(260, 220)

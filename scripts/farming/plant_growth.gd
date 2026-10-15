@@ -6,6 +6,11 @@ extends Node2D
 @export var use_calendar: bool = true
 @export var persistent_id: String = ""
 @export var start_fully_grown: bool = false
+@export var persist_pickup: bool = true
+
+var _collectible_item: StringName = &""
+var _pickup_key: String = ""
+var _picked_up: bool = false
 
 @onready var sprite: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 
@@ -17,6 +22,19 @@ var _growth_tween: Tween
 
 
 func _ready() -> void:
+    # Flores/cogumelos decorativos podem ser coletados com clique sem ferramenta.
+    var source_name: String = scene_file_path.get_file().get_basename().to_lower()
+    if source_name.is_empty():
+        source_name = name.to_snake_case()
+    if source_name.begins_with("flower_") or source_name.begins_with("mushroom_"):
+        _collectible_item = StringName(source_name)
+    _pickup_key = persistent_id if not persistent_id.is_empty() else str(get_path())
+    if _collectible_item != &"" and use_calendar:
+        if persist_pickup and ResourceBag.is_plant_collected(_pickup_key):
+            _picked_up = true
+            queue_free()
+            return
+        add_to_group("pickable_plants")
     if sprite == null or sprite.sprite_frames == null:
         push_warning("PlantGrowth: AnimatedSprite2D ausente ou vazio.")
         return
@@ -87,3 +105,28 @@ func is_mature() -> bool:
 
 func get_max_level() -> int:
     return _max_level
+
+
+func can_pick() -> bool:
+    return not _picked_up and use_calendar and _collectible_item != &"" and sprite != null
+
+
+func contains_click(world_point: Vector2) -> bool:
+    if not can_pick() or sprite.sprite_frames == null:
+        return false
+    var texture: Texture2D = sprite.sprite_frames.get_frame_texture(sprite.animation, sprite.frame)
+    if texture == null:
+        return false
+    var size: Vector2 = texture.get_size()
+    var hit_position: Vector2 = sprite.to_local(world_point) - sprite.offset
+    return Rect2(-size * 0.5, size).grow(4.0).has_point(hit_position)
+
+
+func pick_by_click(_player: Node = null) -> bool:
+    if not can_pick():
+        return false
+    if not ResourceBag.collect_plant(_pickup_key, _collectible_item, persist_pickup):
+        return false
+    _picked_up = true
+    queue_free()
+    return true

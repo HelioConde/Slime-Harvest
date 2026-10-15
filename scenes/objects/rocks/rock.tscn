@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://do1dqqwsqi8jo"]
 
 [ext_resource type="Texture2D" uid="uid://qw4xrtdtiwew" path="res://assets/Objects/Mushrooms, Flowers, Stones.png" id="1_70ahf"]
+[ext_resource type="Script" path="res://scripts/rocks/mineable_rock.gd" id="mineable_script"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_aw33s"]
 atlas = ExtResource("1_70ahf")
@@ -42,6 +43,7 @@ animations = [{
 }]
 
 [node name="Rock" type="Node2D" unique_id=1997084972]
+script = ExtResource("mineable_script")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1511412045]
 sprite_frames = SubResource("SpriteFrames_uv805")

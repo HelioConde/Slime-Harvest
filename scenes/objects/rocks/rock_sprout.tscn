@@ -1,11 +1,13 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Texture2D" path="res://data/objects/rocks/rock_sprout.tres" id="1_texture"]
+[ext_resource type="Script" path="res://scripts/rocks/mineable_rock.gd" id="mineable_script"]
 
 [sub_resource type="RectangleShape2D" id="Shape_base"]
 size = Vector2(22, 8)
 
 [node name="rock_sprout" type="StaticBody2D" groups=["world_objects"]]
+script = ExtResource("mineable_script")
 texture_filter = 1
 collision_layer = 1
 collision_mask = 2
