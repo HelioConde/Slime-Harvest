@@ -4,14 +4,17 @@
 - [x] Nome de exibição atualizado para **Slimekeepers: Lost Valley**.
 - [x] Preservar Player, recursos existentes, mapa provisório e construção de casa.
 - [x] Implementar primeiro ciclo de cultivo em mapa provisório.
-- [ ] Validar visualmente/corrigir falhas de execução no Godot local.
+- [x] Restaurar as 64 cenas originais ausentes do catalogo, mantendo texturas e colisoes.
+- [x] Criar verificacao automatica de referencias e componentes principais.
+- [ ] Validar visualmente/corrigir falhas de execucao no Godot local.
 
 ## M1 — Fazendinha jogável
 - [ ] Integrar o ciclo de cultivo ao mapa de tiles `World.tscn` sem perder a construção de casas.
 - [x] Animar a passagem dos estágios `level1..level4` das flores a cada 3 dias e salvar os dias de jogo.
 - [ ] Integrar os canteiros ao novo mapa principal e confirmar as cenas visualmente no Godot.
-- [x] Machado corta arvores em 3 golpes, executa queda sem loop e cria toco persistente (teste local pendente).
-- [ ] Inventário, ferramentas acessíveis, energia e moedas.
+- [x] Machado corta arvores em **5 golpes**, respeita o balanco antes de cada novo golpe, executa queda sem loop e cria toco persistente (teste visual local pendente).
+- [x] Barra inferior de quatro equipamentos com atalhos, icones, grupos e persistencia.
+- [ ] Mochila de recursos, energia, moedas e colecoes.
 - [ ] Três tipos de cultivos, colheita e venda em um ponto do mapa.
 - [ ] Salvar e carregar posição do jogador, mundo, casa e inventário de modo consistente.
 

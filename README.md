@@ -12,6 +12,8 @@ Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolv
 - Cultivo experimental: enxada prepara/plantar/colher; regador permite o crescimento por etapas a cada tres dias do jogo.
 - Casas: HouseBuilder integrado ao mapa principal scenes/world/World.tscn.
 - Arte: tilesets, personagens, flores, arvores, pedras e cogumelos presentes em assets/ e scenes/.
+- Catalogo: 78 cenas referenciadas, incluindo as 64 restauradas do historico.
+- Checagem estrutural de referencias: `py -3 tools/validate_godot_project.py`.
 
 ## Executar
 
