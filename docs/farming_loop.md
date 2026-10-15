@@ -36,4 +36,5 @@ Este é um protótipo: o visual de sementes, brotos e colheitas é desenhado por
 - O progresso de cada planta colocada no mundo e salvo em `user://slimekeepers_calendar_v1.json`, junto com dia e tempo parcial; nao avanca com o jogo fechado.
 - Em execucao de debug, pressione **F9** para adiantar um dia. Teste com **F6** na cena `scenes/farming/GrowthPreview.tscn`.
 - Para adicionar uma planta ao mapa, instancie a cena da flor ou cogumelo no editor. Para replantar a mesma planta por codigo, chame `replant_today()`.
-- Nota: o canteiro experimental `FarmField` precisa migrar seu antigo temporizador em segundos para o calendario compartilhado.
+- O canteiro experimental `FarmField` tambem avanca 1 fase a cada 3 dias de jogo apos a rega; as plantas usam as cenas reais das flores.
+- Saves antigos do canteiro (versao 1) sao convertidos para o sistema de dias sem apagar as colheitas.
