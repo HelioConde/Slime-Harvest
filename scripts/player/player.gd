@@ -7,44 +7,78 @@ signal tool_use_requested(origin: Vector2, direction: Vector2)
 @export_range(1.0, 3.0) var run_multiplier: float = 1.6
 @export_range(0.05, 2.0) var tool_cooldown: float = 0.3
 @export var controls_enabled: bool = true
-@export_range(16.0, 80.0, 1.0) var axe_reach: float = 40.0
-var axe_equipped: bool = false
-var _axe_label: Label
+@export_range(16.0, 96.0, 1.0) var axe_reach: float = 60.0
+@export_range(0.5, 3.0, 0.05) var axe_animation_speed: float = 1.65
 
+var axe_equipped: bool = false
 var facing: Vector2 = Vector2.DOWN
 var _tool_remaining: float = 0.0
+var _axe_animating: bool = false
+var _axe_label: Label
 
 @onready var animation: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 @onready var placeholder: Polygon2D = get_node_or_null("Placeholder") as Polygon2D
 @onready var interaction_ray: RayCast2D = $InteractionRay
 @onready var tool_origin: Marker2D = $ToolOrigin
 
+
 func _ready() -> void:
 	if animation == null:
-		push_error("Player: mantenha o nó AnimatedSprite2D como filho direto do Player.")
+		push_error("Player: mantenha AnimatedSprite2D como filho direto.")
 		set_physics_process(false)
+		return
+	animation.animation_finished.connect(_on_player_animation_finished)
 	_create_axe_hud()
 
+
 func _input(event: InputEvent) -> void:
-    if not controls_enabled:
-        return
-    var key := event as InputEventKey
-    if key == null or not key.pressed or key.echo:
-        return
-    if key.keycode == KEY_5:
-        axe_equipped = true
-        _refresh_axe_hud()
-    elif key.keycode in [KEY_1, KEY_2, KEY_3, KEY_4]:
-        axe_equipped = false
-        _refresh_axe_hud()
+	if not controls_enabled:
+		return
+	var key := event as InputEventKey
+	if key == null or not key.pressed or key.echo:
+		return
+	if key.keycode == KEY_5:
+		axe_equipped = true
+		_refresh_axe_hud()
+	elif key.keycode in [KEY_1, KEY_2, KEY_3, KEY_4]:
+		axe_equipped = false
+		_refresh_axe_hud()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not controls_enabled or not axe_equipped or _axe_animating:
+		return
+	var click := event as InputEventMouseButton
+	if click == null or not click.pressed or click.button_index != MOUSE_BUTTON_LEFT:
+		return
+	var mouse_world := get_global_mouse_position()
+	var best_tree: Node2D = null
+	var best_distance := INF
+	for node in get_tree().get_nodes_in_group("choppable_trees"):
+		var tree := node as Node2D
+		if tree == null or not tree.has_method("contains_click"):
+			continue
+		var distance_to_player := global_position.distance_to(tree.global_position)
+		if distance_to_player > axe_reach:
+			continue
+		if not bool(tree.call("contains_click", mouse_world)):
+			continue
+		if not bool(tree.call("can_accept_axe_hit")):
+			continue
+		var distance_to_click := mouse_world.distance_squared_to(tree.global_position)
+		if distance_to_click < best_distance:
+			best_distance = distance_to_click
+			best_tree = tree
+	if best_tree != null and _attempt_axe_hit(best_tree):
+		get_viewport().set_input_as_handled()
 
 
 func _physics_process(delta: float) -> void:
 	_tool_remaining = maxf(0.0, _tool_remaining - delta)
 	var direction := Vector2.ZERO
-	if controls_enabled:
+	if controls_enabled and not _axe_animating:
 		direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var running := controls_enabled and Input.is_action_pressed("run")
+	var running := controls_enabled and not _axe_animating and Input.is_action_pressed("run")
 	if direction != Vector2.ZERO:
 		if absf(direction.x) > absf(direction.y):
 			facing = Vector2.RIGHT if direction.x > 0.0 else Vector2.LEFT
@@ -57,50 +91,101 @@ func _physics_process(delta: float) -> void:
 	tool_origin.position = facing * 16.0
 	var moving := get_position_delta().length_squared() > 0.001
 	_update_animation(moving, running)
-	if not controls_enabled:
+	if not controls_enabled or _axe_animating:
 		return
 	if Input.is_action_just_pressed("interact"):
 		_interact()
 	if Input.is_action_just_pressed("use_tool") and _tool_remaining <= 0.0:
-		_tool_remaining = tool_cooldown
 		if axe_equipped:
 			_try_axe_hit()
 		else:
+			_tool_remaining = tool_cooldown
 			tool_use_requested.emit(tool_origin.global_position, facing)
 
+
 func _try_axe_hit() -> void:
-    var query := PhysicsRayQueryParameters2D.create(
-        global_position, global_position + facing * axe_reach, 1, [get_rid()]
-    )
-    var hit := get_world_2d().direct_space_state.intersect_ray(query)
-    if hit.is_empty():
-        return
-    var target := hit.get("collider") as Node
-    if target != null and target.has_method("take_axe_hit"):
-        target.call("take_axe_hit", self)
+	var query := PhysicsRayQueryParameters2D.create(
+		global_position, global_position + facing * axe_reach, 1, [get_rid()]
+	)
+	var hit := get_world_2d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return
+	var target := hit.get("collider") as Node
+	_attempt_axe_hit(target)
+
+
+func _attempt_axe_hit(target: Node) -> bool:
+	if target == null or not controls_enabled or not axe_equipped or _axe_animating:
+		return false
+	if _tool_remaining > 0.0 or not target.has_method("take_axe_hit"):
+		return false
+	var tree := target as Node2D
+	if tree == null or global_position.distance_to(tree.global_position) > axe_reach:
+		return false
+	if not bool(target.call("can_accept_axe_hit")):
+		return false
+	if not bool(target.call("take_axe_hit", self)):
+		return false
+	var toward := tree.global_position - global_position
+	if absf(toward.x) > absf(toward.y):
+		facing = Vector2.RIGHT if toward.x > 0.0 else Vector2.LEFT
+	else:
+		facing = Vector2.DOWN if toward.y > 0.0 else Vector2.UP
+	_tool_remaining = tool_cooldown
+	_play_axe_animation()
+	return true
+
+
+func _play_axe_animation() -> void:
+	var suffix := "down"
+	if facing == Vector2.UP:
+		suffix = "up"
+	elif facing == Vector2.LEFT:
+		suffix = "left"
+	elif facing == Vector2.RIGHT:
+		suffix = "right"
+	var axe_name := StringName("axe_" + suffix)
+	if not _has_frames(axe_name):
+		push_warning("Player: animacao do machado ausente: " + str(axe_name))
+		return
+	_axe_animating = true
+	animation.flip_h = false
+	animation.speed_scale = axe_animation_speed
+	animation.stop()
+	animation.play(axe_name)
+
+
+func _on_player_animation_finished() -> void:
+	if not _axe_animating or not String(animation.animation).begins_with("axe_"):
+		return
+	_axe_animating = false
+	animation.speed_scale = 1.0
+	_update_animation(false, false)
 
 
 func _create_axe_hud() -> void:
-    var canvas := CanvasLayer.new()
-    canvas.name = "AxeHUD"
-    canvas.layer = 12
-    add_child(canvas)
-    _axe_label = Label.new()
-    _axe_label.position = Vector2(8, 84)
-    _axe_label.add_theme_font_size_override("font_size", 12)
-    _axe_label.add_theme_constant_override("outline_size", 3)
-    _axe_label.add_theme_color_override("font_outline_color", Color("#173022"))
-    canvas.add_child(_axe_label)
-    _refresh_axe_hud()
+	var canvas := CanvasLayer.new()
+	canvas.name = "AxeHUD"
+	canvas.layer = 12
+	add_child(canvas)
+	_axe_label = Label.new()
+	_axe_label.position = Vector2(8, 84)
+	_axe_label.add_theme_font_size_override("font_size", 12)
+	_axe_label.add_theme_constant_override("outline_size", 3)
+	_axe_label.add_theme_color_override("font_outline_color", Color("#173022"))
+	canvas.add_child(_axe_label)
+	_refresh_axe_hud()
 
 
 func _refresh_axe_hud() -> void:
-    if _axe_label == null:
-        return
-    _axe_label.text = "Machado equipado: F para cortar" if axe_equipped else "5: Machado | 1-4: Cultivo"
+	if _axe_label == null:
+		return
+	_axe_label.text = "Machado: clique na arvore ou F | 5 golpes" if axe_equipped else "5: equipar machado | 1-4: cultivo"
 
 
 func _update_animation(moving: bool, running: bool) -> void:
+	if _axe_animating:
+		return
 	var suffix := "down"
 	if facing == Vector2.UP:
 		suffix = "up"

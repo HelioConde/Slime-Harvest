@@ -93,7 +93,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_t8d8m")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"wind_swaying",
 "speed": 5.0
 }]
