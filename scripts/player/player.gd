@@ -95,29 +95,52 @@ func _unhandled_input(event: InputEvent) -> void:
 	var click := event as InputEventMouseButton
 	if click == null or not click.pressed or click.button_index != MOUSE_BUTTON_LEFT:
 		return
-	var cursor_world := get_global_mouse_position()
-	if _current_tool() == &"axe":
-		var best_tree: Node2D = null
-		var best_distance := INF
-		for node in get_tree().get_nodes_in_group("choppable_trees"):
-			var tree := node as Node2D
-			if tree == null or not tree.has_method("contains_click"):
-				continue
-			if global_position.distance_to(tree.global_position) > tool_reach:
-				continue
-			if not bool(tree.call("contains_click", cursor_world)):
-				continue
-			if not bool(tree.call("can_accept_axe_hit")):
-				continue
-			var distance_to_click := cursor_world.distance_squared_to(tree.global_position)
-			if distance_to_click < best_distance:
-				best_distance = distance_to_click
-				best_tree = tree
-		if best_tree != null and _attempt_axe_hit(best_tree):
+	var cursor: Vector2 = get_global_mouse_position()
+	# Coleta independente da arma (inclusive quando os itens 4-0 estiverem ativos).
+	if _try_collect_click(cursor):
+		get_viewport().set_input_as_handled()
+		return
+	var current: StringName = _current_tool()
+	if current == &"axe":
+		var tree: Node2D = _find_clicked("choppable_trees", cursor)
+		if tree != null and _attempt_axe_hit(tree):
 			get_viewport().set_input_as_handled()
-	elif global_position.distance_to(cursor_world) <= tool_reach:
-		if _use_non_axe(cursor_world):
+	elif current == &"pickaxe":
+		var rock: Node2D = _find_clicked("mineable_rocks", cursor)
+		if rock != null and _attempt_pickaxe_hit(rock):
 			get_viewport().set_input_as_handled()
+	elif global_position.distance_to(cursor) <= tool_reach and _use_non_axe(cursor):
+		get_viewport().set_input_as_handled()
+
+
+func _find_clicked(group_name: String, cursor: Vector2) -> Node2D:
+	var best: Node2D = null
+	var best_distance: float = INF
+	for candidate in get_tree().get_nodes_in_group(group_name):
+		var node := candidate as Node2D
+		if node == null or not node.has_method("contains_click"):
+			continue
+		if global_position.distance_to(node.global_position) > tool_reach:
+			continue
+		if not bool(node.call("contains_click", cursor)):
+			continue
+		var score: float = cursor.distance_squared_to(node.global_position)
+		if score < best_distance:
+			best_distance = score
+			best = node
+	return best
+
+
+func _try_collect_click(cursor: Vector2) -> bool:
+	for group_name in ["world_drops", "pickable_plants"]:
+		var target: Node2D = _find_clicked(group_name, cursor)
+		if target == null:
+			continue
+		if target.has_method("pickup"):
+			return bool(target.call("pickup", self))
+		if target.has_method("pick_by_click"):
+			return bool(target.call("pick_by_click", self))
+	return false
 
 
 func _physics_process(delta: float) -> void:
@@ -144,6 +167,8 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("use_tool") and _tool_remaining <= 0.0:
 		if _current_tool() == &"axe":
 			_try_axe_hit()
+		elif _current_tool() == &"pickaxe":
+			_try_pickaxe_hit()
 		else:
 			_use_non_axe(tool_origin.global_position + facing * 16.0)
 
@@ -174,13 +199,47 @@ func _attempt_axe_hit(target: Node) -> bool:
 	return true
 
 
+func _try_pickaxe_hit() -> void:
+	var nearest: Node2D = null
+	var best_distance: float = tool_reach + 1.0
+	for candidate in get_tree().get_nodes_in_group("mineable_rocks"):
+		var rock := candidate as Node2D
+		if rock == null or not bool(rock.call("can_accept_pickaxe_hit")):
+			continue
+		var offset: Vector2 = rock.global_position - global_position
+		var distance: float = offset.length()
+		if distance > tool_reach or distance < 0.01 or offset.normalized().dot(facing) < 0.4:
+			continue
+		if distance < best_distance:
+			best_distance = distance
+			nearest = rock
+	if nearest != null:
+		_attempt_pickaxe_hit(nearest)
+
+
+func _attempt_pickaxe_hit(target: Node) -> bool:
+	if target == null or _action_animating or _tool_remaining > 0.0 or _current_tool() != &"pickaxe":
+		return false
+	if not target.has_method("take_pickaxe_hit") or not target.has_method("can_accept_pickaxe_hit"):
+		return false
+	var rock := target as Node2D
+	if rock == null or global_position.distance_to(rock.global_position) > tool_reach:
+		return false
+	if not bool(target.call("can_accept_pickaxe_hit")) or not bool(target.call("take_pickaxe_hit", self)):
+		return false
+	_face_world_position(rock.global_position)
+	_tool_remaining = tool_cooldown
+	_play_tool_animation(&"pickaxe")
+	return true
+
+
 func _use_non_axe(target_world: Vector2) -> bool:
 	if _action_animating or _tool_remaining > 0.0 or not controls_enabled:
 		return false
 	if global_position.distance_to(target_world) > tool_reach:
 		return false
 	var tool_id: StringName = _current_tool()
-	if tool_id not in [&"pickaxe", &"hoe", &"watering_can"]:
+	if tool_id not in [&"hoe", &"watering_can"]:
 		# Recursos podem ser selecionados, mas nao sao ferramentas utilizaveis.
 		return false
 	_face_world_position(target_world)

@@ -36,13 +36,20 @@ var _panel: PanelContainer
 var _strip: HBoxContainer
 var _selection_tween: Tween
 var _pulse_button: Button
+var _toast: Label
+var _toast_tween: Tween
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build_panel()
+	_build_toast()
 	_layout_bar()
 	_refresh_selection()
+	ResourceBag.amount_changed.connect(_on_amount_changed)
+	ResourceBag.item_collected.connect(_on_item_collected)
+	for item_id in SLOT_IDS:
+		_on_amount_changed(item_id, ResourceBag.get_count(item_id))
 
 
 func _notification(what: int) -> void:
@@ -93,6 +100,22 @@ func _make_slot(index: int) -> void:
 	_strip.add_child(button)
 	_slots[item_id] = button
 	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+	var owned := Label.new()
+	owned.name = "OwnedCount"
+	owned.visible = false
+	owned.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	owned.offset_left = -23.0
+	owned.offset_top = 1.0
+	owned.offset_right = -3.0
+	owned.offset_bottom = 13.0
+	owned.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	owned.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	owned.add_theme_font_size_override("font_size", 8)
+	owned.add_theme_color_override("font_color", GOLD)
+	owned.add_theme_constant_override("outline_size", 2)
+	owned.add_theme_color_override("font_outline_color", Color("#172620"))
+	button.add_child(owned)
 
 	var contents := VBoxContainer.new()
 	contents.name = "Content"
@@ -199,6 +222,49 @@ func _slot_style(active: bool, hover: bool = false) -> StyleBoxFlat:
 		style.shadow_color = Color(1.0, 0.77, 0.35, 0.22)
 		style.shadow_size = 2
 	return style
+
+
+func _build_toast() -> void:
+	_toast = Label.new()
+	_toast.name = "LastPickup"
+	_toast.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_toast.anchor_left = 0.5
+	_toast.anchor_right = 0.5
+	_toast.anchor_top = 1.0
+	_toast.anchor_bottom = 1.0
+	_toast.offset_left = -140.0
+	_toast.offset_right = 140.0
+	_toast.offset_top = -116.0
+	_toast.offset_bottom = -92.0
+	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_toast.add_theme_font_size_override("font_size", 11)
+	_toast.add_theme_color_override("font_color", GOLD)
+	_toast.add_theme_constant_override("outline_size", 3)
+	_toast.add_theme_color_override("font_outline_color", Color("#193024"))
+	_toast.modulate.a = 0.0
+	add_child(_toast)
+
+
+func _on_amount_changed(item_id: StringName, count: int) -> void:
+	var button: Button = _slots.get(item_id) as Button
+	if button == null:
+		return
+	var label: Label = button.get_node("OwnedCount") as Label
+	label.visible = count > 0
+	if count > 0:
+		label.text = str(count)
+
+
+func _on_item_collected(item_id: StringName, amount: int) -> void:
+	if _toast == null:
+		return
+	if is_instance_valid(_toast_tween):
+		_toast_tween.kill()
+	_toast.text = "+%d  %s" % [amount, String(item_id).replace("_", " ").capitalize()]
+	_toast.modulate.a = 1.0
+	_toast_tween = create_tween()
+	_toast_tween.tween_interval(0.8)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.65)
 
 
 func _refresh_selection() -> void:
