@@ -69,15 +69,24 @@ func _input(event: InputEvent) -> void:
 	var key := event as InputEventKey
 	if key == null or not key.pressed or key.echo or key.ctrl_pressed or key.alt_pressed:
 		return
+	if key.keycode == KEY_P:
+		# Picareta mantida para mineracao futura; nao ocupa um dos dez slots.
+		_equipment.call("equip", &"pickaxe")
+		return
+	var slot: int = -1
 	match key.keycode:
-		KEY_1:
-			_equipment.call("equip", &"pickaxe")
-		KEY_2:
-			_equipment.call("equip", &"axe")
-		KEY_3:
-			_equipment.call("equip", &"hoe")
-		KEY_4:
-			_equipment.call("equip", &"watering_can")
+		KEY_1: slot = 0
+		KEY_2: slot = 1
+		KEY_3: slot = 2
+		KEY_4: slot = 3
+		KEY_5: slot = 4
+		KEY_6: slot = 5
+		KEY_7: slot = 6
+		KEY_8: slot = 7
+		KEY_9: slot = 8
+		KEY_0: slot = 9
+	if slot >= 0:
+		_equipment.call("equip_slot", slot)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -170,8 +179,9 @@ func _use_non_axe(target_world: Vector2) -> bool:
 		return false
 	if global_position.distance_to(target_world) > tool_reach:
 		return false
-	var tool_id := _current_tool()
-	if tool_id == &"axe":
+	var tool_id: StringName = _current_tool()
+	if tool_id not in [&"pickaxe", &"hoe", &"watering_can"]:
+		# Recursos podem ser selecionados, mas nao sao ferramentas utilizaveis.
 		return false
 	_face_world_position(target_world)
 	_tool_remaining = tool_cooldown

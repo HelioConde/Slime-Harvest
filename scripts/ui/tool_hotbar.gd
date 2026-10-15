@@ -1,119 +1,176 @@
 extends Control
-## Barra de inventario inferior, responsiva, com quatro acessorios clicaveis.
+## Hotbar de dez espacos com os sprites reais do atlas 4x3 (16x16 por icone).
+## Ordem do atlas: regador, machado, enxada, grama, galho, madeira, tronco,
+## gravetos, tabua, pedra grande, pedra processada, pedra pequena.
 
 signal tool_selected(tool_id: StringName)
 
-const ICON_SCRIPT = preload("res://scripts/ui/tool_icon.gd")
-const TOOLS: Array[StringName] = [&"pickaxe", &"axe", &"hoe", &"watering_can"]
-const NAMES := ["Picareta", "Machado", "Enxada", "Regador"]
+const ATLAS: Texture2D = preload("res://assets/Objects/Items/tools-n-meterial-items.png")
+const COLUMN_COUNT: int = 4
+const CELL: int = 16
+const SLOT_IDS: Array[StringName] = [
+	&"watering_can", &"axe", &"hoe", &"grass_drop", &"branch",
+	&"wood", &"trunk", &"twigs", &"plank", &"large_stone"
+]
+const SLOT_NAMES: Array[String] = [
+	"Regador", "Machado", "Enxada", "Grama", "Galho",
+	"Madeira", "Tronco", "Gravetos", "Tabua", "Pedra grande"
+]
+
+const PANEL_COLOR := Color("#162b24")
+const PANEL_BORDER := Color("#c8a96d")
+const SLOT_COLOR := Color("#213a31")
+const SLOT_BORDER := Color("#537766")
+const GOLD := Color("#f1d58e")
 
 var _selected: StringName = &"axe"
 var _slots: Dictionary = {}
+var _panel: PanelContainer
 var _strip: HBoxContainer
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_strip = HBoxContainer.new()
-	_strip.name = "AccessorySlots"
-	_strip.add_theme_constant_override("separation", 7)
-	add_child(_strip)
-	for index in range(TOOLS.size()):
-		_create_slot(TOOLS[index], NAMES[index], index + 1)
+	_build_panel()
 	_layout_bar()
-	_update_slots()
+	_refresh_selection()
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_RESIZED and _strip != null:
+	if what == NOTIFICATION_RESIZED and _panel != null:
 		_layout_bar()
 
 
-func _create_slot(tool_id: StringName, title: String, index: int) -> void:
+func _build_panel() -> void:
+	_panel = PanelContainer.new()
+	_panel.name = "InventoryFrame"
+	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var frame_style := StyleBoxFlat.new()
+	frame_style.bg_color = PANEL_COLOR
+	frame_style.border_color = PANEL_BORDER
+	frame_style.set_border_width_all(2)
+	frame_style.set_corner_radius_all(16)
+	frame_style.shadow_color = Color(0.0, 0.0, 0.0, 0.38)
+	frame_style.shadow_size = 7
+	frame_style.content_margin_left = 8.0
+	frame_style.content_margin_right = 8.0
+	frame_style.content_margin_top = 7.0
+	frame_style.content_margin_bottom = 7.0
+	_panel.add_theme_stylebox_override("panel", frame_style)
+	add_child(_panel)
+
+	_strip = HBoxContainer.new()
+	_strip.name = "TenSlots"
+	_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_strip.add_theme_constant_override("separation", 4)
+	_panel.add_child(_strip)
+
+	for index in range(SLOT_IDS.size()):
+		_make_slot(index)
+
+
+func _make_slot(index: int) -> void:
+	var item_id: StringName = SLOT_IDS[index]
 	var button := Button.new()
-	button.name = "Slot_" + String(tool_id)
-	button.custom_minimum_size = Vector2(72, 77)
+	button.name = "Slot_%02d_%s" % [index + 1, String(item_id)]
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_filter = Control.MOUSE_FILTER_STOP
-	button.tooltip_text = "%d - %s" % [index, title]
-	button.add_to_group("accessory_" + String(tool_id))
-	button.pressed.connect(_on_slot_pressed.bind(tool_id))
+	button.tooltip_text = "%d - %s" % [index + 1, SLOT_NAMES[index]]
+	if index >= 3:
+		button.tooltip_text += " | recurso (coleta em desenvolvimento)"
+	button.add_to_group("hotbar_" + String(item_id))
+	button.pressed.connect(_slot_pressed.bind(item_id))
 	_strip.add_child(button)
-	_slots[tool_id] = button
+	_slots[item_id] = button
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 
-	var inner := VBoxContainer.new()
-	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.alignment = BoxContainer.ALIGNMENT_CENTER
-	inner.add_theme_constant_override("separation", 1)
-	button.add_child(inner)
-	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var contents := VBoxContainer.new()
+	contents.name = "Content"
+	contents.alignment = BoxContainer.ALIGNMENT_CENTER
+	contents.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	contents.add_theme_constant_override("separation", 0)
+	button.add_child(contents)
+	contents.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	var icon: Control = ICON_SCRIPT.new()
-	icon.set("tool_id", tool_id)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	inner.add_child(icon)
+	var image := TextureRect.new()
+	image.name = "ItemIcon"
+	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	image.custom_minimum_size = Vector2(34, 36)
+	image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	image.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var frame := AtlasTexture.new()
+	frame.atlas = ATLAS
+	var col: int = index % COLUMN_COUNT
+	var row: int = index / COLUMN_COUNT
+	frame.region = Rect2(col * CELL, row * CELL, CELL, CELL)
+	frame.filter_clip = true
+	image.texture = frame
+	contents.add_child(image)
 
-	var label := Label.new()
-	label.text = "%d  %s" % [index, title]
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 10)
-	label.add_theme_color_override("font_color", Color("#f6f1d9"))
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	inner.add_child(label)
+	var key_label := Label.new()
+	key_label.name = "Shortcut"
+	key_label.text = str((index + 1) % 10)
+	key_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	key_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	key_label.add_theme_font_size_override("font_size", 10)
+	key_label.add_theme_color_override("font_color", Color("#dfebdc"))
+	key_label.add_theme_constant_override("outline_size", 2)
+	key_label.add_theme_color_override("font_outline_color", Color("#132720"))
+	contents.add_child(key_label)
 
 
 func _layout_bar() -> void:
-	if _strip == null:
+	if _panel == null:
 		return
-	var available := maxf(290.0, size.x - 16.0)
-	var bar_width := minf(440.0, available)
-	_strip.anchor_left = 0.5
-	_strip.anchor_right = 0.5
-	_strip.anchor_top = 1.0
-	_strip.anchor_bottom = 1.0
-	_strip.offset_left = -bar_width / 2.0
-	_strip.offset_right = bar_width / 2.0
-	_strip.offset_top = -87.0
-	_strip.offset_bottom = -8.0
-	var slot_width := (bar_width - 21.0) / 4.0
-	for slot in _slots.values():
-		(slot as Button).custom_minimum_size.x = slot_width
+	var usable: float = maxf(230.0, size.x - 12.0)
+	var width: float = minf(610.0, usable)
+	var slot_width: float = (width - 16.0 - 9.0 * 4.0) / 10.0
+	for item_id in SLOT_IDS:
+		var button: Button = _slots[item_id] as Button
+		button.custom_minimum_size = Vector2(slot_width, 57.0)
+	_panel.custom_minimum_size = Vector2(width, 72.0)
+	_panel.size = Vector2(width, 72.0)
+	_panel.position = Vector2((size.x - width) * 0.5, size.y - 80.0)
+
+
+func get_slot_item(index: int) -> StringName:
+	if index < 0 or index >= SLOT_IDS.size():
+		return &""
+	return SLOT_IDS[index]
 
 
 func set_selected_tool(tool_id: StringName) -> void:
-	if not TOOLS.has(tool_id):
-		return
 	_selected = tool_id
-	_update_slots()
+	_refresh_selection()
 
 
-func _on_slot_pressed(tool_id: StringName) -> void:
-	tool_selected.emit(tool_id)
+func _slot_pressed(item_id: StringName) -> void:
+	tool_selected.emit(item_id)
 
 
-func _style(selected: bool, hovered: bool) -> StyleBoxFlat:
+func _slot_style(active: bool, hover: bool = false) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#43624e") if selected else Color("#25342f")
-	if hovered:
-		style.bg_color = Color("#527360") if selected else Color("#344a3d")
-	style.border_color = Color("#f0d58c") if selected else Color("#718674")
-	style.border_width_left = 3 if selected else 1
-	style.border_width_right = 3 if selected else 1
-	style.border_width_top = 3 if selected else 1
-	style.border_width_bottom = 3 if selected else 1
-	style.corner_radius_top_left = 10
-	style.corner_radius_top_right = 10
-	style.corner_radius_bottom_left = 10
-	style.corner_radius_bottom_right = 10
+	style.bg_color = Color("#385841") if active else SLOT_COLOR
+	if hover:
+		style.bg_color = Color("#4d6e51") if active else Color("#2f4d40")
+	style.border_color = GOLD if active else SLOT_BORDER
+	style.set_border_width_all(3 if active else 1)
+	style.set_corner_radius_all(9)
+	if active:
+		style.shadow_color = Color(1.0, 0.78, 0.38, 0.48)
+		style.shadow_size = 4
 	return style
 
 
-func _update_slots() -> void:
-	for tool_id in TOOLS:
-		var button := _slots[tool_id] as Button
-		var active: bool = tool_id == _selected
-		button.add_theme_stylebox_override("normal", _style(active, false))
-		button.add_theme_stylebox_override("hover", _style(active, true))
-		button.add_theme_stylebox_override("pressed", _style(active, true))
-		button.add_theme_stylebox_override("disabled", _style(false, false))
+func _refresh_selection() -> void:
+	for item_id in SLOT_IDS:
+		if not _slots.has(item_id):
+			continue
+		var button: Button = _slots[item_id] as Button
+		var active: bool = item_id == _selected
+		button.add_theme_stylebox_override("normal", _slot_style(active))
+		button.add_theme_stylebox_override("hover", _slot_style(active, true))
+		button.add_theme_stylebox_override("pressed", _slot_style(active, true))
+		button.add_theme_stylebox_override("hover_pressed", _slot_style(active, true))

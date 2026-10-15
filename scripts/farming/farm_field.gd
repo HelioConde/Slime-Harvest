@@ -135,7 +135,7 @@ func _on_tool_action(tool_id: StringName, world_point: Vector2) -> void:
 				cell["last_day"] = GameCalendar.day
 				_cells[coord] = cell
 				_seeds -= 1
-				_message = "Semente plantada! Equipe o regador (4)."
+				_message = "Semente plantada! Equipe o regador (1)."
 				changed = true
 		elif int(cell.get("stage", 0)) >= _max_crop_stage(coord):
 			cell["seeded"] = false
@@ -200,7 +200,7 @@ func _refresh_hud() -> void:
 	if _harvested >= 3:
 		objective = "OBJETIVO CONCLUIDO! Proximo passo: conhecer um slime."
 	_hud.text = "SLIMEKEEPERS: LOST VALLEY | Cultivo\n" + \
-		"3 Enxada: preparar / plantar / colher | 4 Regador: regar | F ou clique\n" + \
+		"3 Enxada: preparar / plantar / colher | 1 Regador: regar | F ou clique\n" + \
 		"Sementes: %d | Colheitas: %d | %s\n%s" % [_seeds, _harvested, objective, _message]
 
 

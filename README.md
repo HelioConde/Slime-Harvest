@@ -7,7 +7,7 @@ Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolv
 ## Funcionalidades atuais
 
 - Personagem: movimentacao com WASD/setas, corrida com Shift, camera e animacoes direcionais.
-- Hotbar inferior clicavel: 1 Picareta, 2 Machado, 3 Enxada, 4 Regador. Uma ferramenta equipada por vez, salva ao fechar.
+- Hotbar inferior com 10 espacos e icones recortados do spritesheet original 4x3: 1 Regador, 2 Machado, 3 Enxada, 4-0 materiais. Picareta no atalho P. A selecao fica salva.
 - Machado: corte de arvores em cinco golpes com balanco completo; animacao de queda, toco e persistencia.
 - Cultivo experimental: enxada prepara/plantar/colher; regador permite o crescimento por etapas a cada tres dias do jogo.
 - Casas: HouseBuilder integrado ao mapa principal scenes/world/World.tscn.
@@ -19,7 +19,7 @@ Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolv
 
 1. Importe a pasta deste projeto no Godot, usando project.godot.
 2. Pressione F5 para abrir scenes/world/World.tscn.
-3. Pressione 1-4 ou clique na barra para equipar acessorios; F usa a ferramenta equipada.
+3. Pressione 1-9/0 ou clique na hotbar para selecionar itens; F usa a ferramenta equipada.
 4. Teste o machado em scenes/trees/TreeChopDemo.tscn (F6).
 5. Teste a enxada e o regador em scenes/farming/FarmingToolDemo.tscn (F6).
 6. O campo FarmField ainda e uma cena de teste separada; sua integracao ao mapa definitivo continua pendente.
