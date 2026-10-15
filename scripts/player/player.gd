@@ -225,8 +225,6 @@ func _on_action_animation_finished() -> void:
 func _update_animation(moving: bool, running: bool) -> void:
 	if _action_animating:
 		return
-	if _axe_animating:
-		return
 	var suffix := "down"
 	if facing == Vector2.UP:
 		suffix = "up"
