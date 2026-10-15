@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://cgb0xslq3mc6k"]
+
+[ext_resource type="Texture2D" uid="uid://qw4xrtdtiwew" path="res://assets/Objects/Mushrooms, Flowers, Stones.png" id="1_vpl2l"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o07m4"]
+atlas = ExtResource("1_vpl2l")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4abqk"]
+atlas = ExtResource("1_vpl2l")
+region = Rect2(16, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_au0u5"]
+atlas = ExtResource("1_vpl2l")
+region = Rect2(32, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jilwg"]
+atlas = ExtResource("1_vpl2l")
+region = Rect2(48, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qs0ht"]
+atlas = ExtResource("1_vpl2l")
+region = Rect2(64, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_blujy"]
+atlas = ExtResource("1_vpl2l")
+region = Rect2(80, 16, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_uv805"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o07m4")
+}],
+"loop": 1,
+"name": &"level1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4abqk")
+}],
+"loop": 1,
+"name": &"level2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_au0u5")
+}],
+"loop": 1,
+"name": &"level3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jilwg")
+}],
+"loop": 1,
+"name": &"level4",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qs0ht")
+}],
+"loop": 1,
+"name": &"level5",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_blujy")
+}],
+"loop": 1,
+"name": &"level6",
+"speed": 5.0
+}]
+
+[node name="RockSmall" type="Node2D" unique_id=1298602842]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=80207174]
+sprite_frames = SubResource("SpriteFrames_uv805")
+animation = &"level6"

@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://cem0556knxnqk"]
+
+[ext_resource type="Texture2D" uid="uid://qw4xrtdtiwew" path="res://assets/Objects/Mushrooms, Flowers, Stones.png" id="1_7mv1i"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b1gg2"]
+atlas = ExtResource("1_7mv1i")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ernh4"]
+atlas = ExtResource("1_7mv1i")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jh071"]
+atlas = ExtResource("1_7mv1i")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_uv805"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b1gg2")
+}],
+"loop": 1,
+"name": &"level1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ernh4")
+}],
+"loop": 1,
+"name": &"level2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jh071")
+}],
+"loop": 1,
+"name": &"level3",
+"speed": 5.0
+}]
+
+[node name="mushroom_red" type="Node2D" unique_id=425151417 groups=["world_objects"]]
+texture_filter = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=319666962]
+sprite_frames = SubResource("SpriteFrames_uv805")
+animation = &"level3"

@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://crbe8iaa6ro7q"]
+
+[ext_resource type="Texture2D" uid="uid://qw4xrtdtiwew" path="res://assets/Objects/Mushrooms, Flowers, Stones.png" id="1_csawb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_24nfi"]
+atlas = ExtResource("1_csawb")
+region = Rect2(64, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lphuu"]
+atlas = ExtResource("1_csawb")
+region = Rect2(80, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_udrfk"]
+atlas = ExtResource("1_csawb")
+region = Rect2(96, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rpy4b"]
+atlas = ExtResource("1_csawb")
+region = Rect2(112, 48, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pldn2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_24nfi")
+}],
+"loop": 1,
+"name": &"level1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lphuu")
+}],
+"loop": 1,
+"name": &"level2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_udrfk")
+}],
+"loop": 1,
+"name": &"level3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rpy4b")
+}],
+"loop": 1,
+"name": &"level4",
+"speed": 5.0
+}]
+
+[node name="flower_pink" type="Node2D" unique_id=209981286 groups=["world_objects"]]
+texture_filter = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1173008570]
+sprite_frames = SubResource("SpriteFrames_pldn2")
+animation = &"level4"
