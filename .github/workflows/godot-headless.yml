@@ -1,0 +1,36 @@
+name: Godot headless smoke test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  godot-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.7.1
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.1
+          use-dotnet: false
+          include-templates: false
+      - name: Import assets and compile scripts
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --version
+          godot --headless --editor --path . --import --quit 2>&1 | tee godot-import.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|Failed to load resource" godot-import.log; then
+            exit 1
+          fi
+      - name: Start main scene briefly
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --quit-after 4 2>&1 | tee godot-smoke.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|Failed to load resource" godot-smoke.log; then
+            exit 1
+          fi
