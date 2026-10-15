@@ -40,3 +40,8 @@ Por fim derrube a arvore e verifique o toco. Teste visual local pendente.
 As cinco cenas antigas `tree_small`, `tree_large`, `tree_orange`, `tree_pear` e `tree_peach` voltaram com seus sprites e colisoes originais. Tambem usam o mesmo sistema de cinco golpes e deixam stump.
 
 Essas cinco cenas possuem apenas um sprite por especie: na falta da animacao real de seis quadros `wind_swaying`, exibem seis movimentos curtos de rotacao (1,2 segundo por golpe). `tree.tscn` e `tree_apple.tscn` continuam usando os seis quadros reais, sem loop. Todas compartilham z_index=10 para Y-sort com o jogador.
+
+
+## Recursos (atualizacao 15/10/2026)
+
+A arvore deixa um tronco apos `tree_fall.tscn`; o stump exige tres golpes e deixa outro. Ambos aparecem no chao e podem ser recolhidos com clique. A picareta (atalho P) reduz o nivel das pedras a cada golpe, cada um soltando uma pedra. Flores e cogumelos podem ser recolhidos com clique sem mudar a ferramenta. Os itens e o estado das pedras sao salvos pelo ResourceBag. Para repetir o teste, a TreeChopDemo desativa persistencia de arvores, pedras e plantas.

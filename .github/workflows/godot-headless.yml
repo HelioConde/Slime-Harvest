@@ -51,3 +51,12 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Test resource gameplay (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --script res://tests/resource_gameplay_test.gd 2>&1 | tee resource-gameplay.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL gameplay" resource-gameplay.log; then
+            exit 1
+          fi
