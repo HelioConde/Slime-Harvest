@@ -19,3 +19,18 @@ A cena `scenes/trees/TreeChopDemo.tscn` define `persist_felling = false` nas dua
 No mapa principal, `persist_felling = true` por padrao, entao uma arvore derrubada permanece como toco ao reabrir o jogo. A cena de teste nao apaga nem modifica os registros persistidos; saves anteriores continuam protegidos.
 
 Se quiser testar salvamento persistente, instancie uma arvore comum numa cena com `persist_felling = true`. Para testes de repeticao, use `TreeChopDemo.tscn`.
+
+
+## Ordem visual da arvore e do jogador
+
+Os pes do Player e a base do tronco determinam a profundidade via Y-sort (Godot 4).
+- Personagem com Y maior do que a base do tronco: personagem na frente da arvore.
+- Personagem com Y menor do que a base do tronco: arvore/copa na frente do personagem.
+- Arvore e Player usam z_index = 10 para serem ordenados na mesma camada.
+- TreeChopDemo.tscn usa y_sort_enabled = true na raiz e z_index = 10 no Player.
+- World.tscn usa y_sort_enabled = true em Actors e Actors/Map para permitir arvores aninhadas no mapa.
+- As substituicoes por tree_fall.tscn e stump.tscn ja herdam o z_index da arvore original.
+- Tilemaps, HouseBuilder e terrenos foram preservados.
+
+Teste: abra TreeChopDemo.tscn com F6, ande em volta do tronco com WASD e compare a copa e o jogador.
+Por fim derrube a arvore e verifique o toco. Teste visual local pendente.

@@ -191,6 +191,7 @@ animations = [{
 size = Vector2(5, 6)
 
 [node name="tree" type="StaticBody2D" unique_id=1818755409 groups=["world_objects"]]
+z_index = 10
 script = ExtResource("1_chop")
 texture_filter = 1
 collision_mask = 2

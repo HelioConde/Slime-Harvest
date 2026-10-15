@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_apple.tscn" id="3_apple"]
 
 [node name="TreeChopDemo" type="Node2D"]
+y_sort_enabled = true
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 640.0
@@ -14,6 +15,7 @@ mouse_filter = 2
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(260, 220)
+z_index = 10
 
 [node name="Tree" parent="." instance=ExtResource("2_tree")]
 position = Vector2(260, 170)
@@ -24,6 +26,7 @@ position = Vector2(355, 170)
 persist_felling = false
 
 [node name="Help" type="Label" parent="."]
+z_index = 20
 offset_left = 190.0
 offset_top = 65.0
 offset_right = 525.0
