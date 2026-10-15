@@ -20,7 +20,10 @@ var _static_sway_tween: Tween
 func _ready() -> void:
 	_save_key = persistent_id if not persistent_id.is_empty() else str(get_path())
 	if persist_felling and TreePersistence.is_felled(_save_key):
-		_swap_to(STUMP_SCENE, "_Stump")
+		if TreePersistence.is_stump_cleared(_save_key):
+			queue_free()
+		else:
+			_swap_to(STUMP_SCENE, "_Stump")
 		return
 	add_to_group("choppable_trees")
 	_sprite = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
@@ -123,6 +126,12 @@ func _swap_to(scene: PackedScene, suffix: String) -> void:
 	if replacement == null:
 		push_error("ChoppableTree: cena de substituicao invalida.")
 		return
+	if suffix == "_Fall":
+		replacement.set("source_tree_id", _save_key)
+		replacement.set("persist_stump", persist_felling)
+	elif suffix == "_Stump":
+		replacement.set("source_tree_id", _save_key)
+		replacement.set("persist_stump", persist_felling)
 	parent_node.add_child(replacement)
 	replacement.global_transform = global_transform
 	replacement.z_index = z_index

@@ -1,0 +1,128 @@
+extends Node
+## Recursos reais, alteracoes do mundo e drops aguardando coleta.
+
+signal amount_changed(item_id: StringName, total: int)
+signal item_collected(item_id: StringName, amount: int)
+
+const SAVE_PATH := "user://slimekeepers_resources_v1.json"
+const DROP_SCENE: PackedScene = preload("res://scenes/items/ResourceDrop.tscn")
+
+var _counts: Dictionary = {}
+var _drops: Dictionary = {}
+var _claimed: Dictionary = {}
+var _mining_levels: Dictionary = {}
+var _picked_plants: Dictionary = {}
+var _active_scene: Node
+
+
+func _ready() -> void:
+	_load_state()
+
+
+func _process(_delta: float) -> void:
+	var scene: Node = get_tree().current_scene
+	if scene == null or scene == _active_scene:
+		return
+	_active_scene = scene
+	for drop_key in _drops.keys():
+		var record: Dictionary = _drops[drop_key]
+		if str(record.get("scene", "")) != scene.scene_file_path:
+			continue
+		_make_drop(scene, Vector2(float(record.get("x", 0.0)), float(record.get("y", 0.0))), StringName(str(record.get("item", "trunk"))), str(drop_key), true)
+
+
+func get_count(item_id: StringName) -> int:
+	return maxi(0, int(_counts.get(String(item_id), 0)))
+
+
+func add_item(item_id: StringName, amount: int = 1) -> void:
+	if amount <= 0:
+		return
+	var key: String = String(item_id)
+	_counts[key] = get_count(item_id) + amount
+	_save_state()
+	amount_changed.emit(item_id, get_count(item_id))
+	item_collected.emit(item_id, amount)
+
+
+func spawn_drop(parent: Node, position_world: Vector2, item_id: StringName, source_key: String, persistent: bool = true) -> void:
+	if parent == null:
+		return
+	if persistent:
+		if _claimed.has(source_key) or _drops.has(source_key):
+			return
+		var scene: Node = get_tree().current_scene
+		var scene_path: String = scene.scene_file_path if scene != null else ""
+		_drops[source_key] = {"scene": scene_path, "item": String(item_id), "x": position_world.x, "y": position_world.y}
+		_save_state()
+	_make_drop(parent, position_world, item_id, source_key, persistent)
+
+
+func _make_drop(parent: Node, position_world: Vector2, item_id: StringName, source_key: String, persistent: bool) -> void:
+	var drop: Node2D = DROP_SCENE.instantiate() as Node2D
+	if drop == null:
+		return
+	drop.set("item_id", item_id)
+	drop.set("source_key", source_key)
+	drop.set("persist_drop", persistent)
+	parent.add_child(drop)
+	drop.global_position = position_world
+	drop.z_index = 11
+
+
+func collect_drop(source_key: String, item_id: StringName, persistent: bool) -> bool:
+	if persistent:
+		if _claimed.has(source_key) or not _drops.has(source_key):
+			return false
+		_claimed[source_key] = true
+		_drops.erase(source_key)
+	add_item(item_id, 1)
+	return true
+
+
+func is_plant_collected(plant_key: String) -> bool:
+	return bool(_picked_plants.get(plant_key, false))
+
+
+func collect_plant(plant_key: String, item_id: StringName, persistent: bool) -> bool:
+	if persistent:
+		if is_plant_collected(plant_key):
+			return false
+		_picked_plants[plant_key] = true
+	add_item(item_id, 1)
+	return true
+
+
+func rock_level(rock_key: String, original_level: int) -> int:
+	return clampi(int(_mining_levels.get(rock_key, original_level)), 0, original_level)
+
+
+func save_rock_level(rock_key: String, level: int) -> void:
+	_mining_levels[rock_key] = maxi(level, 0)
+	_save_state()
+
+
+func _load_state() -> void:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return
+	var data = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))
+	if not data is Dictionary or int(data.get("version", 0)) != 1:
+		push_warning("ResourceBag: save invalido.")
+		return
+	for pair in [["counts", "_counts"], ["drops", "_drops"], ["claimed", "_claimed"], ["mining_levels", "_mining_levels"], ["picked_plants", "_picked_plants"]]:
+		var value = data.get(pair[0], {})
+		if value is Dictionary:
+			match pair[0]:
+				"counts": _counts = value
+				"drops": _drops = value
+				"claimed": _claimed = value
+				"mining_levels": _mining_levels = value
+				"picked_plants": _picked_plants = value
+
+
+func _save_state() -> void:
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("ResourceBag: falha ao salvar recursos.")
+		return
+	file.store_string(JSON.stringify({"version": 1, "counts": _counts, "drops": _drops, "claimed": _claimed, "mining_levels": _mining_levels, "picked_plants": _picked_plants}))
