@@ -23,7 +23,7 @@ Sem idle_*, o primeiro frame de walk_* fica parado. Sem frames à esquerda, walk
 - InteractionRay: alcance 24 px na direção cardinal; consulta layer Interactable.
 - ToolOrigin: origem de ferramentas, 16 px à frente.
 
-Crie objetos interativos na layer 3 com colisão e método interact(player). O raio seleciona o primeiro objeto encontrado. Ferramentas ainda não cultivam: tool_use_requested(origin, direction) é o ponto de conexão para o próximo sistema. Cooldown evita disparos repetidos.
+Crie objetos interativos na layer 3 com colisão e método interact(player). O raio seleciona o primeiro objeto encontrado. As ferramentas usam os grupos de acessorios do ToolInventory e o sinal tool_action_requested(tool_id, world_position). O cultivo experimental usa esse sinal; os golpes nas arvores usam take_axe_hit(). O cooldown continua ativo. Veja docs/tool_inventory.md.
 
 Para menus/diálogos, use set_controls_enabled(false); ao fechar, true.
 Ajuste walk_speed, run_multiplier e tool_cooldown no Inspector.

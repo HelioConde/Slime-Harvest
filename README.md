@@ -1,35 +1,31 @@
 # Slimekeepers: Lost Valley — Godot 2D
 
-**Nome anterior:** FarmSlime / Slime Harvest.
+**Nomes anteriores:** FarmSlime / Slime Harvest.
 
-Jogo 2D de fazenda, criaturas companheiras e exploração em desenvolvimento no **Godot 4.x**. Nossa prioridade agora é validar um ciclo jogável simples antes de ampliar os sistemas de slimes, economia, vila e exploração.
+Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolvimento no Godot 4.x.
 
-## Onde estamos
+## Funcionalidades atuais
 
-- **Personagem:** movimentação, corrida, câmera e suporte a animações direcionais.
-- **Mapa inicial:** `scenes/world/World.tscn`, selecionado como cena principal; terreno provisório com campo 10×7, lago, árvores, pedras e colisões.
-- **Cultivo experimental:** selecionar ferramenta nas teclas 1 a 4 e usar F próximo do canteiro; preparar, plantar, regar, esperar crescer e colher. Salva automaticamente em `user://slimekeepers_farm_v1.json`.
-- **Construção de casas:** sistema de piso, paredes e telhados por camadas com 25 materiais, em `scenes/world/world2.tscn`. Esse cenário é um laboratório separado e **não** foi substituído pelo mapa principal.
-- **Recursos:** tilesets, arte de objetos, animais e personagens já organizados em `assets/`.
+- Personagem: movimentacao com WASD/setas, corrida com Shift, camera e animacoes direcionais.
+- Hotbar inferior clicavel: 1 Picareta, 2 Machado, 3 Enxada, 4 Regador. Uma ferramenta equipada por vez, salva ao fechar.
+- Machado: corte de arvores em cinco golpes com balanco completo; animacao de queda, toco e persistencia.
+- Cultivo experimental: enxada prepara/plantar/colher; regador permite o crescimento por etapas a cada tres dias do jogo.
+- Casas: HouseBuilder integrado ao mapa principal scenes/world/World.tscn.
+- Arte: tilesets, personagens, flores, arvores, pedras e cogumelos presentes em assets/ e scenes/.
 
-Leia [o tutorial de cultivo](docs/farming_loop.md), [a construção de casas](docs/house_building.md) e [os próximos marcos](docs/roadmap_godot.md).
+## Executar
 
-## Abrir no Godot
+1. Importe a pasta deste projeto no Godot, usando project.godot.
+2. Pressione F5 para abrir scenes/world/World.tscn.
+3. Pressione 1-4 ou clique na barra para equipar acessorios; F usa a ferramenta equipada.
+4. Teste o machado em scenes/trees/TreeChopDemo.tscn (F6).
+5. Teste a enxada e o regador em scenes/farming/FarmingToolDemo.tscn (F6).
+6. O campo FarmField ainda e uma cena de teste separada; sua integracao ao mapa definitivo continua pendente.
 
-1. Abra o Godot e importe a pasta que contém `project.godot`.
-2. Pressione **F5** para jogar o mapa principal. Use **WASD/setas** para andar, **Shift** para correr, **1–4** para alternar a ferramenta e **F** para usá-la.
-3. Para testar a construção de casas, abra `scenes/world/world2.tscn` e pressione **F6**.
+Documentos: [ferramentas](docs/tool_inventory.md), [cultivo](docs/farming_loop.md), [machado](docs/tree_chopping.md), [casas](docs/house_building.md), [proximos marcos](docs/roadmap_godot.md).
 
-> A execução precisa ser validada localmente no Godot; a implementação foi revisada em código, mas não foi testada com o editor nesta atualização.
+## Projeto e escopo
 
-## GitHub e nomes
+O repositorio e [HelioConde/Slime-Harvest](https://github.com/HelioConde/Slime-Harvest). O projeto Roblox 3D e separado e utiliza [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley).
 
-Este repositório continua em [HelioConde/Slime-Harvest](https://github.com/HelioConde/Slime-Harvest), preservando histórico e sincronização da pasta local `C:\FarmSlime`. O nome exibido pelo Godot agora é **Slimekeepers: Lost Valley**.
-
-O repositório [HelioConde/Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley) já existe e contém a versão 3D/Roblox. Por isso, não renomeamos nem sobrescrevemos repositórios neste passo. Planejar uma possível estrutura única só depois de ambos os projetos estarem estáveis.
-
-## Estrutura
-
-`assets/` recursos visuais e sonoros; `scenes/` cenas; `scripts/` comportamentos; `data/` definições; `docs/` manuais; `tests/` testes e `tools/` utilitários.
-
-Não versionar saves, arquivos temporários, logs ou credenciais. Os recursos usados devem ter licenças documentadas.
+A implementacao foi verificada por inspecao dos arquivos GitHub, mas requer validacao de execucao local no Godot.

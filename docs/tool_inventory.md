@@ -20,7 +20,7 @@ A selecao persiste em user://slimekeepers_equipment_v1.json.
 
 ## Acoes
 
-- Picareta: equia e anima o golpe, pronta para integrar objetos mineraveis (mineracao efetiva ainda pendente).
+- Picareta: equipa e anima o golpe, pronta para integrar objetos mineraveis (mineracao efetiva ainda pendente).
 - Machado: cinco golpes, cada um aguarda os seis quadros de wind_swaying, depois animacao de queda e toco persistente.
 - Enxada: prepara terra; no segundo uso planta automaticamente uma semente; quando a flor amadurece, colhe.
 - Regador: rega o canteiro experimental, permitindo avancar um estagio a cada 3 dias de jogo.

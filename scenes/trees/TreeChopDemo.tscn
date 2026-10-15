@@ -26,5 +26,5 @@ offset_left = 190.0
 offset_top = 65.0
 offset_right = 525.0
 offset_bottom = 110.0
-text = "5: equipar machado | Clique na arvore ou F\n5 golpes. Aguarde os 6 quadros de balanco a cada golpe."
+text = "2: equipar machado | Clique na arvore ou F\n5 golpes. Aguarde os 6 quadros de balanco a cada golpe."
 mouse_filter = 2
