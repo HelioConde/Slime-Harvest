@@ -3,6 +3,7 @@ extends StaticBody2D
 
 @export_range(1, 20, 1) var axe_hits_required: int = 5
 @export var persistent_id: String = ""
+@export var persist_felling: bool = true
 
 const FALL_SCENE: PackedScene = preload("res://scenes/objects/trees/tree_fall.tscn")
 const STUMP_SCENE: PackedScene = preload("res://scenes/objects/stumps/stump.tscn")
@@ -16,7 +17,7 @@ var _sprite: AnimatedSprite2D
 
 func _ready() -> void:
 	_save_key = persistent_id if not persistent_id.is_empty() else str(get_path())
-	if TreePersistence.is_felled(_save_key):
+	if persist_felling and TreePersistence.is_felled(_save_key):
 		_swap_to(STUMP_SCENE, "_Stump")
 		return
 	add_to_group("choppable_trees")
@@ -34,7 +35,7 @@ func _ready() -> void:
 
 
 func can_accept_axe_hit() -> bool:
-	return not _swaying and not _falling and _sprite != null and not TreePersistence.is_felled(_save_key)
+	return not _swaying and not _falling and _sprite != null and (not persist_felling or not TreePersistence.is_felled(_save_key))
 
 
 func contains_click(world_point: Vector2) -> bool:
@@ -73,7 +74,8 @@ func _on_sway_finished() -> void:
 	_swaying = false
 	if _hits >= axe_hits_required:
 		_falling = true
-		TreePersistence.mark_felled(_save_key)
+		if persist_felling:
+			TreePersistence.mark_felled(_save_key)
 		_swap_to(FALL_SCENE, "_Fall")
 	elif _sprite.sprite_frames.has_animation(&"idle"):
 		_sprite.play(&"idle")

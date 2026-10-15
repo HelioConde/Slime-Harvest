@@ -17,14 +17,16 @@ position = Vector2(260, 220)
 
 [node name="Tree" parent="." instance=ExtResource("2_tree")]
 position = Vector2(260, 170)
+persist_felling = false
 
 [node name="AppleTree" parent="." instance=ExtResource("3_apple")]
 position = Vector2(355, 170)
+persist_felling = false
 
 [node name="Help" type="Label" parent="."]
 offset_left = 190.0
 offset_top = 65.0
 offset_right = 525.0
 offset_bottom = 110.0
-text = "2: equipar machado | Clique na arvore ou F\n5 golpes. Aguarde os 6 quadros de balanco a cada golpe."
+text = "2: Machado | Clique na arvore ou F | 5 golpes\nEsta cena de teste recria as arvores ao reiniciar (F6)."
 mouse_filter = 2

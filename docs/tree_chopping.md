@@ -11,3 +11,11 @@ Coloque instancias de tree.tscn ou tree_apple.tscn no mapa principal para cortar
 Arvores colocadas pelo editor usam o caminho na cena como ID. Instancias geradas por codigo devem ter persistent_id unico.
 A animacao falling usa provisoriamente os quadros da macieira; arte dedicada para cada especie pode ser adicionada depois.
 Nao ha drop de madeira nem inventario ainda. A execucao dentro do Godot local continua pendente.
+
+## Repetir o teste de derrubada
+
+A cena `scenes/trees/TreeChopDemo.tscn` define `persist_felling = false` nas duas arvores. Isso evita que o save antigo substitua as arvores por tocos no proximo F6. Ao final dos 5 golpes, a queda e o toco continuam acontecendo normalmente enquanto a cena estiver aberta.
+
+No mapa principal, `persist_felling = true` por padrao, entao uma arvore derrubada permanece como toco ao reabrir o jogo. A cena de teste nao apaga nem modifica os registros persistidos; saves anteriores continuam protegidos.
+
+Se quiser testar salvamento persistente, instancie uma arvore comum numa cena com `persist_felling = true`. Para testes de repeticao, use `TreeChopDemo.tscn`.
