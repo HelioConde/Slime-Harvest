@@ -34,6 +34,8 @@ var _selected: StringName = &"axe"
 var _slots: Dictionary = {}
 var _panel: PanelContainer
 var _strip: HBoxContainer
+var _selection_tween: Tween
+var _pulse_button: Button
 
 
 func _ready() -> void:
@@ -133,17 +135,24 @@ func _layout_bar() -> void:
 	if _panel == null:
 		return
 	# Tudo em coordenadas do viewport: margem lateral consistente e area segura.
-	var usable: float = maxf(170.0, size.x - BAR_SIDE_MARGIN * 2.0)
+	# Os dez slots devem caber no viewport logico, mesmo em janelas menores.
+	var usable: float = maxf(100.0, size.x - BAR_SIDE_MARGIN * 2.0)
 	var requested_width: float = minf(BAR_MAX_WIDTH, usable)
 	var slot_width: float = floorf((requested_width - PANEL_PADDING * 2.0 - SLOT_GAP * 9.0) / 10.0)
-	slot_width = maxf(13.0, slot_width)
+	slot_width = maxf(6.0, slot_width)
+	var compact: bool = size.x < 480.0
+	var slot_height: float = 39.0 if compact else SLOT_HEIGHT
+	var bar_height: float = 51.0 if compact else PANEL_HEIGHT
 	for item_id in SLOT_IDS:
 		var button: Button = _slots[item_id] as Button
-		button.custom_minimum_size = Vector2(slot_width, SLOT_HEIGHT)
+		button.custom_minimum_size = Vector2(slot_width, slot_height)
+		var image: TextureRect = button.get_node("Content/ItemIcon") as TextureRect
+		if image != null:
+			image.custom_minimum_size.y = 23.0 if compact else 29.0
 	var real_width: float = PANEL_PADDING * 2.0 + slot_width * 10.0 + SLOT_GAP * 9.0
-	_panel.custom_minimum_size = Vector2(real_width, PANEL_HEIGHT)
-	_panel.size = Vector2(real_width, PANEL_HEIGHT)
-	_panel.position = Vector2(roundf((size.x - real_width) * 0.5), roundf(size.y - PANEL_HEIGHT - BAR_BOTTOM_MARGIN))
+	_panel.custom_minimum_size = Vector2(real_width, bar_height)
+	_panel.size = Vector2(real_width, bar_height)
+	_panel.position = Vector2(roundf((size.x - real_width) * 0.5), roundf(size.y - bar_height - BAR_BOTTOM_MARGIN))
 
 
 func get_slot_item(index: int) -> StringName:
@@ -153,8 +162,25 @@ func get_slot_item(index: int) -> StringName:
 
 
 func set_selected_tool(tool_id: StringName) -> void:
+	var changed: bool = tool_id != _selected
 	_selected = tool_id
 	_refresh_selection()
+	if changed:
+		_animate_selection(tool_id)
+
+
+func _animate_selection(tool_id: StringName) -> void:
+	# Breve pulso visual sem alterar a escala dos icones pixel art.
+	if is_instance_valid(_selection_tween):
+		_selection_tween.kill()
+	if is_instance_valid(_pulse_button):
+		_pulse_button.modulate = Color.WHITE
+	_pulse_button = _slots.get(tool_id) as Button
+	if _pulse_button == null:
+		return
+	_pulse_button.modulate = Color(1.0, 0.91, 0.74, 1.0)
+	_selection_tween = create_tween()
+	_selection_tween.tween_property(_pulse_button, "modulate", Color.WHITE, 0.22).set_trans(Tween.TRANS_SINE)
 
 
 func _slot_pressed(item_id: StringName) -> void:

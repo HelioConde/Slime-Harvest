@@ -50,3 +50,12 @@ A arte deve ser pixel-perfect, sem interpolacao borrada, e a interface nao deve 
 - Calendario ocupa uma placa compacta no canto superior esquerdo.
 - FarmingHUD movido para a direita para nao sobrepor o calendario.
 - Nenhum spritesheet, tilemap ou arquivo de save foi alterado por este ajuste.
+
+## Revisao apos avaliacao do print: 15/10/2026
+
+- Selecionar um novo item executa pulso suave de cor (0,22 s); os icones pixel art nao sao escalados em tween.
+- Em viewport menor que 480 unidades, a barra reduz altura dos slots e icones para caber sem extrapolar as margens.
+- TreeChopDemo define camera zoom 1,5 exclusivamente no teste, deixando o World original inalterado.
+- O painel de instrucoes abre ao clicar em `?` e volta a recolher clicando em `×`.
+- A cena usa flores, grama, cogumelos e pedras originais como decoracao, sem adicionar objetos de gameplay ou alterar os saves.
+- As arvores da cena continuam com persist_felling=false, reaparecendo a cada F6.
