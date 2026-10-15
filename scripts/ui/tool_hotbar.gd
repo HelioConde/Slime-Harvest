@@ -110,9 +110,9 @@ func _style(selected: bool, hovered: bool) -> StyleBoxFlat:
 
 
 func _update_slots() -> void:
-	for tool_id in _slots.keys():
+	for tool_id in TOOLS:
 		var button := _slots[tool_id] as Button
-		var active := tool_id == _selected
+		var active: bool = tool_id == _selected
 		button.add_theme_stylebox_override("normal", _style(active, false))
 		button.add_theme_stylebox_override("hover", _style(active, true))
 		button.add_theme_stylebox_override("pressed", _style(active, true))
