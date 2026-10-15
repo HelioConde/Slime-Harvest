@@ -1,12 +1,16 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/world/decoration.gd" id="3_decoration"]
+[ext_resource type="PackedScene" path="res://scenes/farming/FarmField.tscn" id="4_farm"]
 
 [node name="World" type="Node2D"]
 texture_filter = 1
 script = ExtResource("1_world")
+
+[node name="FarmField" parent="." instance=ExtResource("4_farm")]
+player_path = NodePath("../Actors/Player")
 
 [node name="Actors" type="Node2D" parent="."]
 y_sort_enabled = true

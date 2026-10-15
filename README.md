@@ -1,31 +1,35 @@
-# Slime Harvest
+# Slimekeepers: Lost Valley — Godot 2D
 
-Jogo de fazenda 2D inspirado em Stardew Valley, com cultivo, criação de slimes e exploração. Transforme um pequeno terreno em uma fazenda cheia de vida, descubra novas criaturas e construa sua história na vila.
+**Nome anterior:** FarmSlime / Slime Harvest.
 
-## Estado inicial
+Jogo 2D de fazenda, criaturas companheiras e exploração em desenvolvimento no **Godot 4.x**. Nossa prioridade agora é validar um ciclo jogável simples antes de ampliar os sistemas de slimes, economia, vila e exploração.
 
-Projeto novo, criado do zero e independente do GameSlime antigo. Projeto Godot 4.7, conforme project.godot enviado pelo proprietário. O Player está preparado para receber sprites: movimentação, corrida, colisão, câmera e animações direcionais. Ainda não há mapa de fazenda. Veja [como configurar os sprites e testar](docs/player_setup.md).
+## Onde estamos
 
-## Organização
+- **Personagem:** movimentação, corrida, câmera e suporte a animações direcionais.
+- **Mapa inicial:** `scenes/world/World.tscn`, selecionado como cena principal; terreno provisório com campo 10×7, lago, árvores, pedras e colisões.
+- **Cultivo experimental:** selecionar ferramenta nas teclas 1 a 4 e usar F próximo do canteiro; preparar, plantar, regar, esperar crescer e colher. Salva automaticamente em `user://slimekeepers_farm_v1.json`.
+- **Construção de casas:** sistema de piso, paredes e telhados por camadas com 25 materiais, em `scenes/world/world2.tscn`. Esse cenário é um laboratório separado e **não** foi substituído pelo mapa principal.
+- **Recursos:** tilesets, arte de objetos, animais e personagens já organizados em `assets/`.
 
-| Pasta | Conteúdo |
-| --- | --- |
-| assets/ | Sprites, tilesets, interface, áudio e fontes |
-| scenes/ | Cenas de mundo, jogador, slimes, cultivo e interface |
-| scripts/ | Código separado por sistema |
-| data/ | Definições de plantas, slimes e itens |
-| docs/ | Estrutura e decisões do projeto |
-| tests/ | Testes das mecânicas |
-| tools/ | Ferramentas de desenvolvimento |
+Leia [o tutorial de cultivo](docs/farming_loop.md), [a construção de casas](docs/house_building.md) e [os próximos marcos](docs/roadmap_godot.md).
 
-Use nomes em inglês e snake_case para arquivos e pastas. Os arquivos .gitkeep preservam pastas vazias no Git; podem ser removidos quando elas receberem conteúdo.
+## Abrir no Godot
 
-Veja [a estrutura completa](docs/project_structure.md).
+1. Abra o Godot e importe a pasta que contém `project.godot`.
+2. Pressione **F5** para jogar o mapa principal. Use **WASD/setas** para andar, **Shift** para correr, **1–4** para alternar a ferramenta e **F** para usá-la.
+3. Para testar a construção de casas, abra `scenes/world/world2.tscn` e pressione **F6**.
 
-## Próxima etapa
+> A execução precisa ser validada localmente no Godot; a implementação foi revisada em código, mas não foi testada com o editor nesta atualização.
 
-Adicionar os frames do Player e validar a cena com F6. Depois, criar um mapa pequeno e o ciclo de preparar a terra, plantar, regar e colher.
+## GitHub e nomes
 
-## Sincronização local
+Este repositório continua em [HelioConde/Slime-Harvest](https://github.com/HelioConde/Slime-Harvest), preservando histórico e sincronização da pasta local `C:\FarmSlime`. O nome exibido pelo Godot agora é **Slimekeepers: Lost Valley**.
 
-Pasta informada pelo proprietário: C:\FarmSlime. A tarefa FarmSlime-GitSync acompanha main a cada 30 segundos. Alterações locais ou divergências pausam a sincronização. Não versionar configuração, logs ou credenciais do sincronizador.
+O repositório [HelioConde/Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley) já existe e contém a versão 3D/Roblox. Por isso, não renomeamos nem sobrescrevemos repositórios neste passo. Planejar uma possível estrutura única só depois de ambos os projetos estarem estáveis.
+
+## Estrutura
+
+`assets/` recursos visuais e sonoros; `scenes/` cenas; `scripts/` comportamentos; `data/` definições; `docs/` manuais; `tests/` testes e `tools/` utilitários.
+
+Não versionar saves, arquivos temporários, logs ou credenciais. Os recursos usados devem ter licenças documentadas.
