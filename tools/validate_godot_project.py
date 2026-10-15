@@ -64,11 +64,15 @@ def check() -> list[str]:
             path = match.group(1)
             if not (ROOT / path).is_file():
                 errors.append(f"{script.relative_to(ROOT)}: missing res://{path}")
-        # Mixed tab/space indentation was a previous Godot compilation failure.
+        # Godot permits tabs OR spaces in a file, but not mixed indentation.
+        # Legacy calendar/persistence scripts consistently use spaces.
         if script.relative_to(ROOT).as_posix() in CORE_SCRIPTS:
-            for lineno, line in enumerate(source.splitlines(), 1):
-                if line.startswith(" ") and line.lstrip():
-                    errors.append(f"{script.relative_to(ROOT)}:{lineno}: use tabs, not spaces")
+            lines = source.splitlines()
+            uses_tabs = any(line.startswith("\t") for line in lines)
+            if uses_tabs:
+                for lineno, line in enumerate(lines, 1):
+                    if line.startswith(" ") and line.lstrip():
+                        errors.append(f"{script.relative_to(ROOT)}:{lineno}: mixed tab/space indentation")
 
     project = project_file.read_text(encoding="utf-8-sig")
     main = MAIN_SCENE.search(project)
