@@ -184,10 +184,15 @@ func _create_hud() -> void:
 	layer.layer = 10
 	add_child(layer)
 	_hud = Label.new()
-	_hud.position = Vector2(8, 8)
-	_hud.custom_minimum_size = Vector2(620, 0)
+	# Interface no canto superior direito: nao disputar espaco com o calendario.
+	_hud.anchor_left = 1.0
+	_hud.anchor_right = 1.0
+	_hud.offset_left = -310.0
+	_hud.offset_right = -8.0
+	_hud.offset_top = 8.0
+	_hud.offset_bottom = 72.0
 	_hud.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hud.add_theme_font_size_override("font_size", 12)
+	_hud.add_theme_font_size_override("font_size", 10)
 	_hud.add_theme_constant_override("outline_size", 3)
 	_hud.add_theme_color_override("font_outline_color", Color("#173022"))
 	layer.add_child(_hud)
@@ -199,9 +204,9 @@ func _refresh_hud() -> void:
 	var objective := "OBJETIVO: colher 3 plantas (%d/3)" % mini(_harvested, 3)
 	if _harvested >= 3:
 		objective = "OBJETIVO CONCLUIDO! Proximo passo: conhecer um slime."
-	_hud.text = "SLIMEKEEPERS: LOST VALLEY | Cultivo\n" + \
-		"3 Enxada: preparar / plantar / colher | 1 Regador: regar | F ou clique\n" + \
-		"Sementes: %d | Colheitas: %d | %s\n%s" % [_seeds, _harvested, objective, _message]
+	_hud.text = "CULTIVO | Sementes: %d | Colhidas: %d\n" % [_seeds, _harvested] + \
+		"3 Enxada | 1 Regador | F / clique\n" + \
+		"%s\n%s" % [objective, _message]
 
 
 func _save_progress() -> void:

@@ -4,12 +4,31 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/trees/tree.tscn" id="2_tree"]
 [ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_apple.tscn" id="3_apple"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_help"]
+bg_color = Color(0.07, 0.15, 0.12, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.46, 0.6, 0.46, 1)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
 [node name="TreeChopDemo" type="Node2D"]
 y_sort_enabled = true
 
-[node name="Background" type="ColorRect" parent="."]
-offset_right = 640.0
-offset_bottom = 360.0
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -20
+
+[node name="Background" type="ColorRect" parent="BackgroundLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 color = Color(0.42, 0.60, 0.36, 1.0)
 mouse_filter = 2
 
@@ -25,11 +44,22 @@ persist_felling = false
 position = Vector2(355, 170)
 persist_felling = false
 
-[node name="Help" type="Label" parent="."]
-z_index = 20
-offset_left = 190.0
-offset_top = 65.0
-offset_right = 525.0
-offset_bottom = 110.0
-text = "2: Machado | Clique na arvore ou F | 5 golpes\nEsta cena de teste recria as arvores ao reiniciar (F6)."
+[node name="InfoLayer" type="CanvasLayer" parent="."]
+layer = 9
+
+[node name="HelpPanel" type="PanelContainer" parent="InfoLayer"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -238.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 43.0
 mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_help")
+
+[node name="Help" type="Label" parent="InfoLayer/HelpPanel"]
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.94, 0.96, 0.9, 1)
+text = "2 Machado | F ou clique | 5 golpes
+Aguarde o balanco | F6: reiniciar"

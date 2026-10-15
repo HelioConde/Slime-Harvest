@@ -39,3 +39,14 @@ A selecao continua salva em user://slimekeepers_equipment_v1.json.
 
 Abrir scenes/trees/TreeChopDemo.tscn e pressionar F6. Os 10 slots devem ficar na base da janela; selecione o machado no slot 2 e corte a arvore. Verifique regador e enxada no teste scenes/farming/FarmingToolDemo.tscn, usando as teclas 1 e 3.
 A arte deve ser pixel-perfect, sem interpolacao borrada, e a interface nao deve extrapolar a janela de 640x360.
+
+## Ajustes de interface apos captura 15/10/2026
+
+- Hotbar reduzida para ate 504 unidades logicas: dez slots com altura 46, painel de 58 e margens laterais de pelo menos 12 na janela 640x360.
+- O painel permanece fixo na tela via CanvasLayer (nao se move com a camera do personagem).
+- Sprite original 16x16 e recortado com AtlasTexture; filtro NEAREST mantido para pixels nitidos.
+- Numeracao reduzida, borda dourada mais discreta e sombras menores.
+- TreeChopDemo usa fundo em CanvasLayer e instrucoes curtas em painel ancorado no canto superior direito.
+- Calendario ocupa uma placa compacta no canto superior esquerdo.
+- FarmingHUD movido para a direita para nao sobrepor o calendario.
+- Nenhum spritesheet, tilemap ou arquivo de save foi alterado por este ajuste.

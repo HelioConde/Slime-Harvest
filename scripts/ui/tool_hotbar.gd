@@ -22,6 +22,13 @@ const PANEL_BORDER := Color("#c8a96d")
 const SLOT_COLOR := Color("#213a31")
 const SLOT_BORDER := Color("#537766")
 const GOLD := Color("#f1d58e")
+const BAR_MAX_WIDTH: float = 504.0
+const BAR_SIDE_MARGIN: float = 12.0
+const BAR_BOTTOM_MARGIN: float = 9.0
+const PANEL_PADDING: float = 6.0
+const SLOT_GAP: float = 3.0
+const SLOT_HEIGHT: float = 46.0
+const PANEL_HEIGHT: float = 58.0
 
 var _selected: StringName = &"axe"
 var _slots: Dictionary = {}
@@ -48,21 +55,22 @@ func _build_panel() -> void:
 	var frame_style := StyleBoxFlat.new()
 	frame_style.bg_color = PANEL_COLOR
 	frame_style.border_color = PANEL_BORDER
-	frame_style.set_border_width_all(2)
-	frame_style.set_corner_radius_all(16)
-	frame_style.shadow_color = Color(0.0, 0.0, 0.0, 0.38)
-	frame_style.shadow_size = 7
-	frame_style.content_margin_left = 8.0
-	frame_style.content_margin_right = 8.0
-	frame_style.content_margin_top = 7.0
-	frame_style.content_margin_bottom = 7.0
+	frame_style.set_border_width_all(1)
+	frame_style.border_width_top = 2
+	frame_style.set_corner_radius_all(12)
+	frame_style.shadow_color = Color(0.0, 0.0, 0.0, 0.25)
+	frame_style.shadow_size = 3
+	frame_style.content_margin_left = PANEL_PADDING
+	frame_style.content_margin_right = PANEL_PADDING
+	frame_style.content_margin_top = 5.0
+	frame_style.content_margin_bottom = 5.0
 	_panel.add_theme_stylebox_override("panel", frame_style)
 	add_child(_panel)
 
 	_strip = HBoxContainer.new()
 	_strip.name = "TenSlots"
 	_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_strip.add_theme_constant_override("separation", 4)
+	_strip.add_theme_constant_override("separation", int(SLOT_GAP))
 	_panel.add_child(_strip)
 
 	for index in range(SLOT_IDS.size()):
@@ -95,7 +103,7 @@ func _make_slot(index: int) -> void:
 	var image := TextureRect.new()
 	image.name = "ItemIcon"
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	image.custom_minimum_size = Vector2(34, 36)
+	image.custom_minimum_size = Vector2(0, 29)
 	image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -114,7 +122,7 @@ func _make_slot(index: int) -> void:
 	key_label.text = str((index + 1) % 10)
 	key_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	key_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	key_label.add_theme_font_size_override("font_size", 10)
+	key_label.add_theme_font_size_override("font_size", 9)
 	key_label.add_theme_color_override("font_color", Color("#dfebdc"))
 	key_label.add_theme_constant_override("outline_size", 2)
 	key_label.add_theme_color_override("font_outline_color", Color("#132720"))
@@ -124,15 +132,18 @@ func _make_slot(index: int) -> void:
 func _layout_bar() -> void:
 	if _panel == null:
 		return
-	var usable: float = maxf(230.0, size.x - 12.0)
-	var width: float = minf(610.0, usable)
-	var slot_width: float = (width - 16.0 - 9.0 * 4.0) / 10.0
+	# Tudo em coordenadas do viewport: margem lateral consistente e area segura.
+	var usable: float = maxf(170.0, size.x - BAR_SIDE_MARGIN * 2.0)
+	var requested_width: float = minf(BAR_MAX_WIDTH, usable)
+	var slot_width: float = floorf((requested_width - PANEL_PADDING * 2.0 - SLOT_GAP * 9.0) / 10.0)
+	slot_width = maxf(13.0, slot_width)
 	for item_id in SLOT_IDS:
 		var button: Button = _slots[item_id] as Button
-		button.custom_minimum_size = Vector2(slot_width, 57.0)
-	_panel.custom_minimum_size = Vector2(width, 72.0)
-	_panel.size = Vector2(width, 72.0)
-	_panel.position = Vector2((size.x - width) * 0.5, size.y - 80.0)
+		button.custom_minimum_size = Vector2(slot_width, SLOT_HEIGHT)
+	var real_width: float = PANEL_PADDING * 2.0 + slot_width * 10.0 + SLOT_GAP * 9.0
+	_panel.custom_minimum_size = Vector2(real_width, PANEL_HEIGHT)
+	_panel.size = Vector2(real_width, PANEL_HEIGHT)
+	_panel.position = Vector2(roundf((size.x - real_width) * 0.5), roundf(size.y - PANEL_HEIGHT - BAR_BOTTOM_MARGIN))
 
 
 func get_slot_item(index: int) -> StringName:
@@ -152,15 +163,15 @@ func _slot_pressed(item_id: StringName) -> void:
 
 func _slot_style(active: bool, hover: bool = false) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#385841") if active else SLOT_COLOR
+	style.bg_color = Color("#365542") if active else SLOT_COLOR
 	if hover:
-		style.bg_color = Color("#4d6e51") if active else Color("#2f4d40")
+		style.bg_color = Color("#436449") if active else Color("#2c483b")
 	style.border_color = GOLD if active else SLOT_BORDER
-	style.set_border_width_all(3 if active else 1)
-	style.set_corner_radius_all(9)
+	style.set_border_width_all(2 if active else 1)
+	style.set_corner_radius_all(7)
 	if active:
-		style.shadow_color = Color(1.0, 0.78, 0.38, 0.48)
-		style.shadow_size = 4
+		style.shadow_color = Color(1.0, 0.77, 0.35, 0.22)
+		style.shadow_size = 2
 	return style
 
 

@@ -85,21 +85,35 @@ func _create_day_label() -> void:
     canvas.name = "CalendarHUD"
     canvas.layer = 11
     add_child(canvas)
+    var chip := PanelContainer.new()
+    chip.name = "CalendarChip"
+    chip.position = Vector2(8, 8)
+    chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var style := StyleBoxFlat.new()
+    style.bg_color = Color(0.07, 0.15, 0.12, 0.88)
+    style.border_color = Color("#718d75")
+    style.set_border_width_all(1)
+    style.set_corner_radius_all(7)
+    style.content_margin_left = 8.0
+    style.content_margin_right = 8.0
+    style.content_margin_top = 4.0
+    style.content_margin_bottom = 4.0
+    chip.add_theme_stylebox_override("panel", style)
+    canvas.add_child(chip)
     _day_label = Label.new()
     _day_label.name = "DayLabel"
-    _day_label.position = Vector2(8, 106)
-    _day_label.add_theme_font_size_override("font_size", 12)
-    _day_label.add_theme_constant_override("outline_size", 3)
-    _day_label.add_theme_color_override("font_outline_color", Color("#173022"))
-    canvas.add_child(_day_label)
+    _day_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _day_label.add_theme_font_size_override("font_size", 10)
+    _day_label.add_theme_color_override("font_color", Color("#edf4e3"))
+    chip.add_child(_day_label)
 
 
 func _refresh_label() -> void:
     if _day_label == null:
         return
-    _day_label.text = "Dia %d  |  plantas: +1 fase a cada 3 dias" % day
+    _day_label.text = "Dia %d  |  3 dias/fase" % day
     if OS.is_debug_build():
-        _day_label.text += "  |  F9: avancar um dia (teste)"
+        _day_label.text += "  |  F9 +1"
 
 
 func _load_calendar() -> void:
