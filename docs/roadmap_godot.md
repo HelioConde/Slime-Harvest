@@ -13,8 +13,10 @@
 - [x] Animar a passagem dos estágios `level1..level4` das flores a cada 3 dias e salvar os dias de jogo.
 - [ ] Integrar os canteiros ao novo mapa principal e confirmar as cenas visualmente no Godot.
 - [x] Machado corta arvores em **5 golpes**, respeita o balanco antes de cada novo golpe, executa queda sem loop e cria toco persistente (teste visual local pendente).
-- [x] Barra inferior de quatro equipamentos com atalhos, icones, grupos e persistencia.
-- [ ] Mochila de recursos, energia, moedas e colecoes.
+- [x] Hotbar inferior com 10 slots do spritesheet original, contadores de recursos, grupos, atalhos e persistencia da selecao.
+- [x] Sistema de drops e contadores persistentes de troncos, pedras, flores e cogumelos.
+- [x] Picareta minerando pedras por nivel, toco removivel em tres golpes e coleta de flores/cogumelos com clique.
+- [ ] Mochila visual completa, energia, moedas e colecoes.
 - [ ] Três tipos de cultivos, colheita e venda em um ponto do mapa.
 - [ ] Salvar e carregar posição do jogador, mundo, casa e inventário de modo consistente.
 

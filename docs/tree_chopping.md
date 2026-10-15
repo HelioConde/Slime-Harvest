@@ -45,3 +45,9 @@ Essas cinco cenas possuem apenas um sprite por especie: na falta da animacao rea
 ## Recursos (atualizacao 15/10/2026)
 
 A arvore deixa um tronco apos `tree_fall.tscn`; o stump exige tres golpes e deixa outro. Ambos aparecem no chao e podem ser recolhidos com clique. A picareta (atalho P) reduz o nivel das pedras a cada golpe, cada um soltando uma pedra. Flores e cogumelos podem ser recolhidos com clique sem mudar a ferramenta. Os itens e o estado das pedras sao salvos pelo ResourceBag. Para repetir o teste, a TreeChopDemo desativa persistencia de arvores, pedras e plantas.
+
+## Derrubada completa (outubro 2026)
+
+Depois das cinco machadadas na arvore, aguarde terminar tree_fall.tscn. O efeito agora solta um tronco no chao e instancia stump.tscn. O toco exige mais tres machadadas para desaparecer e soltar outro tronco. Clique nos dois drops para recolher; eles entram no slot 7 da hotbar.
+
+As arvores e os tocos do mundo principal mantem o estado no save. Na cena TreeChopDemo, o corte nao e persistente para facilitar repeticoes. Foi acrescentado um teste com execucao real do motor Godot, incluindo arvore, toco e drops.

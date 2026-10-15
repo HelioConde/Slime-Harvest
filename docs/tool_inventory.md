@@ -59,3 +59,18 @@ A arte deve ser pixel-perfect, sem interpolacao borrada, e a interface nao deve 
 - O painel de instrucoes abre ao clicar em `?` e volta a recolher clicando em `×`.
 - A cena usa flores, grama, cogumelos e pedras originais como decoracao, sem adicionar objetos de gameplay ou alterar os saves.
 - As arvores da cena continuam com persist_felling=false, reaparecendo a cada F6.
+
+## Coleta de recursos e contadores
+
+- Arvore: 5 golpes de machado. A animacao de queda termina e gera um tronco visivel no chao.
+- Toco: 3 machadadas adicionais. Ao ser removido, gera mais um tronco.
+- Pedra: tecla P equipa a picareta. Clique na pedra ou use F olhando para ela; cada golpe reduz levelN em um e gera uma pedra no chao. Pedras sem sprites levelN encolhem por golpe.
+- Troncos e pedras dropados: clique para recolher (ate 60 px logicos do personagem). O numero aparece sobre o icone no slot 7 (tronco) ou no slot 0 (pedra).
+- Flores e cogumelos: clique com qualquer item equipado, quando proximo. Sao adicionados diretamente ao inventario e aparecem como notificacao +1.
+- O inventario salva automaticamente em user://slimekeepers_resources_v1.json. Recursos nao recolhidos persistentes reaparecem apos recarregar o mundo.
+- A TreeChopDemo foi configurada para repetir o teste sem salvar cortes, pedras mineradas ou plantas recolhidas ao fechar F6. Os recursos ja recolhidos no inventario continuam registrados.
+- O inventario e um contador real de itens, nao uma mochila visual completa.
+
+## Teste automatizado
+
+GitHub Actions executa o Godot 4.7.1 em modo headless e chama tests/ResourceGameplayTest.tscn. O teste valida 5 machadadas, bloqueio durante o balanco, queda, spawn do toco, 3 golpes no toco, dois troncos recolhidos, niveis das pedras, drops de pedra, coleta de flor com regador e cogumelo com machado.
