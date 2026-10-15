@@ -34,3 +34,20 @@ jobs:
           if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|Failed to load resource" godot-smoke.log; then
             exit 1
           fi
+
+      - name: Smoke test constructed scenes
+        shell: bash
+        run: |
+          set -o pipefail
+          for scene in \
+            res://scenes/trees/TreeChopDemo.tscn \
+            res://scenes/farming/FarmingToolDemo.tscn \
+            res://scenes/farming/GrowthPreview.tscn \
+            res://scenes/objects/ObjectCatalog.tscn
+          do
+            echo "SMOKE TEST: $scene"
+            godot --headless --path . --scene "$scene" --quit-after 4 2>&1 | tee godot-scene.log
+            if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|Failed to load resource" godot-scene.log; then
+              exit 1
+            fi
+          done
