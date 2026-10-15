@@ -1,6 +1,6 @@
 extends Node2D
-## First playable farming loop for the temporary World.tscn test map.
-## Crops are drawn programmatically until final artwork is integrated.
+## Cultivo experimental conectado ao inventario de ferramentas.
+## Crescimento por dias de jogo com sprites reais das flores.
 
 const FIELD := Rect2(320.0, 416.0, 320.0, 224.0)
 const CELL_SIZE := 32
@@ -9,11 +9,8 @@ const ROWS := 7
 const DAYS_PER_STAGE := 3
 const SAVE_PATH := "user://slimekeepers_farm_v1.json"
 
-enum Tool { HOE, SEED, WATER, HARVEST }
-
 @export var player_path: NodePath
 
-var _selected_tool: Tool = Tool.HOE
 var _cells: Dictionary = {}
 var _seeds := 12
 var _harvested := 0
@@ -38,32 +35,12 @@ func _ready() -> void:
 	_sync_crop_sprites()
 	_create_hud()
 	var player := get_node_or_null(player_path)
-	if player == null or not player.has_signal("tool_use_requested"):
-		push_warning("FarmField: Player ou sinal tool_use_requested não encontrado.")
+	if player == null or not player.has_signal("tool_action_requested"):
+		push_warning("FarmField: Player ou sinal tool_action_requested nao encontrado.")
 	else:
-		player.connect("tool_use_requested", Callable(self, "_on_tool_used"))
+		player.connect("tool_action_requested", Callable(self, "_on_tool_action"))
 	_refresh_hud()
 	queue_redraw()
-
-
-func _unhandled_key_input(event: InputEvent) -> void:
-	var key_event := event as InputEventKey
-	if key_event == null or not key_event.pressed or key_event.echo:
-		return
-	match key_event.keycode:
-		KEY_1:
-			_selected_tool = Tool.HOE
-		KEY_2:
-			_selected_tool = Tool.SEED
-		KEY_3:
-			_selected_tool = Tool.WATER
-		KEY_4:
-			_selected_tool = Tool.HARVEST
-		_:
-			return
-	_message = "Ferramenta alterada. Pressione F perto do canteiro."
-	_refresh_hud()
-	get_viewport().set_input_as_handled()
 
 
 func _on_day_changed(new_day: int) -> void:
@@ -126,10 +103,12 @@ func _max_crop_stage(coord: Vector2i) -> int:
 	return 3
 
 
-func _on_tool_used(origin: Vector2, direction: Vector2) -> void:
-	var target := to_local(origin + direction * 16.0)
+func _on_tool_action(tool_id: StringName, world_point: Vector2) -> void:
+	if tool_id != &"hoe" and tool_id != &"watering_can":
+		return
+	var target := to_local(world_point)
 	if not FIELD.has_point(target):
-		_message = "Você precisa mirar dentro do canteiro."
+		_message = "Aponte dentro do canteiro."
 		_refresh_hud()
 		return
 	var coord := Vector2i(
@@ -140,20 +119,13 @@ func _on_tool_used(origin: Vector2, direction: Vector2) -> void:
 		return
 	var cell: Dictionary = _cells.get(coord, {})
 	var changed := false
-	match _selected_tool:
-		Tool.HOE:
-			if cell.is_empty():
-				_cells[coord] = {"tilled": true, "seeded": false, "watered": false, "stage": 0, "growth_days": 0, "last_day": GameCalendar.day}
-				_message = "Terra preparada! Use 2 para escolher sementes."
-				changed = true
-			else:
-				_message = "Esta área já foi preparada."
-		Tool.SEED:
-			if cell.is_empty():
-				_message = "Primeiro prepare a terra com a enxada (1)."
-			elif cell.get("seeded", false):
-				_message = "Já existe uma planta aqui."
-			elif _seeds <= 0:
+	if tool_id == &"hoe":
+		if cell.is_empty():
+			_cells[coord] = {"tilled": true, "seeded": false, "watered": false, "stage": 0, "growth_days": 0, "last_day": GameCalendar.day}
+			_message = "Solo preparado! Use a enxada novamente para plantar."
+			changed = true
+		elif not cell.get("seeded", false):
+			if _seeds <= 0:
 				_message = "Sem sementes. Colha uma planta para recuperar uma."
 			else:
 				cell["seeded"] = true
@@ -163,35 +135,32 @@ func _on_tool_used(origin: Vector2, direction: Vector2) -> void:
 				cell["last_day"] = GameCalendar.day
 				_cells[coord] = cell
 				_seeds -= 1
-				_message = "Semente plantada! Regue usando 3."
+				_message = "Semente plantada! Equipe o regador (4)."
 				changed = true
-		Tool.WATER:
-			if cell.is_empty() or not cell.get("seeded", false):
-				_message = "Plante uma semente antes de regar."
-			elif cell.get("watered", false):
-				_message = "Esta planta já foi regada."
-			else:
-				cell["watered"] = true
-				cell["last_day"] = GameCalendar.day
-				_cells[coord] = cell
-				_message = "Regado! A planta crescerá em três etapas."
-				changed = true
-		Tool.HARVEST:
-			if not cell.get("seeded", false):
-				_message = "Não existe planta para colher."
-			elif int(cell.get("stage", 0)) < _max_crop_stage(coord):
-				_message = "A planta ainda está crescendo."
-			else:
-				cell["seeded"] = false
-				cell["watered"] = false
-				cell["stage"] = 0
-				cell["growth_days"] = 0
-				cell["last_day"] = GameCalendar.day
-				_cells[coord] = cell
-				_seeds += 1
-				_harvested += 1
-				_message = "Colhido! Você recebeu uma semente para replantar."
-				changed = true
+		elif int(cell.get("stage", 0)) >= _max_crop_stage(coord):
+			cell["seeded"] = false
+			cell["watered"] = false
+			cell["stage"] = 0
+			cell["growth_days"] = 0
+			cell["last_day"] = GameCalendar.day
+			_cells[coord] = cell
+			_seeds += 1
+			_harvested += 1
+			_message = "Colhido! Uma semente recuperada."
+			changed = true
+		else:
+			_message = "Ainda crescendo. Aguarde a maturidade ou regue."
+	elif tool_id == &"watering_can":
+		if cell.is_empty() or not cell.get("seeded", false):
+			_message = "Plante primeiro usando a enxada (3)."
+		elif cell.get("watered", false):
+			_message = "Esta planta ja esta regada."
+		else:
+			cell["watered"] = true
+			cell["last_day"] = GameCalendar.day
+			_cells[coord] = cell
+			_message = "Regado! +1 fase a cada 3 dias de jogo."
+			changed = true
 	if changed:
 		_save_progress()
 		_sync_crop_sprites()
@@ -227,13 +196,12 @@ func _create_hud() -> void:
 func _refresh_hud() -> void:
 	if _hud == null:
 		return
-	var names := ["Enxada", "Sementes", "Regador", "Colher"]
 	var objective := "OBJETIVO: colher 3 plantas (%d/3)" % mini(_harvested, 3)
 	if _harvested >= 3:
-		objective = "OBJETIVO CONCLUÍDO! Próximo passo: conhecer um slime."
-	_hud.text = "SLIMEKEEPERS: LOST VALLEY | Protótipo de cultivo\n" + \
-		"1 Enxada  2 Semente  3 Regador  4 Colher  |  F usar: %s\n" % names[_selected_tool] + \
-		"Sementes: %d  Colheitas: %d  |  %s\n%s" % [_seeds, _harvested, objective, _message]
+		objective = "OBJETIVO CONCLUIDO! Proximo passo: conhecer um slime."
+	_hud.text = "SLIMEKEEPERS: LOST VALLEY | Cultivo\n" + \
+		"3 Enxada: preparar / plantar / colher | 4 Regador: regar | F ou clique\n" + \
+		"Sementes: %d | Colheitas: %d | %s\n%s" % [_seeds, _harvested, objective, _message]
 
 
 func _save_progress() -> void:
