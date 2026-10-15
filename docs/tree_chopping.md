@@ -34,3 +34,9 @@ Os pes do Player e a base do tronco determinam a profundidade via Y-sort (Godot 
 
 Teste: abra TreeChopDemo.tscn com F6, ande em volta do tronco com WASD e compare a copa e o jogador.
 Por fim derrube a arvore e verifique o toco. Teste visual local pendente.
+
+## Arvores recuperadas do catalogo
+
+As cinco cenas antigas `tree_small`, `tree_large`, `tree_orange`, `tree_pear` e `tree_peach` voltaram com seus sprites e colisoes originais. Tambem usam o mesmo sistema de cinco golpes e deixam stump.
+
+Essas cinco cenas possuem apenas um sprite por especie: na falta da animacao real de seis quadros `wind_swaying`, exibem seis movimentos curtos de rotacao (1,2 segundo por golpe). `tree.tscn` e `tree_apple.tscn` continuam usando os seis quadros reais, sem loop. Todas compartilham z_index=10 para Y-sort com o jogador.
