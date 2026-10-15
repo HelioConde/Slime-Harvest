@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c1tqom7mxwb2c"]
 
 [ext_resource type="Texture2D" uid="uid://cpgx2in253d0l" path="res://assets/Objects/Tree animations/tree_sprites.png" id="1_y5kx5"]
+[ext_resource type="Script" path="res://scripts/trees/choppable_tree.gd" id="1_chop"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_tsjaw"]
 atlas = ExtResource("1_y5kx5")
@@ -101,6 +102,7 @@ animations = [{
 size = Vector2(5, 6)
 
 [node name="tree" type="StaticBody2D" unique_id=1818755409 groups=["world_objects"]]
+script = ExtResource("1_chop")
 texture_filter = 1
 collision_mask = 2
 

@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree.tscn" id="2_tree"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_apple.tscn" id="3_apple"]
+
+[node name="TreeChopDemo" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 640.0
+offset_bottom = 360.0
+color = Color(0.42, 0.60, 0.36, 1.0)
+mouse_filter = 2
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector2(260, 220)
+
+[node name="Tree" parent="." instance=ExtResource("2_tree")]
+position = Vector2(260, 170)
+
+[node name="AppleTree" parent="." instance=ExtResource("3_apple")]
+position = Vector2(355, 170)
+
+[node name="Help" type="Label" parent="."]
+offset_left = 190.0
+offset_top = 65.0
+offset_right = 525.0
+offset_bottom = 110.0
+text = "Machado: tecla 5 | Cortar: tecla F\n3 golpes: queda -> toco"
+mouse_filter = 2

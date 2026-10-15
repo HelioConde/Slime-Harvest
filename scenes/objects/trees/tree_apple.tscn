@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c4gjl6spul3tf"]
 
 [ext_resource type="Texture2D" uid="uid://dcdes2u0pt6kf" path="res://assets/Objects/Tree animations/tree apple sprites.png" id="1_ng81s"]
+[ext_resource type="Script" path="res://scripts/trees/choppable_tree.gd" id="1_chop"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_3sxmd"]
 atlas = ExtResource("1_ng81s")
@@ -190,13 +191,14 @@ animations = [{
 size = Vector2(5, 6)
 
 [node name="tree" type="StaticBody2D" unique_id=1818755409 groups=["world_objects"]]
+script = ExtResource("1_chop")
 texture_filter = 1
 collision_mask = 2
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2114169284]
 position = Vector2(0, -15.5)
 sprite_frames = SubResource("SpriteFrames_uv805")
-animation = &"falling"
+animation = &"wind_swaying"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1683161023]
 position = Vector2(0.5, -1)

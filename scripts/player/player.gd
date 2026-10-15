@@ -7,6 +7,9 @@ signal tool_use_requested(origin: Vector2, direction: Vector2)
 @export_range(1.0, 3.0) var run_multiplier: float = 1.6
 @export_range(0.05, 2.0) var tool_cooldown: float = 0.3
 @export var controls_enabled: bool = true
+@export_range(16.0, 80.0, 1.0) var axe_reach: float = 40.0
+var axe_equipped: bool = false
+var _axe_label: Label
 
 var facing: Vector2 = Vector2.DOWN
 var _tool_remaining: float = 0.0
@@ -20,6 +23,21 @@ func _ready() -> void:
 	if animation == null:
 		push_error("Player: mantenha o nó AnimatedSprite2D como filho direto do Player.")
 		set_physics_process(false)
+	_create_axe_hud()
+
+func _input(event: InputEvent) -> void:
+    if not controls_enabled:
+        return
+    var key := event as InputEventKey
+    if key == null or not key.pressed or key.echo:
+        return
+    if key.keycode == KEY_5:
+        axe_equipped = true
+        _refresh_axe_hud()
+    elif key.keycode in [KEY_1, KEY_2, KEY_3, KEY_4]:
+        axe_equipped = false
+        _refresh_axe_hud()
+
 
 func _physics_process(delta: float) -> void:
 	_tool_remaining = maxf(0.0, _tool_remaining - delta)
@@ -45,7 +63,42 @@ func _physics_process(delta: float) -> void:
 		_interact()
 	if Input.is_action_just_pressed("use_tool") and _tool_remaining <= 0.0:
 		_tool_remaining = tool_cooldown
-		tool_use_requested.emit(tool_origin.global_position, facing)
+		if axe_equipped:
+			_try_axe_hit()
+		else:
+			tool_use_requested.emit(tool_origin.global_position, facing)
+
+func _try_axe_hit() -> void:
+    var query := PhysicsRayQueryParameters2D.create(
+        global_position, global_position + facing * axe_reach, 1, [get_rid()]
+    )
+    var hit := get_world_2d().direct_space_state.intersect_ray(query)
+    if hit.is_empty():
+        return
+    var target := hit.get("collider") as Node
+    if target != null and target.has_method("take_axe_hit"):
+        target.call("take_axe_hit", self)
+
+
+func _create_axe_hud() -> void:
+    var canvas := CanvasLayer.new()
+    canvas.name = "AxeHUD"
+    canvas.layer = 12
+    add_child(canvas)
+    _axe_label = Label.new()
+    _axe_label.position = Vector2(8, 84)
+    _axe_label.add_theme_font_size_override("font_size", 12)
+    _axe_label.add_theme_constant_override("outline_size", 3)
+    _axe_label.add_theme_color_override("font_outline_color", Color("#173022"))
+    canvas.add_child(_axe_label)
+    _refresh_axe_hud()
+
+
+func _refresh_axe_hud() -> void:
+    if _axe_label == null:
+        return
+    _axe_label.text = "Machado equipado: F para cortar" if axe_equipped else "5: Machado | 1-4: Cultivo"
+
 
 func _update_animation(moving: bool, running: bool) -> void:
 	var suffix := "down"

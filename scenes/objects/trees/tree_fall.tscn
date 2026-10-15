@@ -1,3 +1,105 @@
 [gd_scene format=3 uid="uid://bhe5p340bbvl6"]
 
+[ext_resource type="Script" path="res://scripts/trees/tree_fall.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/Objects/Tree animations/tree apple sprites.png" id="2_texture"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3sxmd"]
+atlas = ExtResource("2_texture")
+region = Rect2(0, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mqcyn"]
+atlas = ExtResource("2_texture")
+region = Rect2(48, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fvpwd"]
+atlas = ExtResource("2_texture")
+region = Rect2(96, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ott6m"]
+atlas = ExtResource("2_texture")
+region = Rect2(144, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pwwwc"]
+atlas = ExtResource("2_texture")
+region = Rect2(192, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wpdwo"]
+atlas = ExtResource("2_texture")
+region = Rect2(240, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l0qd5"]
+atlas = ExtResource("2_texture")
+region = Rect2(288, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3b7ux"]
+atlas = ExtResource("2_texture")
+region = Rect2(336, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jnfrt"]
+atlas = ExtResource("2_texture")
+region = Rect2(384, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ampa4"]
+atlas = ExtResource("2_texture")
+region = Rect2(432, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fa808"]
+atlas = ExtResource("2_texture")
+region = Rect2(480, 144, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0seu4"]
+atlas = ExtResource("2_texture")
+region = Rect2(528, 144, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fall"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3sxmd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mqcyn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fvpwd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ott6m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pwwwc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wpdwo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l0qd5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3b7ux")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jnfrt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ampa4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fa808")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0seu4")
+}],
+"loop": 0,
+"name": &"falling",
+"speed": 5.0
+}]
+
 [node name="TreeFall" type="Node2D" unique_id=1433728018]
+script = ExtResource("1_script")
+texture_filter = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -15.5)
+sprite_frames = SubResource("SpriteFrames_fall")
+animation = &"falling"
