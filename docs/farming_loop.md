@@ -26,3 +26,14 @@ Os canteiros, sementes e quantidade colhida são salvos automaticamente em `user
 - Confirmar que `world2.tscn` e a construção da casa continuam funcionando sem mudanças.
 
 Este é um protótipo: o visual de sementes, brotos e colheitas é desenhado por código para validar diversão e feedback antes dos sprites definitivos.
+
+
+## Crescimento em dias de jogo
+
+- O autoload `GameCalendar` controla o dia global: por padrao 10 minutos reais de jogo aberto por dia (`seconds_per_day = 600`).
+- Flor, cogumelo e grama com animacoes `level1`, `level2` etc. avancam uma fase a cada **3 dias de jogo** e param na ultima fase disponivel.
+- A mudanca de fase tem transicao suave de escala/opacidade. As cenas originais e imagens permanecem intactas.
+- O progresso de cada planta colocada no mundo e salvo em `user://slimekeepers_calendar_v1.json`, junto com dia e tempo parcial; nao avanca com o jogo fechado.
+- Em execucao de debug, pressione **F9** para adiantar um dia. Teste com **F6** na cena `scenes/farming/GrowthPreview.tscn`.
+- Para adicionar uma planta ao mapa, instancie a cena da flor ou cogumelo no editor. Para replantar a mesma planta por codigo, chame `replant_today()`.
+- Nota: o canteiro experimental `FarmField` precisa migrar seu antigo temporizador em segundos para o calendario compartilhado.

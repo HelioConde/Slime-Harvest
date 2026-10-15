@@ -7,8 +7,9 @@
 - [ ] Validar visualmente/corrigir falhas de execução no Godot local.
 
 ## M1 — Fazendinha jogável
-- [ ] Integrar o ciclo de cultivo ao cenário de tiles `world2.tscn` sem perder a construção de casa.
-- [ ] Substituir protótipos desenhados por sprites licenciados e animações adequadas.
+- [ ] Integrar o ciclo de cultivo ao mapa de tiles `World.tscn` sem perder a construção de casas.
+- [x] Animar a passagem dos estágios `level1..level4` das flores a cada 3 dias e salvar os dias de jogo.
+- [ ] Integrar os canteiros ao novo mapa principal e confirmar as cenas visualmente no Godot.
 - [ ] Inventário, ferramentas acessíveis, energia e moedas.
 - [ ] Três tipos de cultivos, colheita e venda em um ponto do mapa.
 - [ ] Salvar e carregar posição do jogador, mundo, casa e inventário de modo consistente.

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cem0556knxnqk"]
 
 [ext_resource type="Texture2D" uid="uid://qw4xrtdtiwew" path="res://assets/Objects/Mushrooms, Flowers, Stones.png" id="1_7mv1i"]
+[ext_resource type="Script" path="res://scripts/farming/plant_growth.gd" id="growth_script"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_b1gg2"]
 atlas = ExtResource("1_7mv1i")
@@ -42,6 +43,7 @@ animations = [{
 }]
 
 [node name="mushroom_red" type="Node2D" unique_id=425151417 groups=["world_objects"]]
+script = ExtResource("growth_script")
 texture_filter = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=319666962]

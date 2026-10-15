@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="Slimekeepers: Lost Valley"
+run/main_scene="res://scenes/world/World.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameCalendar="*res://scripts/core/game_calendar.gd"
 
 [display]
 
