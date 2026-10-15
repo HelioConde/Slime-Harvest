@@ -27,7 +27,12 @@ func _run() -> void:
 	if not _check(player != null and tree != null, "player and tree exist"):
 		get_tree().quit(1)
 		return
-	var sprite: AnimatedSprite2D = tree.get_node("AnimatedSprite2D") as AnimatedSprite2D
+	var sprite: AnimatedSprite2D = tree.get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+	if sprite == null:
+		sprite = tree.get_node_or_null("Sprite2D") as AnimatedSprite2D
+	if not _check(sprite != null, "tree has animated sprite"):
+		get_tree().quit(1)
+		return
 	if not _check(sprite.sprite_frames.get_frame_count(&"wind_swaying") == 6, "tree has six sway frames"):
 		get_tree().quit(1)
 		return
