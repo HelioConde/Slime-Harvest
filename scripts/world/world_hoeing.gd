@@ -152,9 +152,18 @@ func _load_cells() -> void:
 		push_warning("WorldHoeing: save invalido, ignorando.")
 		return
 	for entry in data["cells"]:
-		if not entry is Dictionary or not entry.get("x") is int or not entry.get("y") is int:
+		if not entry is Dictionary:
 			continue
-		var cell := Vector2i(int(entry["x"]), int(entry["y"]))
+		var x: Variant = entry.get("x")
+		var y: Variant = entry.get("y")
+		# JSON do Godot normalmente carrega numeros inteiros como float.
+		if not (x is float or x is int) or not (y is float or y is int):
+			continue
+		if not is_finite(float(x)) or not is_finite(float(y)):
+			continue
+		if float(x) != floorf(float(x)) or float(y) != floorf(float(y)):
+			continue
+		var cell := Vector2i(int(x), int(y))
 		if absi(cell.x) > 4096 or absi(cell.y) > 4096:
 			continue
 		if rejection_reason(cell).is_empty():
