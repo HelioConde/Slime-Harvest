@@ -47,10 +47,10 @@ func _ready() -> void:
         return
     if start_fully_grown:
         set_growth_level(_max_level, false)
+        if use_calendar:
+            GameCalendar.day_changed.connect(_on_day_changed)
         if _picked_up:
             sprite.hide()
-            if use_calendar:
-                GameCalendar.day_changed.connect(_on_day_changed)
         return
     if use_calendar:
         _save_key = persistent_id if not persistent_id.is_empty() else str(get_path())
@@ -70,6 +70,8 @@ func _on_day_changed(_new_day: int) -> void:
             sprite.show()
             add_to_group("pickable_plants")
             replant_today()
+        return
+    if start_fully_grown:
         return
     _refresh_from_calendar(true)
 
