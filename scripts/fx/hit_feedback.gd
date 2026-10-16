@@ -38,8 +38,8 @@ static func _play_sound(parent: Node2D, at: Vector2, material: StringName) -> vo
 	var pitch: float = 185.0 if material == &"wood" else 450.0
 	for i in range(count):
 		var t: float = float(i) / float(sample_rate)
-		var decay: float = powf(1.0 - float(i) / float(count), 2.7)
-		var tone: float = sinf(TAU * pitch * t) + 0.28 * sinf(TAU * pitch * 2.3 * t)
+		var decay: float = pow(1.0 - float(i) / float(count), 2.7)
+		var tone: float = sin(TAU * pitch * t) + 0.28 * sin(TAU * pitch * 2.3 * t)
 		var sample: int = int(clampf(tone * decay * 0.2, -1.0, 1.0) * 32767.0)
 		if sample < 0:
 			sample += 65536
