@@ -20,7 +20,7 @@ func _intersects_edge(point: Vector2, edge: StaticBody2D) -> bool:
 	query.position = point
 	query.collision_mask = 1
 	query.collide_with_bodies = true
-	for hit in get_world_2d().direct_space_state.intersect_point(query, 48):
+	for hit in edge.get_world_2d().direct_space_state.intersect_point(query, 48):
 		if hit.get("collider") == edge:
 			return true
 	return false
