@@ -101,23 +101,38 @@ func collect_drop(source_key: String, item_id: StringName, persistent: bool) -> 
 	return true
 
 
-func is_plant_collected(plant_key: String) -> bool:
-	return bool(_picked_plants.get(plant_key, false))
+func is_plant_collected(plant_key: String, regrow_days: int = 0) -> bool:
+	if not _picked_plants.has(plant_key):
+		return false
+	var recorded = _picked_plants[plant_key]
+	if recorded is bool:
+		if not recorded:
+			return false
+		# Migrar saves anteriores que continham apenas true/false.
+		recorded = GameCalendar.day
+		_picked_plants[plant_key] = recorded
+		_save_state()
+	if regrow_days > 0 and GameCalendar.day - int(recorded) >= regrow_days:
+		_picked_plants.erase(plant_key)
+		_save_state()
+		return false
+	return true
 
 
 func drop_plant(
 	plant_key: String, item_id: StringName, parent: Node,
 	position_world: Vector2, persistent: bool,
-	art_scene: String = "", art_animation: StringName = &""
+	art_scene: String = "", art_animation: StringName = &"",
+	regrow_days: int = 6
 ) -> bool:
 	# Clicar transforma a planta em um drop no chao. Nunca creditar o inventario aqui.
 	if parent == null:
 		return false
-	var drop_key: String = plant_key + ":plant_drop"
+	var drop_key: String = plant_key + ":plant_drop:" + str(GameCalendar.day)
 	if persistent:
-		if is_plant_collected(plant_key) or _claimed.has(drop_key) or _drops.has(drop_key):
+		if is_plant_collected(plant_key, regrow_days) or _claimed.has(drop_key) or _drops.has(drop_key):
 			return false
-		_picked_plants[plant_key] = true
+		_picked_plants[plant_key] = GameCalendar.day
 	spawn_drop(parent, position_world, item_id, drop_key, persistent, art_scene, art_animation)
 	if persistent:
 		_save_state()

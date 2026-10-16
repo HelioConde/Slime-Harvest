@@ -7,6 +7,7 @@ extends Node2D
 @export var persistent_id: String = ""
 @export var start_fully_grown: bool = false
 @export var persist_pickup: bool = true
+@export_range(0, 30, 1) var regrow_days: int = 6
 
 var _collectible_item: StringName = &""
 var _pickup_key: String = ""
@@ -30,11 +31,10 @@ func _ready() -> void:
         _collectible_item = StringName(source_name)
     _pickup_key = persistent_id if not persistent_id.is_empty() else str(get_path())
     if _collectible_item != &"" and use_calendar:
-        if persist_pickup and ResourceBag.is_plant_collected(_pickup_key):
+        if persist_pickup and ResourceBag.is_plant_collected(_pickup_key, regrow_days):
             _picked_up = true
-            queue_free()
-            return
-        add_to_group("pickable_plants")
+        else:
+            add_to_group("pickable_plants")
     if sprite == null or sprite.sprite_frames == null:
         push_warning("PlantGrowth: AnimatedSprite2D ausente ou vazio.")
         return
@@ -47,6 +47,10 @@ func _ready() -> void:
         return
     if start_fully_grown:
         set_growth_level(_max_level, false)
+        if _picked_up:
+            sprite.hide()
+            if use_calendar:
+                GameCalendar.day_changed.connect(_on_day_changed)
         return
     if use_calendar:
         _save_key = persistent_id if not persistent_id.is_empty() else str(get_path())
@@ -55,9 +59,18 @@ func _ready() -> void:
         _refresh_from_calendar(false)
     else:
         set_growth_level(1, false)
+    if _picked_up:
+        sprite.hide()
 
 
 func _on_day_changed(_new_day: int) -> void:
+    if _picked_up:
+        if persist_pickup and not ResourceBag.is_plant_collected(_pickup_key, regrow_days):
+            _picked_up = false
+            sprite.show()
+            add_to_group("pickable_plants")
+            replant_today()
+        return
     _refresh_from_calendar(true)
 
 
@@ -127,9 +140,10 @@ func pick_by_click(_player: Node = null) -> bool:
         return false
     if not ResourceBag.drop_plant(
         _pickup_key, _collectible_item, get_parent(), global_position,
-        persist_pickup, scene_file_path, sprite.animation
+        persist_pickup, scene_file_path, sprite.animation, regrow_days
     ):
         return false
     _picked_up = true
-    queue_free()
+    remove_from_group("pickable_plants")
+    sprite.hide()
     return true
