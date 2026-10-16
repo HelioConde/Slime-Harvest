@@ -2,6 +2,7 @@ extends Control
 ## Menu de fazenda, com arte em camadas e fallback quando assets ainda nao foram importados.
 ## Multiplayer e saves multiplos nao estao ativos: preservar user:// legado.
 const WORLD_SCENE := "res://scenes/world/World.tscn"
+const SLOTS_SCRIPT = preload("res://scripts/core/save_slots.gd")
 const WALLPAPER := "res://assets/ui/main_menu/vale_encantado.png"
 const FARM_WALLPAPER := "res://assets/ui/main_menu/fazenda_wallpaper.png"
 const ART_DIR := "res://assets/ui/main_menu/"
@@ -29,14 +30,25 @@ var _message: Label
 var _dialog_return_focus: Control
 var _popup_close_button: Button
 var _has_farm_art: bool = false
+var _slots: RefCounted
+var _slots_ok: bool = false
+var _choices: VBoxContainer
+var _farm_input: LineEdit
+var _player_input: LineEdit
+var _popup_fields: VBoxContainer
+var _new_game_replaces: bool = false
 
 
 func _ready() -> void:
+	_slots = SLOTS_SCRIPT.new()
+	_slots_ok = bool(_slots.call("initialize"))
 	_has_farm_art = _texture("farm_logo.png") != null and _texture("farm_frame.png") != null
 	_build_background()
 	_build_panel()
 	_build_popup()
 	_update_save_buttons()
+	if not _slots_ok:
+		_show_message(str(_slots.get("error_message")))
 	(_buttons["Novo jogo"] as BaseButton).grab_focus()
 
 
@@ -177,6 +189,10 @@ func _make_button(parent: Control, label: String, callback: Callable, at: Vector
 		decorated.texture_pressed = _texture("btn_" + code + "_pressed.png")
 		decorated.texture_disabled = _texture("btn_" + code + "_disabled.png")
 		decorated.texture_focused = _texture("btn_" + code + "_hover.png")
+		decorated.mouse_entered.connect(_highlight_sprite.bind(decorated, true))
+		decorated.mouse_exited.connect(_highlight_sprite.bind(decorated, false))
+		decorated.focus_entered.connect(_highlight_sprite.bind(decorated, true))
+		decorated.focus_exited.connect(_highlight_sprite.bind(decorated, false))
 		button = decorated
 	else:
 		var simple := Button.new()
@@ -200,6 +216,16 @@ func _make_button(parent: Control, label: String, callback: Callable, at: Vector
 	return button
 
 
+func _highlight_sprite(button: TextureButton, selected: bool) -> void:
+	if not is_instance_valid(button) or button.disabled:
+		return
+	if selected:
+		# Brilho real por cima do sprite, mesmo quando o PNG hover se parece com o normal.
+		button.self_modulate = Color(1.28, 1.19, 1.03, 1.0)
+	else:
+		button.self_modulate = Color.WHITE
+
+
 func _wood_style(state: String) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("#6a4124")
@@ -216,21 +242,19 @@ func _wood_style(state: String) -> StyleBoxFlat:
 
 
 func _has_legacy_save() -> bool:
-	for path in LEGACY_SAVES:
-		if FileAccess.file_exists(path):
-			return true
-	return false
+	return _slots_ok and bool(_slots.call("has_save"))
 
 
 func _update_save_buttons() -> void:
 	var has_save: bool = _has_legacy_save()
 	(_buttons["Continuar"] as BaseButton).disabled = not has_save
 	(_buttons["Carregar jogo"] as BaseButton).disabled = not has_save
+	(_buttons["Novo jogo"] as BaseButton).disabled = not _slots_ok
 	if has_save:
-		(_buttons["Continuar"] as BaseButton).tooltip_text = "Abrir o mundo com o salvamento atual."
-		(_buttons["Novo jogo"] as BaseButton).tooltip_text = "Protegido: nao sobrescrever o salvamento existente."
+		(_buttons["Continuar"] as BaseButton).tooltip_text = "Abrir a ultima partida ativa."
+		(_buttons["Novo jogo"] as BaseButton).tooltip_text = "Criar outra fazenda ou substituir a atual com backup."
 	else:
-		(_buttons["Novo jogo"] as BaseButton).tooltip_text = "Iniciar sua primeira partida."
+		(_buttons["Novo jogo"] as BaseButton).tooltip_text = "Comece uma nova aventura."
 
 
 func _on_continue() -> void:
@@ -239,15 +263,118 @@ func _on_continue() -> void:
 
 
 func _on_new_game() -> void:
-	if _has_legacy_save():
-		_show_message("Ja existe uma partida local. Novo jogo esta protegido ate que existam saves independentes.\n\nUse Continuar para abrir sua fazenda atual.")
+	if not _slots_ok:
+		_show_message("Os saves nao puderam ser verificados. Nenhuma partida sera alterada.")
+		return
+	if not _has_legacy_save():
+		_show_new_game_form(false)
+		return
+	var free: int = int(_slots.call("first_free_slot"))
+	var active: int = int(_slots.call("active_slot"))
+	var actions: Array[Dictionary] = []
+	if free > 0:
+		actions.append({"label": "Criar outra partida (espaco %d)" % free, "call": Callable(self, "_show_new_game_form").bind(false)})
 	else:
-		_enter_world()
+		actions.append({"label": "Todos os 3 espacos estao ocupados", "disabled": true})
+	actions.append({"label": "Substituir partida atual (espaco %d)" % active, "call": Callable(self, "_show_new_game_form").bind(true)})
+	_show_actions("Novo jogo", "O que deseja fazer? Sua fazenda atual sera mantida se criar outro espaco.", actions)
+
+
+func _show_new_game_form(replace: bool) -> void:
+	_new_game_replaces = replace
+	_show_actions("Nova fazenda", "Informe os nomes da fazenda e do personagem.", [
+		{"label": "Confirmar nomes", "call": Callable(self, "_confirm_new_game_form")}
+	])
+	_popup_fields.visible = true
+	var farm_label := Label.new()
+	farm_label.text = "Nome da fazenda"
+	_popup_fields.add_child(farm_label)
+	_farm_input = LineEdit.new()
+	_farm_input.name = "FarmName"
+	_farm_input.max_length = 32
+	_farm_input.text = "Minha fazenda"
+	_farm_input.placeholder_text = "Nome da fazenda"
+	_popup_fields.add_child(_farm_input)
+	var player_label := Label.new()
+	player_label.text = "Nome do personagem"
+	_popup_fields.add_child(player_label)
+	_player_input = LineEdit.new()
+	_player_input.name = "CharacterName"
+	_player_input.max_length = 32
+	_player_input.text = "Aventureiro"
+	_player_input.placeholder_text = "Nome do personagem"
+	_popup_fields.add_child(_player_input)
+	_farm_input.grab_focus()
+	_farm_input.select_all()
+
+
+func _confirm_new_game_form() -> void:
+	var farm: String = _farm_input.text.strip_edges()
+	var player: String = _player_input.text.strip_edges()
+	if farm.is_empty() or player.is_empty():
+		_show_message("Preencha o nome da fazenda e o nome do personagem.")
+		return
+	if _new_game_replaces:
+		_show_actions("Confirmar substituicao",
+			"Substituir a fazenda atual por \"%s\"?\nUm backup separado sera criado ANTES de iniciar. Os demais espacos nao serao modificados." % farm,
+			[{"label": "Sim, substituir com backup", "call": Callable(self, "_start_new_game").bind(farm, player, true)},
+			{"label": "Nao, voltar", "call": Callable(self, "_on_new_game")}])
+	else:
+		_start_new_game(farm, player, false)
+
+
+func _flush_runtime_saves() -> void:
+	# Autoloads ainda guardam dados antigos em memoria. Gravar antes de arquivar.
+	GameCalendar.save_session_state()
+	ResourceBag.save_session_state()
+	TreePersistence.save_session_state()
+
+
+func _reload_runtime_saves() -> void:
+	GameCalendar.reload_session_state()
+	ResourceBag.reload_session_state()
+	TreePersistence.reload_session_state()
+
+
+func _start_new_game(farm: String, player: String, replace: bool) -> void:
+	var previous_active: int = int(_slots.call("active_slot"))
+	if previous_active > 0:
+		_flush_runtime_saves()
+	if not bool(_slots.call("create_new", farm, player, 0, replace)):
+		_show_message("Nao foi possivel iniciar: %s\nSeus saves continuam protegidos." % str(_slots.get("error_message")))
+		return
+	_reload_runtime_saves()
+	_overlay.visible = false
+	_update_save_buttons()
+	_enter_world()
 
 
 func _on_load_game() -> void:
-	if _has_legacy_save():
-		_show_message("Existe uma partida local. Use Continuar para carrega-la.\n\nOs tres espacos separados serao ativados junto do gerenciador de saves.")
+	if not _slots_ok:
+		return
+	var actions: Array[Dictionary] = []
+	for slot_record in _slots.call("list_slots"):
+		var slot: int = int(slot_record.get("slot", 0))
+		var title: String = str(slot_record.get("farm", "Fazenda"))
+		var owner: String = str(slot_record.get("player", "Aventureiro"))
+		var active: bool = bool(slot_record.get("is_active", false))
+		actions.append({
+			"label": "Espaco %d: %s - %s%s" % [slot, title, owner, " (atual)" if active else ""],
+			"call": Callable(self, "_activate_slot").bind(slot)
+		})
+	_show_actions("Carregar jogo", "Selecione a fazenda que deseja continuar.", actions)
+
+
+func _activate_slot(slot: int) -> void:
+	if slot != int(_slots.call("active_slot")):
+		_flush_runtime_saves()
+		if not bool(_slots.call("activate", slot)):
+			_show_message("Falha ao carregar: %s\nNenhum save foi descartado." % str(_slots.get("error_message")))
+			return
+		_reload_runtime_saves()
+	_overlay.visible = false
+	_update_save_buttons()
+	_enter_world()
 
 
 func _on_multiplayer() -> void:
@@ -259,7 +386,9 @@ func _on_options() -> void:
 
 
 func _on_credits() -> void:
-	_show_message("Slimekeepers: Lost Valley\nJogo independente feito com Godot.\n\nMenu de fazenda com sprites originais.")
+	_show_message("Slimekeepers: Lost Valley\nCriado por Helio Conde\n\nJogo independente feito com Godot.\nMenu de fazenda com arte original.")
+	# UTF-8 mantido no credito visivel.
+	_message.text = _message.text.replace("Helio", "Hélio")
 
 
 func _on_exit() -> void:
@@ -289,41 +418,79 @@ func _build_popup() -> void:
 
 	_overlay_card = PanelContainer.new()
 	_overlay_card.name = "Dialog"
-	_overlay_card.custom_minimum_size = Vector2(326, 160)
+	_overlay_card.custom_minimum_size = Vector2(326, 0)
 	_overlay_card.add_theme_stylebox_override("panel", _wood_style("normal"))
 	center.add_child(_overlay_card)
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 14)
-	margin.add_theme_constant_override("margin_top", 12)
+	margin.add_theme_constant_override("margin_top", 10)
 	margin.add_theme_constant_override("margin_right", 14)
 	margin.add_theme_constant_override("margin_bottom", 10)
 	_overlay_card.add_child(margin)
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 7)
+	content.name = "DialogContent"
+	content.add_theme_constant_override("separation", 6)
 	margin.add_child(content)
 
 	_message = Label.new()
 	_message.name = "DialogText"
-	_message.custom_minimum_size = Vector2(292, 100)
+	_message.custom_minimum_size = Vector2(292, 60)
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.add_theme_font_size_override("font_size", 11)
 	_message.add_theme_color_override("font_color", Color("#fff1d5"))
 	content.add_child(_message)
 
+	_popup_fields = VBoxContainer.new()
+	_popup_fields.name = "FormFields"
+	_popup_fields.visible = false
+	_popup_fields.add_theme_constant_override("separation", 2)
+	content.add_child(_popup_fields)
+
+	_choices = VBoxContainer.new()
+	_choices.name = "Choices"
+	_choices.add_theme_constant_override("separation", 4)
+	content.add_child(_choices)
+
 	_popup_close_button = Button.new()
 	_popup_close_button.name = "Back"
-	_popup_close_button.text = "Voltar"
-	_popup_close_button.custom_minimum_size = Vector2(0, 25)
+	_popup_close_button.text = "Cancelar / Voltar"
+	_popup_close_button.custom_minimum_size = Vector2(0, 24)
 	_popup_close_button.pressed.connect(_dismiss_popup)
 	content.add_child(_popup_close_button)
 
 
 func _show_message(message: String) -> void:
-	_dialog_return_focus = get_viewport().gui_get_focus_owner()
+	_show_actions("", message, [])
+
+
+func _show_actions(_title: String, message: String, actions: Array[Dictionary]) -> void:
+	if not _overlay.visible:
+		_dialog_return_focus = get_viewport().gui_get_focus_owner()
 	_message.text = message
+	for child in _choices.get_children():
+		_choices.remove_child(child)
+		child.queue_free()
+	for child in _popup_fields.get_children():
+		_popup_fields.remove_child(child)
+		child.queue_free()
+	_popup_fields.visible = false
+	var next_focus: Control = _popup_close_button
+	for spec in actions:
+		var item := Button.new()
+		item.text = str(spec.get("label", "Continuar"))
+		item.name = "Choice_" + str(_choices.get_child_count())
+		item.custom_minimum_size = Vector2(0, 27)
+		item.add_theme_font_size_override("font_size", 12)
+		item.disabled = bool(spec.get("disabled", false))
+		var handler: Callable = spec.get("call", Callable())
+		if handler.is_valid():
+			item.pressed.connect(handler)
+		_choices.add_child(item)
+		if next_focus == _popup_close_button and not item.disabled:
+			next_focus = item
 	_overlay.visible = true
-	_popup_close_button.grab_focus()
+	next_focus.grab_focus()
 
 
 func _dismiss_popup() -> void:
