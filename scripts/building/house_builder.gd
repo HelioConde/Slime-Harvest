@@ -8,6 +8,8 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export var initial_house_fixed: bool = true
+@export_range(2, 64, 1) var max_spawn_distance_tiles: int = 12
+@export_range(1, 3, 1) var player_build_clearance_tiles: int = 1
 @export_range(1, 100) var material_limit: int = 25
 @export_range(0, 8) var roof_bottom_inset_px: int = 0
 @export_range(0.1, 1.0) var construction_roof_opacity: float = 0.5
@@ -30,6 +32,7 @@ var manually_hide_roof := false
 var preview_roof := false
 var footprint: Dictionary = {}
 var _initial_anchor: Vector2i = Vector2i(99999, 99999)
+var _spawn_cell: Vector2i = Vector2i.ZERO
 var history: Array[Dictionary] = []
 var bodies: Array[StaticBody2D] = []
 var building := false
@@ -57,6 +60,8 @@ func _ready() -> void:
 	floor_layer.z_index = 4
 	floor_layer.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(floor_layer)
+	# Congelar o spawn uma unica vez. Nao usar a posicao atual do player.
+	_spawn_cell = floor_layer.local_to_map(floor_layer.to_local(player.global_position))
 	roof.position = floor_layer.position
 	walls.tile_set = wall_tiles
 	front_walls = TileMapLayer.new()
@@ -681,6 +686,61 @@ func _has_house_space(floor_cell: Vector2i) -> bool:
 				return false
 	return true
 
+func _spawn_limit_reason(cell: Vector2i) -> String:
+	# Distancia radial medida em celulas do TileMap (nao em pixels).
+	var distance_squared: int = (cell - _spawn_cell).length_squared()
+	if distance_squared > max_spawn_distance_tiles * max_spawn_distance_tiles:
+		return "Casa longe demais do spawn (maximo %d blocos)." % max_spawn_distance_tiles
+	return ""
+
+
+func _player_clearance_reason(cell: Vector2i) -> String:
+	# Reservar o bloco do personagem e todos os vizinhos imediatos (3x3).
+	if player == null:
+		return ""
+	var player_cell: Vector2i = floor_layer.local_to_map(floor_layer.to_local(player.global_position))
+	if maxi(absi(cell.x - player_cell.x), absi(cell.y - player_cell.y)) <= player_build_clearance_tiles:
+		return "Afaste o personagem: deixe 1 bloco livre ao redor."
+	return ""
+
+
+func _wall_ring(cells: Dictionary) -> Dictionary:
+	var generated: Dictionary = {}
+	for occupied in cells:
+		var cell: Vector2i = occupied
+		for y in range(-1, 2):
+			for x in range(-1, 2):
+				var wall: Vector2i = cell + Vector2i(x, y)
+				if not cells.has(wall):
+					generated[wall] = true
+	return generated
+
+
+func _new_construction_reason(new_floor: Dictionary, target_cell: Vector2i, include_target: bool) -> String:
+	# Nenhum piso ou parede nova deve surgir sobre o player, mesmo por geracao automatica.
+	for occupied in new_floor:
+		var cell: Vector2i = occupied
+		if not footprint.has(cell):
+			var range_error: String = _spawn_limit_reason(cell)
+			if not range_error.is_empty():
+				return range_error
+			var player_error: String = _player_clearance_reason(cell)
+			if not player_error.is_empty():
+				return player_error
+	var existing_walls: Dictionary = _wall_ring(footprint)
+	for new_wall in _wall_ring(new_floor):
+		if not existing_walls.has(new_wall):
+			var wall_error: String = _player_clearance_reason(new_wall)
+			if not wall_error.is_empty():
+				return wall_error
+	if include_target:
+		var limit_error: String = _spawn_limit_reason(target_cell)
+		if not limit_error.is_empty():
+			return limit_error
+		return _player_clearance_reason(target_cell)
+	return ""
+
+
 func _add_reason(cell: Vector2i, addition: Dictionary) -> String:
 	if _selected_cells().has(cell):
 		return ""
@@ -706,6 +766,9 @@ func _add_reason(cell: Vector2i, addition: Dictionary) -> String:
 			if not _has_house_space(added_cell):
 				return "Deixe espaço para as paredes e uma célula de margem até a borda do mapa."
 			proposed[added_cell] = true
+		var placement_reason: String = _new_construction_reason(proposed, cell, false)
+		if not placement_reason.is_empty():
+			return placement_reason
 		var layout_error: String = _house_layout_error(proposed)
 		if not layout_error.is_empty():
 			return layout_error
@@ -714,6 +777,10 @@ func _add_reason(cell: Vector2i, addition: Dictionary) -> String:
 			return contour_error
 	if brush == "Piso" and not _has_house_space(cell):
 		return "Deixe espaço para as paredes e uma célula de margem até a borda do mapa."
+	if brush != "Piso":
+		var placement_reason: String = _new_construction_reason(footprint, cell, true)
+		if not placement_reason.is_empty():
+			return placement_reason
 	if brush == "Parede":
 		if footprint.has(cell):
 			return "Pinte a parede fora do piso, no contorno da casa."
