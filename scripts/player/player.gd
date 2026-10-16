@@ -439,12 +439,12 @@ func set_controls_enabled(enabled: bool) -> void:
 
 ## A escolha pertence ao slot ativo; partidas antigas recebem a opcao masculina.
 func _apply_selected_appearance() -> void:
-    var appearance := "masculino"
-    var slots: RefCounted = SAVE_SLOTS.new()
-    if bool(slots.call("initialize")):
-        var active: int = int(slots.call("active_slot"))
-        if active > 0:
-            var metadata: Dictionary = slots.call("slot_metadata", active)
-            appearance = str(metadata.get("appearance", "masculino"))
-    if not PLAYER_SKINS.apply(animation, appearance):
-        push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
+	var appearance := "masculino"
+	var slots: RefCounted = SAVE_SLOTS.new()
+	if bool(slots.call("initialize")):
+		var active: int = int(slots.call("active_slot"))
+		if active > 0:
+			var metadata: Dictionary = slots.call("slot_metadata", active)
+			appearance = str(metadata.get("appearance", "masculino"))
+	if not PLAYER_SKINS.apply(animation, appearance):
+		push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
