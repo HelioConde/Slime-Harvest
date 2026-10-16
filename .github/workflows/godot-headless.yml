@@ -41,6 +41,8 @@ jobs:
           set -o pipefail
           for scene in \
             res://scenes/trees/TreeChopDemo.tscn \
+            res://scenes/trees/FruitTreesDemo.tscn \
+            res://scenes/world/TerrainGallery.tscn \
             res://scenes/farming/FarmingToolDemo.tscn \
             res://scenes/farming/GrowthPreview.tscn \
             res://scenes/objects/ObjectCatalog.tscn
@@ -70,3 +72,13 @@ jobs:
             exit 1
           fi
           grep -F "PASS polish: animation timing, persistence, resource variants and collision" polish-gameplay.log
+
+      - name: Validate fruit trees and terrain presets (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/FruitTerrainTest.tscn --quit-after 1200 2>&1 | tee fruit-terrain.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL fruit-terrain" fruit-terrain.log; then
+            exit 1
+          fi
+          grep -F "PASS fruit-terrain: all four fruit trees and six terrain patches validated" fruit-terrain.log
