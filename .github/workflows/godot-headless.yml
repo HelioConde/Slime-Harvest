@@ -82,3 +82,13 @@ jobs:
             exit 1
           fi
           grep -F "PASS fruit-terrain: all four fruit trees and six terrain patches validated" fruit-terrain.log
+
+      - name: Test main world hoe restrictions (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/WorldHoeTest.tscn --quit-after 900 2>&1 | tee world-hoe.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL world-hoe" world-hoe.log; then
+            exit 1
+          fi
+          grep -F "PASS world-hoe: green-ground tilling, occupied cells, fixed house, save and load" world-hoe.log
