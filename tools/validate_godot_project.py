@@ -87,8 +87,10 @@ def check() -> list[str]:
         r'\[ext_resource type="PackedScene"[^\n]*path="res://([^"]+)"',
         catalog,
     )
-    if len(scene_paths) < 78:
-        errors.append(f"ObjectCatalog: expected at least 78 original objects, got {len(scene_paths)}")
+    # 22 variacoes flower_warm_*/flower_cool_* foram removidas intencionalmente.
+    # Manter os 56 objetos restantes, inclusive as seis flores principais.
+    if len(scene_paths) < 56:
+        errors.append(f"ObjectCatalog: expected at least 56 retained objects, got {len(scene_paths)}")
     if len(scene_paths) != len(set(scene_paths)):
         errors.append("ObjectCatalog: duplicate PackedScene references")
 
