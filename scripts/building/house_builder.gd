@@ -7,6 +7,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var ground_path: NodePath
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
+@export var initial_house_fixed: bool = true
 @export_range(1, 100) var material_limit: int = 25
 @export_range(0, 8) var roof_bottom_inset_px: int = 0
 @export_range(0.1, 1.0) var construction_roof_opacity: float = 0.5
@@ -28,6 +29,7 @@ var floor_layer: TileMapLayer
 var manually_hide_roof := false
 var preview_roof := false
 var footprint: Dictionary = {}
+var _initial_anchor: Vector2i = Vector2i(99999, 99999)
 var history: Array[Dictionary] = []
 var bodies: Array[StaticBody2D] = []
 var building := false
@@ -82,6 +84,22 @@ func _ready() -> void:
 	removal_outline.z_index = 31
 	add_child(removal_outline)
 	ghost.hide()
+	# O construtor representa a casa inicial, sempre no mesmo terreno quando ja salva.
+	if FileAccess.file_exists(SAVE_PATH):
+		_load_house()
+
+
+func is_world_point_protected(world_point: Vector2, margin_tiles: int = 3) -> bool:
+	if footprint.is_empty() or floor_layer == null:
+		return false
+	var target: Vector2i = floor_layer.local_to_map(floor_layer.to_local(world_point))
+	var padding: int = maxi(0, margin_tiles) + 1  # Margem adicional das paredes.
+	for existing in footprint:
+		var cell: Vector2i = existing
+		if absi(target.x - cell.x) <= padding and absi(target.y - cell.y) <= padding:
+			return true
+	return false
+
 
 func _make_roof_terrain() -> void:
 	# Make a private atlas so padding does not reveal the wall underneath.
@@ -244,6 +262,8 @@ func _process(_delta: float) -> void:
 			return
 		_remember()
 		if brush == "Piso":
+			if initial_house_fixed and footprint.is_empty():
+				_initial_anchor = cursor
 			for key in addition:
 				footprint[key] = true
 		else:
@@ -312,6 +332,8 @@ func _removal_reason(start: Vector2i, end: Vector2i) -> String:
 			proposed.erase(cell)
 	if cut.is_empty():
 		return "Selecione uma área com piso."
+	if initial_house_fixed and _initial_anchor != Vector2i(99999, 99999) and not proposed.has(_initial_anchor):
+		return "A casa inicial nao pode ser demolida nem movida."
 	# A complete demolition bypasses courtyard and edge restrictions.
 	if proposed.is_empty():
 		return ""
@@ -969,7 +991,12 @@ func _remember() -> void:
 func _undo() -> void:
 	if history.is_empty():
 		return
-	var previous: Dictionary = history.pop_back()
+	var previous: Dictionary = history.back()
+	if initial_house_fixed and _initial_anchor != Vector2i(99999, 99999):
+		if not previous.floor.has(_initial_anchor):
+			status.text = "A casa inicial nao pode mudar de lugar."
+			return
+	history.pop_back()
 	footprint = previous.floor
 	wall_cells = previous.walls
 	roof_cells = previous.roof
@@ -1003,7 +1030,13 @@ func _save_house() -> void:
 	if file == null:
 		status.text = "Não foi possível salvar."
 		return
-	file.store_string(JSON.stringify({"version": 2, "floor": _encode_cells(footprint), "walls": [], "roof": []}))
+	file.store_string(JSON.stringify({
+		"version": 2,
+		"floor": _encode_cells(footprint),
+		"walls": [],
+		"roof": [],
+		"anchor": {"x": _initial_anchor.x, "y": _initial_anchor.y}
+	}))
 	file.flush()
 	var error := file.get_error()
 	file.close()
@@ -1041,6 +1074,21 @@ func _load_house() -> void:
 	if decoded.floor.size() > material_limit:
 		status.text = "Piso ultrapassa o limite de materiais."
 		return
+	var saved_anchor := Vector2i(99999, 99999)
+	if not decoded.floor.is_empty():
+		var anchor_data: Variant = data.get("anchor", {})
+		if anchor_data is Dictionary and anchor_data.get("x") is int and anchor_data.get("y") is int:
+			saved_anchor = Vector2i(int(anchor_data["x"]), int(anchor_data["y"]))
+		if not decoded.floor.has(saved_anchor):
+			# Saves anteriores nao tinham ancora; eleger uma celula estavel do piso.
+			var cells_sorted: Array = decoded.floor.keys()
+			cells_sorted.sort_custom(func(a, b): return a.y < b.y or (a.y == b.y and a.x < b.x))
+			saved_anchor = cells_sorted[0]
+	if initial_house_fixed and _initial_anchor != Vector2i(99999, 99999):
+		if not decoded.floor.has(_initial_anchor):
+			status.text = "Carregamento recusado: a casa inicial nao pode ser movida."
+			return
+		saved_anchor = _initial_anchor
 	var layout_error: String = _house_layout_error(decoded.floor)
 	if not layout_error.is_empty():
 		status.text = layout_error
@@ -1056,6 +1104,7 @@ func _load_house() -> void:
 			status.text = "Afaste o jogador da parede salva."
 			return
 	footprint = decoded.floor
+	_initial_anchor = saved_anchor
 	wall_cells = decoded.walls
 	roof_cells = decoded.roof
 	history.clear()

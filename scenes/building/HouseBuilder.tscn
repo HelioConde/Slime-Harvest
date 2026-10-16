@@ -4,7 +4,7 @@
 [ext_resource type="TileSet" path="res://data/tilesets/palettes/14_Wooden_House_Walls_Tilset.tres" id="2_walls"]
 [ext_resource type="TileSet" path="res://data/tilesets/palettes/13_Wooden_House_Roof_Tilset.tres" id="3_roof"]
 
-[node name="HouseBuilder" type="Node2D"]
+[node name="HouseBuilder" type="Node2D" groups=["initial_house"]]
 texture_filter = 1
 script = ExtResource("1_script")
 wall_tiles = ExtResource("2_walls")
