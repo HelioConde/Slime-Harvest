@@ -9,3 +9,7 @@ WASD/setas: mover. Shift: correr. O campo 10×7 agora oferece um ciclo de cultiv
 Validação desta etapa: conferir sintaxe e referências antes do commit. Execução no Godot deve ser conferida localmente: F5, movimentar nas quatro direções, correr, testar colisão com lago/árvores/limites e sobreposição atrás das copas.
 
 Próxima etapa: testes locais no Godot, trocar os desenhos de crescimento por sprites e conectar inventário/economia. O construtor de casa permanece no cenário independente world2.tscn.
+
+## Terra arada persistente no World.tscn
+
+O mundo principal agora tem a camada `TilledSoil` para criar solo cultivável sem modificar a pintura de `grass2`. Use a enxada (3) com clique ou F perto da grama. Não pode arar sobre objetos, próximo da casa inicial ou em terreno sem grama. A casa inicial tem uma âncora fixa; a construção salva é carregada quando o World abre. Veja [guia de preparo do terreno](world_hoe.md).

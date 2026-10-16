@@ -13,3 +13,7 @@ Salvar/Carregar guarda três conjuntos independentes em user://house_terrain_tes
 A casa manual em scenes/world/world2.tscn foi preservada como referência; seus tiles não são convertidos automaticamente pelo construtor. Cantos e recortes muito específicos ainda precisam de acabamento; este construtor não reproduz automaticamente todos os detalhes decorativos desenhados à mão (janelas, chaminé e porta).
 
 Validação: parser GDScript aprovado. Execução e aparência pendentes de teste no Godot.
+
+## Casa inicial fixa
+
+Ao construir a primeira célula de piso da casa inicial, ela é registrada como âncora permanente. Após isso, o editor pode expandir ou modificar a casa, mas não pode apagar essa célula para realocar a construção. Desfazer e carregar outro desenho também respeitam a âncora. O save v2 mantém compatibilidade, adicionando o campo opcional anchor; um save anterior ganha âncora ao abrir. A construção salva é carregada na inicialização do World. A enxada não altera o piso nem a margem de segurança ao redor da casa. Detalhes no [guia de preparo de terreno](world_hoe.md).

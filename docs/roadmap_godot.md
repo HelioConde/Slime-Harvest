@@ -39,3 +39,12 @@
 Esta trilha é **Godot 2D**, não a implementação 3D/Roblox existente em outro repositório. Compartilhamos conceito e identidade, mas não portamos recursos entre motores sem adequação.
 
 Prioridade de trabalho: primeiro deixar o jogo **divertido e funcional**, depois ampliar arte e conteúdo.
+
+## Novo sistema no World
+
+- [x] Enxada prepara diretamente grama verde do mapa principal usando TileSet existente e save separado.
+- [x] Bloqueio de células ocupadas e margem de segurança da casa inicial.
+- [x] Casa inicial possui âncora fixa: não permite mover nem demolir totalmente após posicionar.
+- [x] Arbustos, troncos, brotos e tocos decorativos podem ser eliminados usando sprites atuais.
+- [ ] Conectar plantio, rega e colheita às células aradas do mapa principal.
+- [ ] Expandir interação para novos objetos que forem adicionados futuramente.

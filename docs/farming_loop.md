@@ -11,3 +11,7 @@ Teste de cultivo: abra scenes/farming/FarmingToolDemo.tscn e pressione F6.
 
 Acoes: 1 Picareta, 2 Machado, 3 Enxada, 4-0 Materiais (regador 1). Uma ferramenta equipada por vez.
 O sistema de cultivo existe como prototipo separado; World.tscn preserva o HouseBuilder e o mapa original.
+
+## Novo preparo de terra no mundo principal
+
+Além do protótipo de flores, o World.tscn agora permite arar grama com a enxada 3 e reaproveita o TileSet Tilled_Dirt_v2. As células aradas são persistentes em save próprio; água, objetos e proximidade da casa impedem o preparo. **O plantio e a rega ainda devem ser conectados a essas células numa etapa posterior**, portanto usar a enxada no mundo principal não consome sementes nem cria flores automaticamente. Veja [preparo de terra](world_hoe.md).

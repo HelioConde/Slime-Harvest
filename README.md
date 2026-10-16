@@ -39,3 +39,7 @@ A implementacao foi verificada por inspecao dos arquivos GitHub, mas requer vali
 ## Árvores frutíferas e terreno reutilizável
 
 A macieira animada agora serve de modelo para laranjeira, pessegueiro e pereira usando os sprites existentes. O TileSet do mundo é reutilizado em seis superfícies de exemplo, preservando o World original. Abra scenes/trees/FruitTreesDemo.tscn ou scenes/world/TerrainGallery.tscn e pressione F6. Para inserir um terreno em outro mapa, instancie scenes/world/TerrainPatch.tscn. Detalhes: [árvores e terrenos](docs/fruit_trees_terrains.md).
+
+## Enxada no mundo principal e casa fixa
+
+No `World.tscn`, use 3 (enxada) e clique ou F sobre o chão verde: cada enxadada cria terra arada real no TileSet original. Não se pode arar em cima de objetos, fora da grama ou perto da casa inicial. Arbustos, troncos, brotos e tocos decorativos podem ser removidos com o machado antes de arar. A casa inicial mantém sua posição depois da primeira construção, com salvamento compatível. Guia: [preparo de terreno e casa fixa](docs/world_hoe.md).
