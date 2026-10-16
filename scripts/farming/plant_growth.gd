@@ -27,7 +27,7 @@ func _ready() -> void:
     var source_name: String = scene_file_path.get_file().get_basename().to_lower()
     if source_name.is_empty():
         source_name = name.to_snake_case()
-    if source_name.begins_with("flower_") or source_name.begins_with("mushroom_"):
+    if source_name.begins_with("flower_") or source_name.begins_with("mushroom_") or source_name == "grass":
         _collectible_item = StringName(source_name)
     _pickup_key = persistent_id if not persistent_id.is_empty() else str(get_path())
     if _collectible_item != &"" and use_calendar:

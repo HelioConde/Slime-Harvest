@@ -104,6 +104,9 @@ func _object_overlaps(world_point: Vector2) -> bool:
 			if object == null or observed.has(object) or not object.is_visible_in_tree() or object.is_queued_for_deletion():
 				continue
 			observed[object] = true
+			# Vegetacao ja arrancada permanece na cena invisivel ate regenerar.
+			if object.has_method("can_pick") and not bool(object.call("can_pick")):
+				continue
 			if _visual_bounds(object).intersects(area):
 				return true
 	return false
