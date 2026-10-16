@@ -20,7 +20,7 @@ Ao construir a primeira célula de piso da casa inicial, ela é registrada como 
 
 ## Distancia do spawn e seguranca de construcao
 
-A casa inicial so pode ser construida e ampliada dentro de um raio de 12 blocos do spawn, armazenado na inicializacao do World. Esse valor pode ser alterado pelo parametro max_spawn_distance_tiles no Inspector do HouseBuilder (2 a 64).
+A casa inicial so pode ser construida e ampliada dentro de um raio de 25 blocos do spawn, armazenado na inicializacao do World. Esse valor pode ser alterado pelo parametro max_spawn_distance_tiles no Inspector do HouseBuilder (2 a 64).
 
 O bloco atual do jogador e os oito blocos imediatamente vizinhos nao podem receber pisos, paredes ou telhados novos. Tambem e proibido construir pisos que gerariam paredes automaticamente perto do jogador. Essa distancia e configuravel em player_build_clearance_tiles (padrao 1). O indicador fica vermelho e explica o motivo.
 

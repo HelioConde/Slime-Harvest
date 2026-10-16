@@ -16,7 +16,7 @@ y_sort_enabled = true
 [node name="HouseBuilder" parent="Actors/Map" unique_id=277812168 instance=ExtResource("1_1fp7r")]
 player_path = NodePath("../../Player")
 ground_path = NodePath("../grass2")
-max_spawn_distance_tiles = 12
+max_spawn_distance_tiles = 25
 player_build_clearance_tiles = 1
 
 [node name="water" type="TileMapLayer" parent="Actors/Map" unique_id=222847836]

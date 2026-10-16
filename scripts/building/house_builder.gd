@@ -8,7 +8,7 @@ const DIRECTIONS: Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN,
 @export var wall_tiles: TileSet
 @export var roof_tiles: TileSet
 @export var initial_house_fixed: bool = true
-@export_range(2, 64, 1) var max_spawn_distance_tiles: int = 12
+@export_range(2, 64, 1) var max_spawn_distance_tiles: int = 25
 @export_range(1, 3, 1) var player_build_clearance_tiles: int = 1
 @export_range(1, 100) var material_limit: int = 25
 @export_range(0, 8) var roof_bottom_inset_px: int = 0

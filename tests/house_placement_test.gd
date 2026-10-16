@@ -29,13 +29,13 @@ func _run() -> void:
 	var spawn: Vector2i = house.get("_spawn_cell")
 	var range_tiles: int = int(house.get("max_spawn_distance_tiles"))
 	var safe_tiles: int = int(house.get("player_build_clearance_tiles"))
-	if not _check(range_tiles == 12 and safe_tiles == 1, "spawn radius and player safety margin configured"):
+	if not _check(range_tiles == 25 and safe_tiles == 1, "spawn radius and player safety margin configured"):
 		return
-	if not _check(String(house.call("_spawn_limit_reason", spawn + Vector2i(12, 0))).is_empty(), "distance of exactly 12 tiles allowed"):
+	if not _check(String(house.call("_spawn_limit_reason", spawn + Vector2i(25, 0))).is_empty(), "distance of exactly 25 tiles allowed"):
 		return
-	if not _check(not String(house.call("_spawn_limit_reason", spawn + Vector2i(13, 0))).is_empty(), "outside 12-tile spawn radius blocked"):
+	if not _check(not String(house.call("_spawn_limit_reason", spawn + Vector2i(26, 0))).is_empty(), "outside 25-tile spawn radius blocked"):
 		return
-	if not _check(not String(house.call("_spawn_limit_reason", spawn + Vector2i(9, 9))).is_empty(), "diagonal outside circular radius blocked"):
+	if not _check(not String(house.call("_spawn_limit_reason", spawn + Vector2i(18, 18))).is_empty(), "diagonal outside circular radius blocked"):
 		return
 
 	var candidate: Vector2i = spawn
