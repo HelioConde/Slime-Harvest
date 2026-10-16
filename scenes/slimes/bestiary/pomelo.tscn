@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="SpriteFrames" path="res://assets/slimes/bestiary/pomelo/pomelo_frames.tres" id="1_frames"]
+
+[node name="Pomelo" type="Node2D"]
+texture_filter = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-30, -53)
+sprite_frames = ExtResource("1_frames")
+animation = &"idle"
+autoplay = "idle"
+centered = false

@@ -1,22 +1,22 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://b1t6k5ycue7qb"]
 
-[ext_resource type="Script" path="res://scripts/building/house_builder.gd" id="1_script"]
-[ext_resource type="TileSet" path="res://data/tilesets/palettes/14_Wooden_House_Walls_Tilset.tres" id="2_walls"]
-[ext_resource type="TileSet" path="res://data/tilesets/palettes/13_Wooden_House_Roof_Tilset.tres" id="3_roof"]
+[ext_resource type="Script" uid="uid://baryuuhuo1i5k" path="res://scripts/building/house_builder.gd" id="1_script"]
+[ext_resource type="TileSet" uid="uid://biqccvdixrrsw" path="res://data/tilesets/palettes/14_Wooden_House_Walls_Tilset.tres" id="2_walls"]
+[ext_resource type="TileSet" uid="uid://ci4bds7arxx8x" path="res://data/tilesets/palettes/13_Wooden_House_Roof_Tilset.tres" id="3_roof"]
 
-[node name="HouseBuilder" type="Node2D" groups=["initial_house"]]
+[node name="HouseBuilder" type="Node2D" unique_id=1328442483 groups=["initial_house"]]
 texture_filter = 1
 script = ExtResource("1_script")
 wall_tiles = ExtResource("2_walls")
 roof_tiles = ExtResource("3_roof")
 
-[node name="Walls" type="TileMapLayer" parent="."]
+[node name="Walls" type="TileMapLayer" parent="." unique_id=2118777677]
 z_index = 5
 tile_set = ExtResource("2_walls")
 
-[node name="Roof" type="TileMapLayer" parent="."]
+[node name="Roof" type="TileMapLayer" parent="." unique_id=1881287115]
 z_index = 20
 tile_set = ExtResource("3_roof")
 
-[node name="Preview" type="Sprite2D" parent="."]
+[node name="Preview" type="Sprite2D" parent="." unique_id=1922607754]
 z_index = 30
