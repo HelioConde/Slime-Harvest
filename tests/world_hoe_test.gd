@@ -36,13 +36,21 @@ func _run() -> void:
 		get_tree().quit(1)
 		return
 	var free_cells: Array[Vector2i] = []
+	var why_blocked: Dictionary = {}
+	var sources: Dictionary = {}
 	for green_cell in grass.get_used_cells():
 		var point: Vector2 = grass.to_global(grass.map_to_local(green_cell))
 		var hoe_cell: Vector2i = hoe.local_to_map(hoe.to_local(point))
-		if hoe.call("rejection_reason", hoe_cell) == "":
+		var reason: String = String(hoe.call("rejection_reason", hoe_cell))
+		var id: int = grass.get_cell_source_id(green_cell)
+		sources[id] = int(sources.get(id, 0)) + 1
+		if reason == "":
 			free_cells.append(hoe_cell)
+		else:
+			why_blocked[reason] = int(why_blocked.get(reason, 0)) + 1
 		if free_cells.size() >= 4:
 			break
+	print("DIAGNOSTIC world-hoe: sources=", sources, " blocked=", why_blocked)
 	if not _check(free_cells.size() >= 4, "four unoccupied green cells can be prepared"):
 		get_tree().quit(1)
 		return
