@@ -33,7 +33,7 @@ Nao foi criado nenhum sprite, tileset nem sprite sheet novo. Os efeitos reaprove
 
 ## Hotbar
 
-- O nome do item aparece sobre a barra; P mostra Picareta, mesmo sem ocupar slot original.
+- O nome do item aparece sobre a barra; 4 seleciona Picareta no atlas 4x4 atualizado, e P permanece atalho secundario.
 - Troca por roda do mouse, atalhos 1-0 e cliques continua disponivel.
 - Quantidades grandes sao apresentadas como 999+, evitando extrapolar slots.
 

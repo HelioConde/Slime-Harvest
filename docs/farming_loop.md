@@ -9,7 +9,7 @@ Teste de cultivo: abra scenes/farming/FarmingToolDemo.tscn e pressione F6.
 5. Equipe enxada com 3 novamente e colha uma planta madura.
 6. A colheita recupera uma semente; o salvamento dos canteiros continua em user://slimekeepers_farm_v1.json.
 
-Acoes: 1 Picareta, 2 Machado, 3 Enxada, 4-0 Materiais (regador 1). Uma ferramenta equipada por vez.
+Acoes: 1 Regador, 2 Machado, 3 Enxada, 4 Picareta, 5-0 Materiais. Uma ferramenta equipada por vez.
 O sistema de cultivo existe como prototipo separado; World.tscn preserva o HouseBuilder e o mapa original.
 
 ## Novo preparo de terra no mundo principal

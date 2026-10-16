@@ -21,7 +21,7 @@
 | 9 | Tabua | plank | Item de recurso (coleta pendente) |
 | 10 / tecla 0 | Pedra grande | large_stone | Item de recurso (mineracao pendente) |
 
-A **picareta** continua disponivel pelo atalho **P** com a animacao pick_*, pois o sprite fornecido nao inclui picareta entre os dez primeiros itens. Nao substituimos nenhum icone do atlas pelo desenho antigo.
+O atlas original enviado em 16/10 foi atualizado para 4x4 (64x64). A **picareta agora ocupa o slot 4** e continua acessivel por P como atalho secundario, usando a animacao original pick_*.
 A selecao visual muda por clique ou pelas teclas 1-9 e 0. Recursos podem ser selecionados, mas nao executam golpe nem mostram quantidade ficticia.
 Os atalhos de ferramentas anteriores mudaram: regador 1, machado 2, enxada 3.
 F ou clique esquerdo usa a ferramenta equipada perto de um alvo valido. Clique sobre a propria interface nao deve atacar.
@@ -85,4 +85,4 @@ A coleta da flor/cogumelo agora acontece em duas etapas: 1) o clique gera um ite
 
 ## Refinamento da jogabilidade
 
-A hotbar agora identifica o item selecionado e aceita roda do mouse; a picareta (P) nao ocupa os sprites originais. O impacto e sincronizado com o quadro da animacao. Para detalhes de drops, efeitos, regrowth e testes, consulte [refinamentos](gameplay_polish.md).
+A hotbar agora identifica o item selecionado e aceita roda do mouse; a picareta usa o sprite do slot 4 (P e atalho secundario). O impacto e sincronizado com o quadro da animacao. Para detalhes de drops, efeitos, regrowth e testes, consulte [refinamentos](gameplay_polish.md).
