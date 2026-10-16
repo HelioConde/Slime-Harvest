@@ -20,6 +20,12 @@ var _tool_remaining: float = 0.0
 var _action_animating: bool = false
 var _equipment: Node
 var _hotbar: Control
+var _queued_target: Node2D
+var _queued_tool: StringName = &""
+var _queued_position: Vector2 = Vector2.ZERO
+var _impact_applied: bool = true
+var _impact_frame: int = 1
+var _hotbar_index: int = 1
 
 @onready var animation: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 @onready var placeholder: Polygon2D = get_node_or_null("Placeholder") as Polygon2D
@@ -34,6 +40,7 @@ func _ready() -> void:
 		return
 	add_to_group("resource_collectors")
 	animation.animation_finished.connect(_on_action_animation_finished)
+	animation.frame_changed.connect(_on_tool_frame_changed)
 	_equipment = INVENTORY_SCRIPT.new()
 	_equipment.name = "ToolInventory"
 	_equipment.connect("tool_changed", Callable(self, "_on_tool_changed"))
@@ -56,6 +63,11 @@ func _current_tool() -> StringName:
 
 func _on_hotbar_selection(tool_id: StringName) -> void:
 	if controls_enabled and not _action_animating and _equipment != null:
+		if _hotbar != null:
+			for i in range(10):
+				if StringName(_hotbar.call("get_slot_item", i)) == tool_id:
+					_hotbar_index = i
+					break
 		_equipment.call("equip", tool_id)
 
 
@@ -71,7 +83,7 @@ func _input(event: InputEvent) -> void:
 	if key == null or not key.pressed or key.echo or key.ctrl_pressed or key.alt_pressed:
 		return
 	if key.keycode == KEY_P:
-		# Picareta mantida para mineracao futura; nao ocupa um dos dez slots.
+		# Picareta fora dos dez slots, sem substituir os sprites originais.
 		_equipment.call("equip", &"pickaxe")
 		return
 	var slot: int = -1
@@ -87,6 +99,7 @@ func _input(event: InputEvent) -> void:
 		KEY_9: slot = 8
 		KEY_0: slot = 9
 	if slot >= 0:
+		_hotbar_index = slot
 		_equipment.call("equip_slot", slot)
 
 
@@ -94,7 +107,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not controls_enabled or _action_animating or _equipment == null:
 		return
 	var click := event as InputEventMouseButton
-	if click == null or not click.pressed or click.button_index != MOUSE_BUTTON_LEFT:
+	if click == null or not click.pressed:
+		return
+	if click.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		var step: int = -1 if click.button_index == MOUSE_BUTTON_WHEEL_UP else 1
+		_hotbar_index = posmod(_hotbar_index + step, 10)
+		_equipment.call("equip_slot", _hotbar_index)
+		get_viewport().set_input_as_handled()
+		return
+	if click.button_index != MOUSE_BUTTON_LEFT:
 		return
 	var cursor: Vector2 = get_global_mouse_position()
 	# Coleta independente da arma (inclusive quando os itens 4-0 estiverem ativos).
@@ -192,12 +213,9 @@ func _attempt_axe_hit(target: Node) -> bool:
 	var tree := target as Node2D
 	if tree == null or global_position.distance_to(tree.global_position) > tool_reach:
 		return false
-	if not bool(target.call("can_accept_axe_hit")) or not bool(target.call("take_axe_hit", self)):
+	if not bool(target.call("can_accept_axe_hit")):
 		return false
-	_face_world_position(tree.global_position)
-	_tool_remaining = tool_cooldown
-	_play_tool_animation(&"axe")
-	return true
+	return _start_target_action(tree, &"axe")
 
 
 func _try_pickaxe_hit() -> void:
@@ -226,12 +244,44 @@ func _attempt_pickaxe_hit(target: Node) -> bool:
 	var rock := target as Node2D
 	if rock == null or global_position.distance_to(rock.global_position) > tool_reach:
 		return false
-	if not bool(target.call("can_accept_pickaxe_hit")) or not bool(target.call("take_pickaxe_hit", self)):
+	if not bool(target.call("can_accept_pickaxe_hit")):
 		return false
-	_face_world_position(rock.global_position)
+	return _start_target_action(rock, &"pickaxe")
+
+
+func _start_target_action(target: Node2D, tool_id: StringName) -> bool:
+	if _action_animating or not controls_enabled:
+		return false
+	_face_world_position(target.global_position)
+	_queued_target = target
+	_queued_tool = tool_id
+	_queued_position = target.global_position
+	_impact_applied = false
 	_tool_remaining = tool_cooldown
-	_play_tool_animation(&"pickaxe")
+	_play_tool_animation(tool_id)
 	return true
+
+
+func _on_tool_frame_changed() -> void:
+	if _action_animating and not _impact_applied and animation.frame >= _impact_frame:
+		_apply_queued_impact()
+
+
+func _apply_queued_impact() -> void:
+	if _impact_applied:
+		return
+	_impact_applied = true
+	var tool_id: StringName = _queued_tool
+	if is_instance_valid(_queued_target):
+		if global_position.distance_to(_queued_target.global_position) <= tool_reach:
+			if tool_id == &"axe" and _queued_target.has_method("can_accept_axe_hit"):
+				if bool(_queued_target.call("can_accept_axe_hit")):
+					_queued_target.call("take_axe_hit", self)
+			elif tool_id == &"pickaxe" and _queued_target.has_method("can_accept_pickaxe_hit"):
+				if bool(_queued_target.call("can_accept_pickaxe_hit")):
+					_queued_target.call("take_pickaxe_hit", self)
+	elif tool_id in [&"hoe", &"watering_can"]:
+		tool_action_requested.emit(tool_id, _queued_position)
 
 
 func _use_non_axe(target_world: Vector2) -> bool:
@@ -244,9 +294,12 @@ func _use_non_axe(target_world: Vector2) -> bool:
 		# Recursos podem ser selecionados, mas nao sao ferramentas utilizaveis.
 		return false
 	_face_world_position(target_world)
+	_queued_target = null
+	_queued_tool = tool_id
+	_queued_position = target_world
+	_impact_applied = false
 	_tool_remaining = tool_cooldown
 	_play_tool_animation(tool_id)
-	tool_action_requested.emit(tool_id, target_world)
 	return true
 
 
@@ -276,7 +329,10 @@ func _play_tool_animation(tool_id: StringName) -> void:
 	var tool_animation := StringName(prefix + "_" + suffix)
 	if not _has_frames(tool_animation):
 		push_warning("Player: animacao de ferramenta ausente: " + str(tool_animation))
+		_apply_queued_impact()
 		return
+	var frame_count: int = animation.sprite_frames.get_frame_count(tool_animation)
+	_impact_frame = mini(frame_count - 1, maxi(1, floori(float(frame_count) * 0.45)))
 	_action_animating = true
 	animation.flip_h = false
 	animation.speed_scale = tool_animation_speed
@@ -287,6 +343,9 @@ func _play_tool_animation(tool_id: StringName) -> void:
 func _on_action_animation_finished() -> void:
 	if not _action_animating:
 		return
+	_apply_queued_impact()
+	_queued_target = null
+	_queued_tool = &""
 	_action_animating = false
 	animation.speed_scale = 1.0
 	_update_animation(false, false)
