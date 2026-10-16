@@ -121,6 +121,11 @@ func _get_visual_texture() -> Texture2D:
 					var graphic: Texture2D = frames.get_frame_texture(selected, 0)
 					preview.free()
 					return graphic
+			var static_sprite := preview.get_node_or_null("Sprite2D") as Sprite2D
+			if static_sprite != null and static_sprite.texture != null:
+				var original_texture: Texture2D = static_sprite.texture
+				preview.free()
+				return original_texture
 			preview.free()
 	var atlas := AtlasTexture.new()
 	atlas.atlas = ICONS
