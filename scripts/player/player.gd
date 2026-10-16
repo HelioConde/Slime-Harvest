@@ -85,7 +85,7 @@ func _input(event: InputEvent) -> void:
 	if key == null or not key.pressed or key.echo or key.ctrl_pressed or key.alt_pressed:
 		return
 	if key.keycode == KEY_P:
-		# Picareta fora dos dez slots, sem substituir os sprites originais.
+		# Atalho P mantido por compatibilidade; o slot principal agora e 4.
 		_equipment.call("equip", &"pickaxe")
 		return
 	var slot: int = -1

@@ -1,7 +1,7 @@
 extends Control
-## Hotbar de dez espacos com os sprites reais do atlas 4x3 (16x16 por icone).
-## Ordem do atlas: regador, machado, enxada, grama, galho, madeira, tronco,
-## gravetos, tabua, pedra grande, pedra processada, pedra pequena.
+## Hotbar de dez espacos com os sprites reais do atlas 4x4 (16x16 por icone).
+## Ordem: regador, machado, enxada, picareta, galho, madeira,
+## tronco, gravetos, tabua, pedra grande, pedra processada, pedra pequena, grama.
 
 signal tool_selected(tool_id: StringName)
 
@@ -9,11 +9,11 @@ const ATLAS: Texture2D = preload("res://assets/Objects/Items/tools-n-meterial-it
 const COLUMN_COUNT: int = 4
 const CELL: int = 16
 const SLOT_IDS: Array[StringName] = [
-	&"watering_can", &"axe", &"hoe", &"grass_drop", &"branch",
+	&"watering_can", &"axe", &"hoe", &"pickaxe", &"branch",
 	&"wood", &"trunk", &"twigs", &"plank", &"large_stone"
 ]
 const SLOT_NAMES: Array[String] = [
-	"Regador", "Machado", "Enxada", "Grama", "Galho",
+	"Regador", "Machado", "Enxada", "Picareta", "Galho",
 	"Madeira", "Tronco", "Gravetos", "Tabua", "Pedra grande"
 ]
 
@@ -96,7 +96,7 @@ func _make_slot(index: int) -> void:
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_filter = Control.MOUSE_FILTER_STOP
 	button.tooltip_text = "%d - %s" % [index + 1, SLOT_NAMES[index]]
-	if index >= 3:
+	if index >= 4:
 		button.tooltip_text += " | quantidade coletada"
 	button.add_to_group("hotbar_" + String(item_id))
 	button.pressed.connect(_slot_pressed.bind(item_id))
@@ -247,7 +247,7 @@ func _update_selection_label() -> void:
 	if _selection_label == null:
 		return
 	if _selected == &"pickaxe":
-		_selection_label.text = "P | Picareta"
+		_selection_label.text = "4 | Picareta"
 		return
 	for i in range(SLOT_IDS.size()):
 		if SLOT_IDS[i] == _selected:

@@ -22,6 +22,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+    # Nao avancar dias enquanto a tela inicial estiver aberta.
+    var active_scene: Node = get_tree().current_scene
+    if active_scene != null and active_scene.scene_file_path == "res://scenes/ui/MainMenu.tscn":
+        return
     if delta <= 0.0:
         return
     seconds_into_day += delta

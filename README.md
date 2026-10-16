@@ -7,7 +7,7 @@ Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolv
 ## Funcionalidades atuais
 
 - Personagem: movimentacao suave (aceleracao/desaceleracao), Shift, camera e animacoes direcionais, com impactos sincronizados.
-- Hotbar inferior com 10 espacos e icones recortados do spritesheet original 4x3: 1 Regador, 2 Machado, 3 Enxada, 4-0 materiais. Picareta no atalho P. A selecao fica salva.
+- Hotbar inferior com 10 espacos e icones recortados do spritesheet atualizado 4x4: 1 Regador, 2 Machado, 3 Enxada, 4 Picareta, 5-0 materiais. Atalho P para picareta mantido. A selecao fica salva.
 - Machado: corte de arvores em cinco golpes com balanco completo; queda deixa um tronco; toco pede mais tres golpes e deixa outro tronco.
 - Cultivo experimental: enxada prepara/plantar/colher; regador permite o crescimento por etapas a cada tres dias do jogo.
 - Picareta (tecla P): minerar pedras nivel por nivel; pedra pequena e grande geram recompensas distintas usando sprites originais.
@@ -21,7 +21,7 @@ Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolv
 ## Executar
 
 1. Importe a pasta deste projeto no Godot, usando project.godot.
-2. Pressione F5 para abrir scenes/world/World.tscn.
+2. Pressione F5 para abrir scenes/ui/MainMenu.tscn. Para testar o mundo diretamente, abra scenes/world/World.tscn e use F6.
 3. Pressione 1-9/0 ou clique na hotbar para selecionar itens; F usa a ferramenta equipada.
 4. Teste o machado em scenes/trees/TreeChopDemo.tscn (F6).
 5. Teste mineracao e coleta na mesma TreeChopDemo (F6). Aproxime-se da pedra, equipe P e use clique ou F. Clique em drops, flores ou cogumelos para recolher.

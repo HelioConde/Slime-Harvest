@@ -1,11 +1,11 @@
 extends Node
-## Um item ativo por vez; atalhos de 1 a 0. A picareta permanece no atalho P.
+## Um item ativo por vez; atalhos de 1 a 0. Picareta no slot 4 (P e alias).
 
 signal tool_changed(tool_id: StringName)
 
 const SAVE_PATH := "user://slimekeepers_equipment_v1.json"
 const HOTBAR_IDS: Array[StringName] = [
-	&"watering_can", &"axe", &"hoe", &"grass_drop", &"branch",
+	&"watering_can", &"axe", &"hoe", &"pickaxe", &"branch",
 	&"wood", &"trunk", &"twigs", &"plank", &"large_stone"
 ]
 const TOOL_IDS: Array[StringName] = [&"watering_can", &"axe", &"hoe", &"pickaxe"]
@@ -15,7 +15,7 @@ var _items: Dictionary = {}
 
 
 func _ready() -> void:
-	for item_id in HOTBAR_IDS + [&"pickaxe"]:
+	for item_id in HOTBAR_IDS:
 		var accessory := Node.new()
 		accessory.name = "Item_" + String(item_id)
 		add_child(accessory)
