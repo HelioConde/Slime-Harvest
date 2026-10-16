@@ -26,6 +26,14 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry.tscn" id="23_0qn2w"]
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry_leaf.tscn" id="24_l5iln"]
 
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_small.tscn" id="27_tree_small"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree.tscn" id="28_tree"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_apple.tscn" id="29_tree_apple"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_orange.tscn" id="30_tree_orange"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_pear.tscn" id="31_tree_pear"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_peach.tscn" id="32_tree_peach"]
+[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_large.tscn" id="33_tree_large"]
+
 [ext_resource type="Script" path="res://scripts/slimes/world_population.gd" id="26_population"]
 
 [node name="World2" type="Node2D" unique_id=2045392138]
@@ -138,6 +146,46 @@ position = Vector2(237, 178)
 
 [node name="red_berry_leaf" parent="Actors/Map" unique_id=1403635951 instance=ExtResource("24_l5iln")]
 position = Vector2(169, 224)
+
+[node name="tree_small_west" parent="Actors/Map" instance=ExtResource("27_tree_small")]
+position = Vector2(-252, -176)
+persistent_id = "world2_forest_v1_tree_small_west"
+
+[node name="tree_large_east" parent="Actors/Map" instance=ExtResource("33_tree_large")]
+position = Vector2(258, -171)
+persistent_id = "world2_forest_v1_tree_large_east"
+
+[node name="tree_apple_west" parent="Actors/Map" instance=ExtResource("29_tree_apple")]
+position = Vector2(-250, -76)
+persistent_id = "world2_forest_v1_tree_apple_west"
+
+[node name="tree_orange_east" parent="Actors/Map" instance=ExtResource("30_tree_orange")]
+position = Vector2(252, -68)
+persistent_id = "world2_forest_v1_tree_orange_east"
+
+[node name="tree_pear_west" parent="Actors/Map" instance=ExtResource("31_tree_pear")]
+position = Vector2(-265, 72)
+persistent_id = "world2_forest_v1_tree_pear_west"
+
+[node name="tree_peach_east" parent="Actors/Map" instance=ExtResource("32_tree_peach")]
+position = Vector2(285, 135)
+persistent_id = "world2_forest_v1_tree_peach_east"
+
+[node name="tree_common_west" parent="Actors/Map" instance=ExtResource("28_tree")]
+position = Vector2(-245, 181)
+persistent_id = "world2_forest_v1_tree_common_west"
+
+[node name="tree_large_southeast" parent="Actors/Map" instance=ExtResource("33_tree_large")]
+position = Vector2(260, 261)
+persistent_id = "world2_forest_v1_tree_large_southeast"
+
+[node name="tree_small_southwest" parent="Actors/Map" instance=ExtResource("27_tree_small")]
+position = Vector2(-95, 285)
+persistent_id = "world2_forest_v1_tree_small_southwest"
+
+[node name="tree_common_south" parent="Actors/Map" instance=ExtResource("28_tree")]
+position = Vector2(105, 280)
+persistent_id = "world2_forest_v1_tree_common_south"
 
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("3_v5dby")]
 z_index = 10
