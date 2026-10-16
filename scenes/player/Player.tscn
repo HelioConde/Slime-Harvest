@@ -13,8 +13,8 @@ motion_mode = 1
 script = ExtResource("1_player")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=745536399]
-position = Vector2(0, -20)
-scale = Vector2(0.18, 0.18)
+position = Vector2(0, -18)
+scale = Vector2(0.16, 0.16)
 sprite_frames = ExtResource("2_new_male")
 animation = &"idle_down"
 
