@@ -7,6 +7,7 @@ const FX = preload("res://scripts/fx/hit_feedback.gd")
 @export var persistent_id: String = ""
 @export var persist_mining: bool = true
 @export_range(1, 12, 1) var static_hits: int = 3
+@export var drop_item_id: StringName = &"large_stone"
 
 var _sprite: AnimatedSprite2D
 var _static_sprite: Sprite2D
@@ -76,10 +77,11 @@ func take_pickaxe_hit(_player: Node = null) -> bool:
 		impact_texture = _static_sprite.texture
 	FX.burst(get_parent() as Node2D, global_position + Vector2(0, -4), impact_texture, &"stone")
 	_level -= 1
+	FX.show_remaining(get_parent() as Node2D, global_position + Vector2(0, -13), _level)
 	if persist_mining:
 		ResourceBag.save_rock_level(_save_key, _level)
 	var drop_key: String = _save_key + ":stone:" + str(_level)
-	ResourceBag.spawn_drop(get_parent(), global_position + Vector2(10, -3), &"large_stone", drop_key, persist_mining)
+	ResourceBag.spawn_drop(get_parent(), global_position + Vector2(10, -3), drop_item_id, drop_key, persist_mining)
 	_update_visual()
 	var graphic: Node2D = _sprite if _sprite != null else _static_sprite
 	if graphic != null:

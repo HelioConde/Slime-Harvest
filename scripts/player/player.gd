@@ -10,6 +10,8 @@ const HOTBAR_SCENE: PackedScene = preload("res://scenes/ui/ToolHotbar.tscn")
 
 @export_range(1.0, 500.0) var walk_speed: float = 90.0
 @export_range(1.0, 3.0) var run_multiplier: float = 1.6
+@export_range(100.0, 2000.0, 10.0) var move_acceleration: float = 680.0
+@export_range(100.0, 2200.0, 10.0) var move_deceleration: float = 950.0
 @export_range(0.05, 2.0) var tool_cooldown: float = 0.3
 @export var controls_enabled: bool = true
 @export_range(16.0, 96.0, 1.0) var tool_reach: float = 60.0
@@ -176,7 +178,12 @@ func _physics_process(delta: float) -> void:
 			facing = Vector2.RIGHT if direction.x > 0.0 else Vector2.LEFT
 		else:
 			facing = Vector2.DOWN if direction.y > 0.0 else Vector2.UP
-	velocity = direction * walk_speed * (run_multiplier if running else 1.0)
+	var desired: Vector2 = direction * walk_speed * (run_multiplier if running else 1.0)
+	if not controls_enabled or _action_animating:
+		velocity = Vector2.ZERO
+	else:
+		var rate: float = move_acceleration if direction != Vector2.ZERO else move_deceleration
+		velocity = velocity.move_toward(desired, rate * delta)
 	move_and_slide()
 	interaction_ray.target_position = facing * 24.0
 	tool_origin.position = facing * 16.0

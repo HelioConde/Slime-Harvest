@@ -80,6 +80,7 @@ animations = [{
 
 [node name="RockSmall" type="Node2D" unique_id=1298602842]
 script = ExtResource("mineable_script")
+drop_item_id = &"small_stone"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=80207174]
 sprite_frames = SubResource("SpriteFrames_uv805")

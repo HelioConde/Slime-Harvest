@@ -57,3 +57,25 @@ static func _play_sound(parent: Node2D, at: Vector2, material: StringName) -> vo
 	audio.global_position = at
 	audio.finished.connect(audio.queue_free)
 	audio.play()
+
+
+static func show_remaining(parent: Node2D, position_world: Vector2, remaining: int) -> void:
+	if parent == null or remaining <= 0:
+		return
+	var popup := Label.new()
+	popup.text = str(remaining)
+	popup.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	popup.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	popup.add_theme_font_size_override("font_size", 9)
+	popup.add_theme_color_override("font_color", Color(1.0, 0.94, 0.75))
+	popup.add_theme_constant_override("outline_size", 2)
+	popup.add_theme_color_override("font_outline_color", Color(0.2, 0.18, 0.13))
+	popup.custom_minimum_size = Vector2(18, 14)
+	parent.add_child(popup)
+	popup.global_position = position_world - Vector2(9, 13)
+	popup.z_index = 40
+	var tween := popup.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(popup, "position:y", popup.position.y - 9.0, 0.52)
+	tween.tween_property(popup, "modulate:a", 0.0, 0.52)
+	tween.chain().tween_callback(popup.queue_free)

@@ -13,7 +13,7 @@ extends Node2D
 @export_range(0.0, 2.0, 0.05) var pickup_delay: float = 0.30
 
 const ICONS: Texture2D = preload("res://assets/Objects/Items/tools-n-meterial-items.png")
-const ICON_INDEX := {"trunk": 6, "large_stone": 9, "wood": 5, "twigs": 7, "plank": 8}
+const ICON_INDEX := {"trunk": 6, "large_stone": 9, "small_stone": 11, "wood": 5, "twigs": 7, "plank": 8}
 
 var _sprite: Sprite2D
 var _picked := false

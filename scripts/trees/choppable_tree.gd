@@ -84,6 +84,7 @@ func take_axe_hit(_player: Node = null) -> bool:
 		texture = _static_sprite.texture
 	FX.burst(get_parent() as Node2D, global_position + Vector2(0, -12), texture, &"wood")
 	_hits += 1
+	FX.show_remaining(get_parent() as Node2D, global_position + Vector2(0, -25), hits_remaining())
 	if persist_felling and _hits < axe_hits_required:
 		TreePersistence.save_tree_hits(_save_key, _hits)
 	_swaying = true

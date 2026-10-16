@@ -45,6 +45,7 @@ func take_axe_hit(_player: Node = null) -> bool:
 		return false
 	FX.burst(get_parent() as Node2D, global_position + Vector2(0, -5), _sprite.texture, &"wood")
 	_hits += 1
+	FX.show_remaining(get_parent() as Node2D, global_position + Vector2(0, -8), hits_remaining())
 	if persist_stump and _hits < axe_hits_required:
 		TreePersistence.save_stump_hits(source_tree_id, _hits)
 	_busy = true
