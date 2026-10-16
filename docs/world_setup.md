@@ -13,3 +13,7 @@ Próxima etapa: testes locais no Godot, trocar os desenhos de crescimento por sp
 ## Terra arada persistente no World.tscn
 
 O mundo principal agora tem a camada `TilledSoil` para criar solo cultivável sem modificar a pintura de `grass2`. Use a enxada (3) com clique ou F perto da grama. Não pode arar sobre objetos, próximo da casa inicial ou em terreno sem grama. A casa inicial tem uma âncora fixa; a construção salva é carregada quando o World abre. Veja [guia de preparo do terreno](world_hoe.md).
+
+## Colisão das margens
+
+A cena World.tscn contém `Actors/Map/TerrainEdgeCollision`, que lê o TileSet original, acompanha os contornos alfa das margens e impede a entrada na água exposta. Visualize em Godot > Debug > Visible Collision Shapes. A geração física não interfere nos tiles existentes, na enxada ou na casa. Veja [guia de colisões](terrain_edge_collision.md).

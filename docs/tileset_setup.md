@@ -77,3 +77,7 @@ Próxima etapa: desenhar o mundo com os atlases escolhidos, depois definir colis
 ## Reutilizar superfícies
 
 Foi adicionado um TileMapLayer reutilizável em scenes/world/TerrainPatch.tscn e seis superfícies na cena scenes/world/TerrainGallery.tscn. Todos referenciam world_tileset.tres. Os índices de terrain são: grama 9, grama escura 3, terra 11, terra escura 5, pedra 13 e terra arada 17. O gerador só preenche camadas vazias e respeita pintura manual. [Guia completo](fruit_trees_terrains.md).
+
+## Colisão por borda dos sprites
+
+As margens do World usam uma nova camada física gerada a partir dos pixels opacos e transparentes dos sprites originais: água exposta bloqueia, terra e grama permanecem caminháveis. A colisão **não** transforma todos os tiles em paredes e não altera o `world_tileset.tres`. Consulte [Colisões do terreno](terrain_edge_collision.md).

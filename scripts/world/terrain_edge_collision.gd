@@ -158,7 +158,6 @@ func _add_rectangle(rectangle: Rect2i) -> void:
 	# Origem: o primeiro pixel da celula zero no TileMap.
 	var tile_origin: Vector2 = water.map_to_local(Vector2i.ZERO) - Vector2(_tile_size) * 0.5
 	var center: Vector2 = tile_origin + Vector2(rectangle.position) + Vector2(rectangle.size) * 0.5
-	collider.global_position = center if is_inside_tree() else center
 	add_child(collider)
 	collider.global_position = water.to_global(center)
 	_rectangles += 1
