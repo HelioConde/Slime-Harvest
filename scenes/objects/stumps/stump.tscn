@@ -1,4 +1,5 @@
-[gd_scene load_steps=3 format=3]
+
+[gd_scene format=3 uid="uid://dbmab2lfdq82o"]
 
 [ext_resource type="Texture2D" path="res://data/objects/stumps/stump.tres" id="1_texture"]
 [ext_resource type="Script" path="res://scripts/trees/choppable_stump.gd" id="2_script"]
@@ -6,16 +7,16 @@
 [sub_resource type="RectangleShape2D" id="Shape_base"]
 size = Vector2(8, 8)
 
-[node name="stump" type="StaticBody2D" groups=["world_objects"]]
+[node name="stump" type="StaticBody2D" unique_id=445958169 groups=["world_objects"]]
 script = ExtResource("2_script")
 texture_filter = 1
 collision_layer = 1
 collision_mask = 2
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -5.0)
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2124194970]
+position = Vector2(0, -3)
 texture = ExtResource("1_texture")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -4.0)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=467167299]
+position = Vector2(0, -4)
 shape = SubResource("Shape_base")
