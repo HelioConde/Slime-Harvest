@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="TileSet" path="res://data/tilesets/world_tileset.tres" id="1_world"]
+[ext_resource type="Script" path="res://scripts/world/terrain_patch.gd" id="2_patch"]
+
+[node name="TerrainPatch" type="TileMapLayer"]
+tile_set = ExtResource("1_world")
+script = ExtResource("2_patch")
+terrain_set_index = 9
+size_in_tiles = Vector2i(11, 6)
+organic_border = true
