@@ -1,15 +1,18 @@
-# Imagem do menu inicial
+# Menu de fazenda — Godot 4.7.1
 
-O cenário aprovado (sem slimes, para animação futura) deve ser importado em:
+O menu no GitHub ja seleciona automaticamente a arte em camadas, quando os PNGs forem importados pelo Godot.
 
-`res://assets/ui/main_menu/vale_encantado.png`
+## Instalar a arte
 
-Fonte: wallpaper original gerado para Slimekeepers: Lost Valley, 1672 × 941 px, sem slimes.
+1. Em C:\FarmSlime, execute git pull --ff-only origin main (depois de verificar git status).
+2. Extraia Slimekeepers_Menu_Fazenda_Godot.zip na **raiz** C:\FarmSlime — o ZIP ja contem assets/ui/main_menu/.
+3. Abra Godot e aguarde importar as texturas. Pressione F5 para testar o novo fundo e os botoes.
+4. Publique as artes: git add assets/ui/main_menu e git commit -m "feat(menu): sprites de fazenda" e git push origin main.
 
-A textura é carregada em `scripts/ui/main_menu.gd` pelo nó `ValleyWallpaper`, se existir. `TextureRect.STRETCH_KEEP_ASPECT_COVERED` mantém a tela preenchida, evitando deformar a paisagem. Caso a imagem ainda não tenha sido copiada, aparece um fundo verde temporário sem erro.
+Arquivos principais: fazenda_wallpaper.png (1672x941, sem slimes), farm_logo.png, farm_frame.png, btn_*.png (normal, hover, pressed, disabled), wood_*.png para botoes traduziveis depois. As fotos geradas sao independentes dos scripts e dos saves.
 
-O arquivo da imagem é binário e não foi incluído neste commit. Instale-o pelo pacote de assets entregue na conversa. Não altere saves ao instalar.
+Se as artes nao estiverem presentes, o menu usa a paisagem anterior e controles de texto como fallback. Nenhum recurso user:// e alterado pela instalacao. A interface tem uma camada SlimeAnimationLayer vazia para animar slimes posteriormente.
 
-A primeira versão do menu inclui botões Continuar, Novo jogo, Carregar jogo, Multiplayer (em breve), Opções, Créditos e Sair. A transição para `World.tscn` preserva os saves existentes.
+O botao Multiplayer fica desativado ate existir sistema de sessoes, autoridade de rede e saves por mundo/personagem. Novo jogo nao sobrescreve a fazenda legada; existe apenas um save ate a implementacao dos tres espacos independentes.
 
-Para preparar multiplayer corretamente no futuro, criar um gerenciador de sessão e saves por usuário/mundo antes de ativar o botão. Não misturar dados entre partidas locais e sessões de rede.
+Aviso: sprites btn_*.png contem texto PT-BR pintado na imagem; futuros idiomas devem usar as variantes wood_* sem letras com Label/Text overlay.

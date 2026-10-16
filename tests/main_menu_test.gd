@@ -18,11 +18,11 @@ func _run() -> void:
 	var main := load("res://scenes/ui/MainMenu.tscn").instantiate() as Control
 	add_child(main)
 	await get_tree().process_frame
-	if not _assert(main.get_node_or_null("MenuOptions/Novojogo") is Button, "Novo jogo exists"):
+	if not _assert(main.get_node_or_null("MenuOptions/Novojogo") is BaseButton, "Novo jogo exists"):
 		return
-	if not _assert(main.get_node_or_null("MenuOptions/Multiplayer") is Button and main.get_node("MenuOptions/Multiplayer").disabled, "future multiplayer disabled safely"):
+	if not _assert(main.get_node_or_null("MenuOptions/Multiplayer") is BaseButton and main.get_node("MenuOptions/Multiplayer").disabled, "future multiplayer disabled safely"):
 		return
-	if not _assert(main.get_node_or_null("MenuOptions/Carregarjogo") is Button, "load game button exists"):
+	if not _assert(main.get_node_or_null("MenuOptions/Carregarjogo") is BaseButton, "load game button exists"):
 		return
 	if not _assert(main.get_script().get_script_constant_map()["WALLPAPER"] == "res://assets/ui/main_menu/vale_encantado.png", "wallpaper reference stable"):
 		return
@@ -34,6 +34,25 @@ func _run() -> void:
 	if not _assert(atlas != null and atlas.get_width() == 64 and atlas.get_height() == 64, "uploaded tool atlas is valid 64x64 RGBA image"):
 		return
 	if not _assert(main.has_method("_has_legacy_save") and main.has_method("_enter_world"), "existing save migration path remains available"):
+		return
+	
+	var multi := main.get_node("MenuOptions/Multiplayer") as BaseButton
+	if not _assert(multi.tooltip_text.contains("Multiplayer") or multi.tooltip_text.contains("multiplayer"), "disabled multiplayer explains unavailable status"):
+		return
+	if not _assert(main.get_node_or_null("SlimeAnimationLayer") != null, "dedicated future slime animation layer"):
+		return
+	if not _assert(main.get_node_or_null("PopupOverlay/PopupCenter/Dialog") is PanelContainer, "popup uses responsive centered layout"):
+		return
+	main.call("_on_new_game") if bool(main.call("_has_legacy_save")) else main.call("_on_options")
+	await get_tree().process_frame
+	if not _assert((main.get_node("PopupOverlay") as Control).visible, "modal opens without clipping or leaving scene"):
+		return
+	var dialog := main.get_node("PopupOverlay/PopupCenter/Dialog") as Control
+	var viewport := main.get_viewport_rect()
+	if not _assert(dialog.get_global_rect().position.x >= 0 and dialog.get_global_rect().end.x <= viewport.size.x and dialog.get_global_rect().end.y <= viewport.size.y, "modal entirely inside viewport"):
+		return
+	main.call("_dismiss_popup")
+	if not _assert(not (main.get_node("PopupOverlay") as Control).visible, "modal closes cleanly"):
 		return
 	print("PASS menu: functional safe entry point, future multiplayer and fourth-slot pickaxe")
 	get_tree().quit(0)
