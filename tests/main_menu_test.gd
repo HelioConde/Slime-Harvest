@@ -54,5 +54,20 @@ func _run() -> void:
 	main.call("_dismiss_popup")
 	if not _assert(not (main.get_node("PopupOverlay") as Control).visible, "modal closes cleanly"):
 		return
+	var btn := main.get_node("MenuOptions/Novojogo") as TextureButton
+	if not _assert(btn != null, "New game button is textured"):
+		return
+	main.call("_highlight_sprite", btn, true)
+	if not _assert(btn.self_modulate.r > 1.1, "New game glows on hover and focus"):
+		return
+	main.call("_highlight_sprite", btn, false)
+	if not _assert(is_equal_approx(btn.self_modulate.r, 1.0), "New game returns to normal on mouse exit"):
+		return
+	main.call("_on_credits")
+	var credits_text: String = str(main.get_node("PopupOverlay/PopupCenter/Dialog/MarginContainer/DialogContent/DialogText").text)
+	if not _assert(credits_text.contains("Hélio Conde"), "creator correctly credited"):
+		return
+	main.call("_dismiss_popup")
+
 	print("PASS menu: functional safe entry point, future multiplayer and fourth-slot pickaxe")
 	get_tree().quit(0)
