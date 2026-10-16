@@ -142,3 +142,13 @@ jobs:
             exit 1
           fi
           grep -F "PASS save-slots: legacy, isolation, switching, replace with backup and persistence" save-slots.log
+
+      - name: Test debug F1 world reset and backup isolation (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/WorldResetTest.tscn --quit-after 500 2>&1 | tee world-reset.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL world-reset" world-reset.log; then
+            exit 1
+          fi
+          grep -F "PASS world-reset: safe backup, map cleared, inventory retained and other slot protected" world-reset.log
