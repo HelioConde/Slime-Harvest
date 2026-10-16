@@ -31,3 +31,12 @@
 - As folhas originais permanecem em `assets/Characters/new/`. Os 28 estados incluem 8 quadros por direcao, em recortes das imagens originais 1774x887. Escala de exibição 0.25 para manter proporcao com o mapa.
 - **Observacao:** o pacote masculino nao contem uma sequencia exclusiva de caminhada distinta da corrida: a caminhada usa a folha de corrida em velocidade menor, ate ser produzido um spritesheet proprio.
 - Teste importante: abrir Player.tscn e verificar `AnimatedSprite2D > Sprite Frames` no inspetor. Validar os 4 lados, armas e posicao dos pes no mapa.
+
+## Ajuste de fluidez do Player (16/10/2026)
+
+- A folha masculina `exec-fd8ae2cc...` possui passos caminhando, mas havia sido usada no `idle`. Agora fornece o `walk` (8 quadros); para parado usamos a pose estavel do ultimo quadro, sem andar parado. A folha masculina `exec-9749d5d0...` fica exclusiva para `run`.
+- `idle` feminino usa ida-e-volta nos oito quadros (14 exposicoes) para evitar salto seco do ultimo quadro para o primeiro.
+- Medimos a deriva lateral das folhas originais e alinhamos os desenhos, sem alterar a colisao, o ponto de interacao ou os PNGs. Compensacoes no `player_motion_alignment.gd`, aplicadas quando cada quadro muda.
+- 9 FPS para caminhar, 12 FPS para correr; velocidade acompanha parcialmente a velocidade fisica. Ao trocar entre caminhar/correr preserva a fase do passo.
+- Golpes mantem os eventos de impacto no mesmo quadro, mas agora usam duracoes variaveis: preparacao mais lenta, contato rapido e retorno mais suave.
+- Falta criar sprites extras (idle masculino com piscadas reais e eventualmente locomocao com diagonais) para acabamento definitivo. Inspecione no F5 e teste todas as direcoes.

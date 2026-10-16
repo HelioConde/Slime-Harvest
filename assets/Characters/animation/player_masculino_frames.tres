@@ -136,131 +136,131 @@ atlas = ExtResource("tex_1")
 region = Rect2(1552, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_0"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(0, 0, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_1"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(222, 0, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_2"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(444, 0, 221, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_3"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(665, 0, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_4"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(887, 0, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_5"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1109, 0, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_6"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1331, 0, 221, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_down_7"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1552, 0, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_0"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(0, 222, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_1"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(222, 222, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_2"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(444, 222, 221, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_3"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(665, 222, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_4"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(887, 222, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_5"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1109, 222, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_6"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1331, 222, 221, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_up_7"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1552, 222, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_0"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(0, 444, 222, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_1"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(222, 444, 222, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_2"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(444, 444, 221, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_3"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(665, 444, 222, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_4"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(887, 444, 222, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_5"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1109, 444, 222, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_6"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1331, 444, 221, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_right_7"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1552, 444, 222, 221)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_0"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(0, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_1"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(222, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_2"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(444, 665, 221, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_3"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(665, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_4"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(887, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_5"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1109, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_6"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1331, 665, 221, 222)
 
 [sub_resource type="AtlasTexture" id="f_walk_left_7"]
-atlas = ExtResource("tex_2")
+atlas = ExtResource("tex_1")
 region = Rect2(1552, 665, 222, 222)
 
 [sub_resource type="AtlasTexture" id="f_run_down_0"]
@@ -906,260 +906,176 @@ region = Rect2(1552, 665, 222, 222)
 [resource]
 animations = [{
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("f_idle_down_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_down_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_down_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_down_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_down_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_down_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_down_6")
-}, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_idle_down_7")
 }],
 "loop": true,
 "name": &"idle_down",
-"speed": 5.0
+"speed": 4.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("f_idle_up_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_up_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_up_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_up_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_up_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_up_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_up_6")
-}, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_idle_up_7")
 }],
 "loop": true,
 "name": &"idle_up",
-"speed": 5.0
+"speed": 4.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("f_idle_right_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_right_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_right_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_right_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_right_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_right_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_right_6")
-}, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_idle_right_7")
 }],
 "loop": true,
 "name": &"idle_right",
-"speed": 5.0
+"speed": 4.0
 }, {
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("f_idle_left_0")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_left_1")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_left_2")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_left_3")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_left_4")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_left_5")
-}, {
-"duration": 1.0,
-"texture": SubResource("f_idle_left_6")
-}, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_idle_left_7")
 }],
 "loop": true,
 "name": &"idle_left",
-"speed": 5.0
+"speed": 4.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_down_7")
 }],
 "loop": true,
 "name": &"walk_down",
-"speed": 8.0
+"speed": 9.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_up_7")
 }],
 "loop": true,
 "name": &"walk_up",
-"speed": 8.0
+"speed": 9.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_right_7")
 }],
 "loop": true,
 "name": &"walk_right",
-"speed": 8.0
+"speed": 9.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_walk_left_7")
 }],
 "loop": true,
 "name": &"walk_left",
-"speed": 8.0
+"speed": 9.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_down_7")
 }],
 "loop": true,
@@ -1167,28 +1083,28 @@ animations = [{
 "speed": 12.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_up_7")
 }],
 "loop": true,
@@ -1196,28 +1112,28 @@ animations = [{
 "speed": 12.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_right_7")
 }],
 "loop": true,
@@ -1225,28 +1141,28 @@ animations = [{
 "speed": 12.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_0")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_1")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_2")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_3")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_4")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_5")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_6")
 }, {
-"duration": 1.0,
+"duration": 1.00,
 "texture": SubResource("f_run_left_7")
 }],
 "loop": true,
@@ -1254,28 +1170,28 @@ animations = [{
 "speed": 12.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_down_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_down_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_axe_down_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_axe_down_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_axe_down_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_axe_down_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_down_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_down_7")
 }],
 "loop": false,
@@ -1283,28 +1199,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_up_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_up_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_axe_up_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_axe_up_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_axe_up_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_axe_up_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_up_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_up_7")
 }],
 "loop": false,
@@ -1312,28 +1228,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_right_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_right_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_axe_right_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_axe_right_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_axe_right_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_axe_right_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_right_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_right_7")
 }],
 "loop": false,
@@ -1341,28 +1257,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_left_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_left_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_axe_left_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_axe_left_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_axe_left_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_axe_left_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_axe_left_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_axe_left_7")
 }],
 "loop": false,
@@ -1370,28 +1286,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_down_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_down_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_pick_down_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_pick_down_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_pick_down_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_pick_down_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_down_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_down_7")
 }],
 "loop": false,
@@ -1399,28 +1315,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_up_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_up_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_pick_up_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_pick_up_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_pick_up_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_pick_up_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_up_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_up_7")
 }],
 "loop": false,
@@ -1428,28 +1344,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_right_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_right_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_pick_right_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_pick_right_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_pick_right_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_pick_right_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_right_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_right_7")
 }],
 "loop": false,
@@ -1457,28 +1373,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_left_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_left_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_pick_left_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_pick_left_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_pick_left_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_pick_left_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_pick_left_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_pick_left_7")
 }],
 "loop": false,
@@ -1486,28 +1402,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_down_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_down_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_hoe_down_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_hoe_down_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_hoe_down_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_hoe_down_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_down_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_down_7")
 }],
 "loop": false,
@@ -1515,28 +1431,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_up_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_up_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_hoe_up_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_hoe_up_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_hoe_up_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_hoe_up_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_up_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_up_7")
 }],
 "loop": false,
@@ -1544,28 +1460,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_right_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_right_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_hoe_right_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_hoe_right_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_hoe_right_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_hoe_right_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_right_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_right_7")
 }],
 "loop": false,
@@ -1573,28 +1489,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_left_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_left_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_hoe_left_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_hoe_left_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_hoe_left_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_hoe_left_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_hoe_left_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_hoe_left_7")
 }],
 "loop": false,
@@ -1602,28 +1518,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_down_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_down_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_watering_down_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_watering_down_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_watering_down_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_watering_down_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_down_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_down_7")
 }],
 "loop": false,
@@ -1631,28 +1547,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_up_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_up_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_watering_up_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_watering_up_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_watering_up_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_watering_up_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_up_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_up_7")
 }],
 "loop": false,
@@ -1660,28 +1576,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_right_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_right_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_watering_right_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_watering_right_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_watering_right_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_watering_right_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_right_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_right_7")
 }],
 "loop": false,
@@ -1689,28 +1605,28 @@ animations = [{
 "speed": 8.0
 }, {
 "frames": [{
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_left_0")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_left_1")
 }, {
-"duration": 1.0,
+"duration": 0.90,
 "texture": SubResource("f_watering_left_2")
 }, {
-"duration": 1.0,
+"duration": 0.75,
 "texture": SubResource("f_watering_left_3")
 }, {
-"duration": 1.0,
+"duration": 0.70,
 "texture": SubResource("f_watering_left_4")
 }, {
-"duration": 1.0,
+"duration": 0.85,
 "texture": SubResource("f_watering_left_5")
 }, {
-"duration": 1.0,
+"duration": 1.15,
 "texture": SubResource("f_watering_left_6")
 }, {
-"duration": 1.0,
+"duration": 1.30,
 "texture": SubResource("f_watering_left_7")
 }],
 "loop": false,

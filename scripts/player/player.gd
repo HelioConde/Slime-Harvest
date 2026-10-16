@@ -6,6 +6,7 @@ signal tool_use_requested(origin: Vector2, direction: Vector2)
 signal tool_action_requested(tool_id: StringName, world_position: Vector2)
 
 const PLAYER_SKINS = preload("res://scripts/player/player_skins.gd")
+const MOTION_ALIGNMENT = preload("res://scripts/player/player_motion_alignment.gd")
 const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
 const HOTBAR_SCENE: PackedScene = preload("res://scenes/ui/ToolHotbar.tscn")
@@ -30,6 +31,7 @@ var _queued_position: Vector2 = Vector2.ZERO
 var _impact_applied: bool = true
 var _impact_frame: int = 1
 var _hotbar_index: int = 1
+var _player_appearance: String = "masculino"
 
 @onready var animation: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 @onready var placeholder: Polygon2D = get_node_or_null("Placeholder") as Polygon2D
@@ -46,6 +48,8 @@ func _ready() -> void:
 	add_to_group("resource_collectors")
 	animation.animation_finished.connect(_on_action_animation_finished)
 	animation.frame_changed.connect(_on_tool_frame_changed)
+	animation.frame_changed.connect(_sync_sprite_anchor)
+	_sync_sprite_anchor()
 	_equipment = INVENTORY_SCRIPT.new()
 	_equipment.name = "ToolInventory"
 	_equipment.connect("tool_changed", Callable(self, "_on_tool_changed"))
@@ -363,6 +367,7 @@ func _play_tool_animation(tool_id: StringName) -> void:
 	animation.speed_scale = tool_animation_speed
 	animation.stop()
 	animation.play(tool_animation)
+	_sync_sprite_anchor()
 
 
 func _on_action_animation_finished() -> void:
@@ -409,9 +414,19 @@ func _update_animation(moving: bool, running: bool) -> void:
 	animation.visible = true
 	if is_instance_valid(placeholder):
 		placeholder.visible = false
-	animation.speed_scale = run_multiplier if moving and running and not String(name_to_play).begins_with("run_") else 1.0
+	var is_locomotion: bool = String(name_to_play).begins_with("walk_") or String(name_to_play).begins_with("run_")
+	var target_speed: float = walk_speed * (run_multiplier if String(name_to_play).begins_with("run_") else 1.0)
+	animation.speed_scale = clampf(velocity.length() / maxf(target_speed, 0.01), 0.8, 1.2) if moving and is_locomotion else 1.0
 	if animation.animation != name_to_play:
+		var previous: String = String(animation.animation)
+		var preserve_step: bool = moving and is_locomotion and (previous.begins_with("walk_") or previous.begins_with("run_"))
+		var previous_frame: int = animation.frame
+		var previous_progress: float = animation.frame_progress
 		animation.play(name_to_play)
+		if preserve_step:
+			var next_frames: int = animation.sprite_frames.get_frame_count(name_to_play)
+			animation.set_frame_and_progress(mini(previous_frame, next_frames - 1), previous_progress)
+		_sync_sprite_anchor()
 	elif moving or state == "idle" and String(name_to_play).begins_with("idle_"):
 		if not animation.is_playing():
 			animation.play()
@@ -446,5 +461,13 @@ func _apply_selected_appearance() -> void:
 		if active > 0:
 			var metadata: Dictionary = slots.call("slot_metadata", active)
 			appearance = str(metadata.get("appearance", "masculino"))
+	_player_appearance = appearance
 	if not PLAYER_SKINS.apply(animation, appearance):
 		push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
+
+
+## Ajusta apenas o desenho, nao a posicao da entidade nem a colisao.
+func _sync_sprite_anchor() -> void:
+	if animation == null or animation.sprite_frames == null:
+		return
+	animation.offset = MOTION_ALIGNMENT.frame_offset(_player_appearance, animation.animation, animation.frame)
