@@ -266,3 +266,64 @@ func activate(slot: int) -> bool:
 		_write_index()
 		return false
 	return true
+
+
+const WORLD_FILES: Array[String] = [
+	"house_terrain_test.json",
+	"slimekeepers_world_hoeing_v1.json",
+	"slimekeepers_felled_trees_v1.json",
+]
+
+
+func reset_active_world() -> bool:
+	## Chamado APOS o mundo ser descarregado para nao recriar saves na saida de TileMap.
+	## Reset apenas de mundo: preservar counts, calendario, equipamento e outras fazendas.
+	error_message = ""
+	if _index.is_empty() and not initialize():
+		return false
+	var original: Dictionary = _read_live()
+	var next_data: Dictionary = original.duplicate(true)
+	# Nunca apagar saves de recursos sem primeiro validar e isolar os itens.
+	var resource_name := "slimekeepers_resources_v1.json"
+	if original.has(resource_name):
+		var data: Variant = JSON.parse_string((original[resource_name] as PackedByteArray).get_string_from_utf8())
+		if not data is Dictionary or int(data.get("version", 0)) != 1 or not data.get("counts", {}) is Dictionary:
+			error_message = "Inventario salvo invalido. Reset cancelado sem apagar arquivos."
+			return false
+		var empty_world_resources: Dictionary = {
+			"version": 1,
+			"counts": (data.get("counts", {}) as Dictionary).duplicate(true),
+			"drops": {},
+			"claimed": {},
+			"mining_levels": {},
+			"picked_plants": {},
+		}
+		next_data[resource_name] = JSON.stringify(empty_world_resources).to_utf8_buffer()
+	for name in WORLD_FILES:
+		next_data.erase(name)
+	# Garantir snapshot completo antes de tocar qualquer arquivo.
+	var previous_index: Dictionary = _index.duplicate(true)
+	var active: int = active_slot()
+	var backup: String = _archive(original, active, "antes_reset_mapa_f1")
+	if backup.is_empty():
+		return false
+	if not _restore_live(next_data):
+		# Rollback em caso de erro parcial; copia anterior permanece no snapshot.
+		_restore_live(original)
+		_index = previous_index
+		return false
+	_index["last_backup"] = backup
+	if active > 0:
+		var slots: Dictionary = _index.get("slots", {})
+		var metadata: Dictionary = slots.get(str(active), {})
+		if not metadata.is_empty():
+			# Ponto de recuperacao antes do reset permanece separado ate a proxima troca de slot.
+			metadata["snapshot"] = backup
+			metadata["updated_unix"] = int(Time.get_unix_time_from_system())
+			slots[str(active)] = metadata
+	if not _write_index():
+		_restore_live(original)
+		_index = previous_index
+		_write_index()
+		return false
+	return true
