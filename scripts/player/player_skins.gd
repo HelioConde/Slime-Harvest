@@ -3,8 +3,8 @@ extends RefCounted
 const MALE_FRAMES: SpriteFrames = preload("res://assets/Characters/animation/player_masculino_frames.tres")
 const FEMALE_FRAMES: SpriteFrames = preload("res://assets/Characters/animation/player_feminino_frames.tres")
 ## Ajuste visual compartilhado entre os avatares; sem alterar colisao ou fisica.
-const VISUAL_SCALE := Vector2(0.18, 0.18)
-const VISUAL_POSITION := Vector2(0, -20)
+const VISUAL_SCALE := Vector2(0.16, 0.16)
+const VISUAL_POSITION := Vector2(0, -18)
 
 
 static func apply(sprite: AnimatedSprite2D, appearance: String) -> bool:
