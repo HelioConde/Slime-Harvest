@@ -86,6 +86,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if key.keycode == KEY_P:
 		# Atalho P mantido por compatibilidade; o slot principal agora e 4.
+		_hotbar_index = 3
 		_equipment.call("equip", &"pickaxe")
 		return
 	var slot: int = -1
