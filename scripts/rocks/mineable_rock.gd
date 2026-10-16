@@ -2,6 +2,8 @@ extends Node2D
 ## Cada golpe de picareta reduz um nivel e solta uma pedra no chao.
 ## Pedras com level1..levelN usam sprites reais; pedras estaticas encolhem.
 
+const FX = preload("res://scripts/fx/hit_feedback.gd")
+
 @export var persistent_id: String = ""
 @export var persist_mining: bool = true
 @export_range(1, 12, 1) var static_hits: int = 3
@@ -67,6 +69,12 @@ func take_pickaxe_hit(_player: Node = null) -> bool:
 	if not can_accept_pickaxe_hit():
 		return false
 	_busy = true
+	var impact_texture: Texture2D
+	if _sprite != null:
+		impact_texture = _sprite.sprite_frames.get_frame_texture(_sprite.animation, 0)
+	elif _static_sprite != null:
+		impact_texture = _static_sprite.texture
+	FX.burst(get_parent() as Node2D, global_position + Vector2(0, -4), impact_texture, &"stone")
 	_level -= 1
 	if persist_mining:
 		ResourceBag.save_rock_level(_save_key, _level)

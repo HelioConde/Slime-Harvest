@@ -1,6 +1,8 @@
 extends StaticBody2D
 ## Toco restante de uma arvore: tres machadadas e mais um tronco.
 
+const FX = preload("res://scripts/fx/hit_feedback.gd")
+
 @export_range(1, 20, 1) var axe_hits_required: int = 3
 @export var source_tree_id: String = ""
 @export var persist_stump: bool = true
@@ -41,6 +43,7 @@ func contains_click(world_point: Vector2) -> bool:
 func take_axe_hit(_player: Node = null) -> bool:
 	if not can_accept_axe_hit():
 		return false
+	FX.burst(get_parent() as Node2D, global_position + Vector2(0, -5), _sprite.texture, &"wood")
 	_hits += 1
 	if persist_stump and _hits < axe_hits_required:
 		TreePersistence.save_stump_hits(source_tree_id, _hits)

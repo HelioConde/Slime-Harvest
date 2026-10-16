@@ -7,6 +7,7 @@ extends StaticBody2D
 
 const FALL_SCENE: PackedScene = preload("res://scenes/objects/trees/tree_fall.tscn")
 const STUMP_SCENE: PackedScene = preload("res://scenes/objects/stumps/stump.tscn")
+const FX = preload("res://scripts/fx/hit_feedback.gd")
 
 var _hits: int = 0
 var _swaying: bool = false
@@ -76,6 +77,12 @@ func take_axe_hit(_player: Node = null) -> bool:
 	if _sprite != null and not _sprite.sprite_frames.has_animation(&"wind_swaying"):
 		push_warning("ChoppableTree: wind_swaying nao encontrada.")
 		return false
+	var texture: Texture2D
+	if _sprite != null:
+		texture = _sprite.sprite_frames.get_frame_texture(_sprite.animation, _sprite.frame)
+	elif _static_sprite != null:
+		texture = _static_sprite.texture
+	FX.burst(get_parent() as Node2D, global_position + Vector2(0, -12), texture, &"wood")
 	_hits += 1
 	if persist_felling and _hits < axe_hits_required:
 		TreePersistence.save_tree_hits(_save_key, _hits)
@@ -137,6 +144,12 @@ func _swap_to(scene: PackedScene, suffix: String) -> void:
 	if suffix == "_Fall":
 		replacement.set("source_tree_id", _save_key)
 		replacement.set("persist_stump", persist_felling)
+		if _sprite != null and _sprite.sprite_frames.has_animation(&"falling"):
+			replacement.set("fall_frames", _sprite.sprite_frames)
+			replacement.set("fall_offset", _sprite.position)
+		elif _static_sprite != null:
+			replacement.set("fall_texture", _static_sprite.texture)
+			replacement.set("fall_offset", _static_sprite.position)
 	elif suffix == "_Stump":
 		replacement.set("source_tree_id", _save_key)
 		replacement.set("persist_stump", persist_felling)
