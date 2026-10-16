@@ -32,6 +32,11 @@ var _impact_applied: bool = true
 var _impact_frame: int = 1
 var _hotbar_index: int = 1
 var _player_appearance: String = "masculino"
+## Suaviza mudancas dos offsets dos sprites sem alterar o CharacterBody2D.
+var _anchor_current := Vector2.ZERO
+var _anchor_target := Vector2.ZERO
+var _anchor_initialized: bool = false
+var _was_moving: bool = false
 
 @onready var animation: AnimatedSprite2D = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 @onready var placeholder: Polygon2D = get_node_or_null("Placeholder") as Polygon2D
@@ -195,8 +200,12 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	interaction_ray.target_position = facing * 24.0
 	tool_origin.position = facing * 16.0
-	var moving := get_position_delta().length_squared() > 0.001
+	# Ignorar micromovimentos e oscilações ao parar.
+	var distance_moved: float = get_position_delta().length()
+	var moving: bool = direction.length_squared() > 0.01 and velocity.length() >= (7.0 if _was_moving else 13.0) and distance_moved > 0.07
+	_was_moving = moving
 	_update_animation(moving, running)
+	_update_visual_anchor(delta)
 	if not controls_enabled or _action_animating:
 		return
 	if Input.is_action_just_pressed("interact"):
@@ -416,16 +425,20 @@ func _update_animation(moving: bool, running: bool) -> void:
 		placeholder.visible = false
 	var is_locomotion: bool = String(name_to_play).begins_with("walk_") or String(name_to_play).begins_with("run_")
 	var target_speed: float = walk_speed * (run_multiplier if String(name_to_play).begins_with("run_") else 1.0)
-	animation.speed_scale = clampf(velocity.length() / maxf(target_speed, 0.01), 0.8, 1.2) if moving and is_locomotion else 1.0
+	animation.speed_scale = clampf(velocity.length() / maxf(target_speed, 0.01), 0.5, 1.2) if moving and is_locomotion else 1.0
 	if animation.animation != name_to_play:
 		var previous: String = String(animation.animation)
 		var preserve_step: bool = moving and is_locomotion and (previous.begins_with("walk_") or previous.begins_with("run_"))
 		var previous_frame: int = animation.frame
 		var previous_progress: float = animation.frame_progress
+		var previous_count: int = animation.sprite_frames.get_frame_count(animation.animation)
 		animation.play(name_to_play)
-		if preserve_step:
+		if preserve_step and previous_count > 0:
 			var next_frames: int = animation.sprite_frames.get_frame_count(name_to_play)
-			animation.set_frame_and_progress(mini(previous_frame, next_frames - 1), previous_progress)
+			# Preserva a fase proporcional (importante quando os ciclos tem duracoes diferentes).
+			var normalized: float = (float(previous_frame) + previous_progress) / float(previous_count)
+			var next_phase: float = normalized * float(next_frames)
+			animation.set_frame_and_progress(clampi(floori(next_phase), 0, next_frames - 1), fposmod(next_phase, 1.0))
 		_sync_sprite_anchor()
 	elif moving or state == "idle" and String(name_to_play).begins_with("idle_"):
 		if not animation.is_playing():
@@ -466,8 +479,21 @@ func _apply_selected_appearance() -> void:
 		push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
 
 
-## Ajusta apenas o desenho, nao a posicao da entidade nem a colisao.
+## Mantem a colisao fixa; os sprites mudam a compensacao lateral em cada quadro.
 func _sync_sprite_anchor() -> void:
 	if animation == null or animation.sprite_frames == null:
 		return
-	animation.offset = MOTION_ALIGNMENT.frame_offset(_player_appearance, animation.animation, animation.frame)
+	_anchor_target = MOTION_ALIGNMENT.frame_offset(_player_appearance, animation.animation, animation.frame)
+	if not _anchor_initialized:
+		_anchor_current = _anchor_target
+		_anchor_initialized = true
+		animation.offset = _anchor_current
+
+
+func _update_visual_anchor(delta: float) -> void:
+	if animation == null or not _anchor_initialized:
+		return
+	# Corrige gradualmente os saltos na transicao de quadros e na virada do ciclo.
+	_anchor_current = _anchor_current.lerp(_anchor_target, 1.0 - exp(-maxf(delta, 0.0) * 19.0))
+	# Quadros ~222px em escala .25: quantizar para um pixel inteiro no mapa.
+	animation.offset = Vector2(roundf(_anchor_current.x * 0.25) * 4.0, roundf(_anchor_current.y * 0.25) * 4.0)
