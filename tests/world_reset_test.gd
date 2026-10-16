@@ -45,6 +45,8 @@ func _run() -> void:
 	var second_resource := "{\"version\":1,\"counts\":{\"wood\":9,\"stone\":4},\"claimed\":{\"bush\":true},\"drops\":{\"d2\":{\"item\":\"stone\"}},\"mining_levels\":{\"rock\":1},\"picked_plants\":{\"bush\":3}}"
 	if not _check(_write(res_file, second_resource) and _write(house, "{\"farm\":2}") and _write(hoe, "{\"farm\":2}") and _write(trees, "{\"farm\":2}") and _write(calendar, "{\"day\":12}") and _write(equipment, "{\"equipped\":\"axe\"}"), "second slot has old map state"):
 		return
+	# create_new alterna de fazenda e atualiza o snapshot da original; comparar apos a troca.
+	slot_one = str(slots.call("slot_metadata", 1).get("snapshot", ""))
 	if not _check(bool(slots.call("reset_active_world")), "map state reset with backup"):
 		return
 	for file_path in [house, hoe, trees]:
