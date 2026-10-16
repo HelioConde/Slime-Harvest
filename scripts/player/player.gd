@@ -32,6 +32,7 @@ func _ready() -> void:
 		push_error("Player: mantenha AnimatedSprite2D como filho direto.")
 		set_physics_process(false)
 		return
+	add_to_group("resource_collectors")
 	animation.animation_finished.connect(_on_action_animation_finished)
 	_equipment = INVENTORY_SCRIPT.new()
 	_equipment.name = "ToolInventory"

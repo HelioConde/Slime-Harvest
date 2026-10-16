@@ -125,7 +125,10 @@ func contains_click(world_point: Vector2) -> bool:
 func pick_by_click(_player: Node = null) -> bool:
     if not can_pick():
         return false
-    if not ResourceBag.collect_plant(_pickup_key, _collectible_item, persist_pickup):
+    if not ResourceBag.drop_plant(
+        _pickup_key, _collectible_item, get_parent(), global_position,
+        persist_pickup, scene_file_path, sprite.animation
+    ):
         return false
     _picked_up = true
     queue_free()

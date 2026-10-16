@@ -23,6 +23,9 @@ func _run() -> void:
 	await get_tree().process_frame
 
 	var player: CharacterBody2D = demo.get_node("Player") as CharacterBody2D
+	# Manter o jogador distante enquanto testamos drops de arvore e pedra,
+	# para que o magnetismo nao recolha itens antes das verificacoes.
+	player.global_position = Vector2(-500, -500)
 	var tree: Node = demo.get_node("Tree")
 	if not _check(player != null and tree != null, "player and tree exist"):
 		get_tree().quit(1)
@@ -107,25 +110,50 @@ func _run() -> void:
 		return
 
 	var flower: Node2D = demo.get_node("Scenery/FlowerPinkWest") as Node2D
-	player.global_position = flower.global_position + Vector2(0, 14)
+	var flower_position: Vector2 = flower.global_position
+	player.global_position = flower_position + Vector2(0, 14)
 	player.call("_on_hotbar_selection", &"watering_can")
 	var before_flower: int = ResourceBag.get_count(&"flower_pink")
-	if not _check(bool(player.call("_try_collect_click", flower.global_position)), "flower collected while watering can is equipped"):
+	if not _check(bool(player.call("_try_collect_click", flower_position)), "flower click with watering can drops item"):
 		get_tree().quit(1)
 		return
+	# Provar que clicar nao adicionou a flor diretamente no inventario.
+	player.global_position = flower_position + Vector2(200, 0)
 	await get_tree().process_frame
-	if not _check(ResourceBag.get_count(&"flower_pink") == before_flower + 1, "flower enters inventory"):
+	if not _check(ResourceBag.get_count(&"flower_pink") == before_flower, "flower click does not auto-credit bag"):
+		get_tree().quit(1)
+		return
+	var flower_drop: Node2D = null
+	for candidate in get_tree().get_nodes_in_group("world_drops"):
+		if candidate.get("item_id") == &"flower_pink":
+			flower_drop = candidate as Node2D
+			break
+	if not _check(flower_drop != null and flower_drop.get_node("DropIcon").texture != null, "flower sprite drop exists in world"):
+		get_tree().quit(1)
+		return
+	await get_tree().create_timer(0.45).timeout
+	if not _check(ResourceBag.get_count(&"flower_pink") == before_flower, "magnet does not collect outside range"):
+		get_tree().quit(1)
+		return
+	player.global_position = flower_position + Vector2(0, 25)
+	await get_tree().create_timer(1.0).timeout
+	if not _check(ResourceBag.get_count(&"flower_pink") == before_flower + 1, "nearby flower drop magnetically collected"):
 		get_tree().quit(1)
 		return
 
 	var mushroom: Node2D = demo.get_node("Scenery/MushroomWest") as Node2D
-	player.global_position = mushroom.global_position + Vector2(0, 14)
+	var mushroom_position: Vector2 = mushroom.global_position
+	player.global_position = mushroom_position + Vector2(0, 14)
 	player.call("_on_hotbar_selection", &"axe")
 	var before_mushroom: int = ResourceBag.get_count(&"mushroom_red")
-	if not _check(bool(player.call("_try_collect_click", mushroom.global_position)), "mushroom collected while axe equipped"):
+	if not _check(bool(player.call("_try_collect_click", mushroom_position)), "mushroom click while axe equipped drops item"):
 		get_tree().quit(1)
 		return
-	if not _check(ResourceBag.get_count(&"mushroom_red") == before_mushroom + 1, "mushroom enters inventory"):
+	if not _check(ResourceBag.get_count(&"mushroom_red") == before_mushroom, "mushroom remains outside bag until pickup"):
+		get_tree().quit(1)
+		return
+	await get_tree().create_timer(1.0).timeout
+	if not _check(ResourceBag.get_count(&"mushroom_red") == before_mushroom + 1, "mushroom drawn into bag by magnet"):
 		get_tree().quit(1)
 		return
 	print("PASS: all resource gameplay tests completed.")

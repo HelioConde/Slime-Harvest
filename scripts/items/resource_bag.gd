@@ -28,7 +28,14 @@ func _process(_delta: float) -> void:
 		var record: Dictionary = _drops[drop_key]
 		if str(record.get("scene", "")) != scene.scene_file_path:
 			continue
-		_make_drop(scene, Vector2(float(record.get("x", 0.0)), float(record.get("y", 0.0))), StringName(str(record.get("item", "trunk"))), str(drop_key), true)
+		_make_drop(
+			scene,
+			Vector2(float(record.get("x", 0.0)), float(record.get("y", 0.0))),
+			StringName(str(record.get("item", "trunk"))),
+			str(drop_key), true,
+			str(record.get("art_scene", "")),
+			StringName(str(record.get("art_animation", "")))
+		)
 
 
 func get_count(item_id: StringName) -> int:
@@ -45,7 +52,11 @@ func add_item(item_id: StringName, amount: int = 1) -> void:
 	item_collected.emit(item_id, amount)
 
 
-func spawn_drop(parent: Node, position_world: Vector2, item_id: StringName, source_key: String, persistent: bool = true) -> void:
+func spawn_drop(
+	parent: Node, position_world: Vector2, item_id: StringName,
+	source_key: String, persistent: bool = true,
+	art_scene: String = "", art_animation: StringName = &""
+) -> void:
 	if parent == null:
 		return
 	if persistent:
@@ -53,18 +64,28 @@ func spawn_drop(parent: Node, position_world: Vector2, item_id: StringName, sour
 			return
 		var scene: Node = get_tree().current_scene
 		var scene_path: String = scene.scene_file_path if scene != null else ""
-		_drops[source_key] = {"scene": scene_path, "item": String(item_id), "x": position_world.x, "y": position_world.y}
+		_drops[source_key] = {
+			"scene": scene_path,
+			"item": String(item_id),
+			"x": position_world.x, "y": position_world.y,
+			"art_scene": art_scene, "art_animation": String(art_animation)
+		}
 		_save_state()
-	_make_drop(parent, position_world, item_id, source_key, persistent)
+	_make_drop(parent, position_world, item_id, source_key, persistent, art_scene, art_animation)
 
 
-func _make_drop(parent: Node, position_world: Vector2, item_id: StringName, source_key: String, persistent: bool) -> void:
+func _make_drop(
+	parent: Node, position_world: Vector2, item_id: StringName, source_key: String,
+	persistent: bool, art_scene: String = "", art_animation: StringName = &""
+) -> void:
 	var drop: Node2D = DROP_SCENE.instantiate() as Node2D
 	if drop == null:
 		return
 	drop.set("item_id", item_id)
 	drop.set("source_key", source_key)
 	drop.set("persist_drop", persistent)
+	drop.set("art_scene", art_scene)
+	drop.set("art_animation", art_animation)
 	parent.add_child(drop)
 	drop.global_position = position_world
 	drop.z_index = 11
@@ -84,12 +105,22 @@ func is_plant_collected(plant_key: String) -> bool:
 	return bool(_picked_plants.get(plant_key, false))
 
 
-func collect_plant(plant_key: String, item_id: StringName, persistent: bool) -> bool:
+func drop_plant(
+	plant_key: String, item_id: StringName, parent: Node,
+	position_world: Vector2, persistent: bool,
+	art_scene: String = "", art_animation: StringName = &""
+) -> bool:
+	# Clicar transforma a planta em um drop no chao. Nunca creditar o inventario aqui.
+	if parent == null:
+		return false
+	var drop_key: String = plant_key + ":plant_drop"
 	if persistent:
-		if is_plant_collected(plant_key):
+		if is_plant_collected(plant_key) or _claimed.has(drop_key) or _drops.has(drop_key):
 			return false
 		_picked_plants[plant_key] = true
-	add_item(item_id, 1)
+	spawn_drop(parent, position_world, item_id, drop_key, persistent, art_scene, art_animation)
+	if persistent:
+		_save_state()
 	return true
 
 
