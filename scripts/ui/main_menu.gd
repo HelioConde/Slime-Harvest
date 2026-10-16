@@ -423,6 +423,7 @@ func _build_popup() -> void:
 	center.add_child(_overlay_card)
 
 	var margin := MarginContainer.new()
+	margin.name = "MarginContainer"
 	margin.add_theme_constant_override("margin_left", 14)
 	margin.add_theme_constant_override("margin_top", 10)
 	margin.add_theme_constant_override("margin_right", 14)
