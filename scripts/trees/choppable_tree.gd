@@ -25,6 +25,8 @@ func _ready() -> void:
 		else:
 			_swap_to(STUMP_SCENE, "_Stump")
 		return
+	if persist_felling:
+		_hits = mini(axe_hits_required - 1, TreePersistence.get_tree_hits(_save_key))
 	add_to_group("choppable_trees")
 	_sprite = get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
 	if _sprite == null:
@@ -39,6 +41,10 @@ func _ready() -> void:
 			_sprite.stop()
 	elif _static_sprite == null:
 		push_warning("ChoppableTree: sprite ausente; machado desativado.")
+
+
+func hits_remaining() -> int:
+	return maxi(0, axe_hits_required - _hits)
 
 
 func can_accept_axe_hit() -> bool:
@@ -71,6 +77,8 @@ func take_axe_hit(_player: Node = null) -> bool:
 		push_warning("ChoppableTree: wind_swaying nao encontrada.")
 		return false
 	_hits += 1
+	if persist_felling and _hits < axe_hits_required:
+		TreePersistence.save_tree_hits(_save_key, _hits)
 	_swaying = true
 	if _sprite != null:
 		_sprite.stop()

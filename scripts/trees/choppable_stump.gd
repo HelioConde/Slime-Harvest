@@ -16,8 +16,14 @@ func _ready() -> void:
 	if persist_stump and TreePersistence.is_stump_cleared(source_tree_id):
 		queue_free()
 		return
+	if persist_stump:
+		_hits = mini(axe_hits_required - 1, TreePersistence.get_stump_hits(source_tree_id))
 	_sprite = $Sprite2D as Sprite2D
 	add_to_group("choppable_trees")
+
+
+func hits_remaining() -> int:
+	return maxi(0, axe_hits_required - _hits)
 
 
 func can_accept_axe_hit() -> bool:
@@ -36,6 +42,8 @@ func take_axe_hit(_player: Node = null) -> bool:
 	if not can_accept_axe_hit():
 		return false
 	_hits += 1
+	if persist_stump and _hits < axe_hits_required:
+		TreePersistence.save_stump_hits(source_tree_id, _hits)
 	_busy = true
 	var tween := create_tween()
 	tween.tween_property(_sprite, "rotation", 0.08, 0.11)
