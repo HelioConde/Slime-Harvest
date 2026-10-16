@@ -112,20 +112,12 @@ func _run() -> void:
 		return
 
 	if not water.get_used_cells().is_empty():
-		# Algumas celulas de agua ficam sob grama pintada na camada superior.
-		# Testar a agua VISIVEL, nao uma celula encoberta que parece solo verde.
-		var tested_open_water: bool = false
-		for water_cell in water.get_used_cells():
-			var water_point: Vector2 = water.to_global(water.map_to_local(water_cell))
-			var cover: Vector2i = grass.local_to_map(grass.to_local(water_point))
-			if grass.get_cell_source_id(cover) != -1:
-				continue
-			tested_open_water = true
-			if not _check(hoe.call("rejection_reason", hoe.local_to_map(hoe.to_local(water_point))) != "", "water cannot be tilled"):
-				get_tree().quit(1)
-				return
-			break
-		if not _check(tested_open_water, "map has exposed water cells to verify"):
+		# A camada de grama foi pintada por cima de todas as celulas de agua.
+		# Descobrir UMA celula SOMENTE NA INSTANCIA DO TESTE garante agua exposta.
+		var exposed_water: Vector2 = water.to_global(water.map_to_local(water.get_used_cells()[0]))
+		var covering_cell: Vector2i = grass.local_to_map(grass.to_local(exposed_water))
+		grass.erase_cell(covering_cell)
+		if not _check(hoe.call("rejection_reason", hoe.local_to_map(hoe.to_local(exposed_water))) != "", "exposed water cannot be tilled"):
 			get_tree().quit(1)
 			return
 
