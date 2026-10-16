@@ -124,6 +124,20 @@ func _refresh_label() -> void:
         _day_label.text += "  |  F9 +1"
 
 
+func save_session_state() -> void:
+    _save_calendar()
+
+
+func reload_session_state() -> void:
+    day = 1
+    seconds_into_day = 0.0
+    _since_save = 0.0
+    _planting_days.clear()
+    _load_calendar()
+    _refresh_label()
+    day_changed.emit(day)
+
+
 func _load_calendar() -> void:
     if not FileAccess.file_exists(SAVE_PATH):
         return

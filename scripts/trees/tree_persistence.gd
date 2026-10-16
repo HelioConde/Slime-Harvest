@@ -8,6 +8,22 @@ var _stump_hits: Dictionary = {}
 
 
 func _ready() -> void:
+	_load_state()
+
+
+func save_session_state() -> void:
+	_save()
+
+
+func reload_session_state() -> void:
+	_felled.clear()
+	_cleared_stumps.clear()
+	_tree_hits.clear()
+	_stump_hits.clear()
+	_load_state()
+
+
+func _load_state() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
 	var data = JSON.parse_string(FileAccess.get_file_as_string(SAVE_PATH))

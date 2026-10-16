@@ -148,6 +148,22 @@ func save_rock_level(rock_key: String, level: int) -> void:
 	_save_state()
 
 
+func save_session_state() -> void:
+	_save_state()
+
+
+func reload_session_state() -> void:
+	_counts.clear()
+	_drops.clear()
+	_claimed.clear()
+	_mining_levels.clear()
+	_picked_plants.clear()
+	_active_scene = null
+	_load_state()
+	for item_id in _counts.keys():
+		amount_changed.emit(StringName(str(item_id)), get_count(StringName(str(item_id))))
+
+
 func _load_state() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
