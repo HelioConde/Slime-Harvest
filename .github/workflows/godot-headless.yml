@@ -122,3 +122,13 @@ jobs:
             exit 1
           fi
           grep -F "PASS terrain-edge: precise spritesheet shoreline physics without blocking solid land" terrain-edge.log
+
+      - name: Test menu and updated tool atlas (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/MainMenuTest.tscn --quit-after 400 2>&1 | tee main-menu.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL menu" main-menu.log; then
+            exit 1
+          fi
+          grep -F "PASS menu: functional safe entry point, future multiplayer and fourth-slot pickaxe" main-menu.log

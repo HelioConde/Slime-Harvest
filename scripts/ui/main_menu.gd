@@ -2,7 +2,7 @@ extends Control
 ## Menu leve: nunca instancia o World atras da interface.
 ## Multiplayer futuro reservado, sem fingir que existe rede/salas.
 const WORLD_SCENE := "res://scenes/world/World.tscn"
-const WALLPAPER := "res://assets/ui/main_menu/vale_encantado.jpg"
+const WALLPAPER := "res://assets/ui/main_menu/vale_encantado.png"
 const LEGACY_SAVES := [
 	"user://house_terrain_test.json",
 	"user://slimekeepers_calendar_v1.json",
@@ -43,7 +43,7 @@ func _build_background() -> void:
 		photo.texture = load(WALLPAPER) as Texture2D
 		add_child(photo)
 	else:
-		push_warning("MainMenu: wallpaper indisponivel; importe vale_encantado.jpg na pasta assets/ui/main_menu.")
+		push_warning("MainMenu: wallpaper indisponivel; importe vale_encantado.png na pasta assets/ui/main_menu.")
 
 	var shade := ColorRect.new()
 	shade.name = "MenuShadow"

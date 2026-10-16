@@ -24,7 +24,11 @@ func _ready() -> void:
 func _process(delta: float) -> void:
     # Nao avancar dias enquanto a tela inicial estiver aberta.
     var active_scene: Node = get_tree().current_scene
-    if active_scene != null and active_scene.scene_file_path == "res://scenes/ui/MainMenu.tscn":
+    var is_main_menu: bool = active_scene != null and active_scene.scene_file_path == "res://scenes/ui/MainMenu.tscn"
+    var calendar_hud := get_node_or_null("CalendarHUD") as CanvasLayer
+    if calendar_hud != null:
+        calendar_hud.visible = not is_main_menu
+    if is_main_menu:
         return
     if delta <= 0.0:
         return

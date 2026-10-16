@@ -43,3 +43,12 @@ A macieira animada agora serve de modelo para laranjeira, pessegueiro e pereira 
 ## Enxada no mundo principal e casa fixa
 
 No `World.tscn`, use 3 (enxada) e clique ou F sobre o chão verde: cada enxadada cria terra arada real no TileSet original. Não se pode arar em cima de objetos, fora da grama ou perto da casa inicial. Arbustos, troncos, brotos e tocos decorativos podem ser removidos com o machado antes de arar. A casa inicial mantém sua posição depois da primeira construção, com salvamento compatível. Guia: [preparo de terreno e casa fixa](docs/world_hoe.md).
+
+## Menu inicial e atlas de ferramentas atualizado
+
+- A cena inicial agora é `scenes/ui/MainMenu.tscn`, com interface própria; o mundo principal continua disponível em `scenes/world/World.tscn`.
+- A imagem oficial do menu deve ficar em `assets/ui/main_menu/vale_encantado.png`. Caso ainda não esteja instalada, o menu exibe um fundo verde seguro sem quebrar o projeto.
+- O novo atlas `tools-n-meterial-items.png` foi substituído pelo original enviado nesta conversa, 64 × 64 pixels (4 × 4 ícones). A picareta ocupa o **4º slot**, e a tecla P continua como atalho.
+- `Continuar` funciona somente com save legado existente; `Novo jogo` impede sobrescrever a fazenda salva enquanto não houver separação de slots.
+- `Multiplayer` fica desativado (em breve), com entrada reservada para futuras sessões de rede. O menu não inicia serviços multiplayer.
+- O calendário pausa e sua HUD desaparece na tela inicial.
