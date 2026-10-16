@@ -62,10 +62,9 @@ func rejection_reason(cell: Vector2i) -> String:
 	var source_id: int = grass.get_cell_source_id(grass_cell)
 	if source_id == -1 or not _source_is_green(grass.tile_set, source_id):
 		return "A enxada so prepara o chao verde."
-	if water.get_cell_source_id(water.local_to_map(water.to_local(world_point))) != -1:
-		return "Nao e possivel arar a agua."
-	if other_ground.get_cell_source_id(other_ground.local_to_map(other_ground.to_local(world_point))) != -1:
-		return "Este terreno nao e grama livre."
+	# water e soil_water ficam por BAIXO de grass2 no World original.
+	# Uma celula verde pintada na camada superior pode sobrepor ambas.
+	# Bloqueie superficies que nao sejam verdes pela fonte visivel acima.
 	if house.has_method("is_world_point_protected"):
 		if bool(house.call("is_world_point_protected", world_point, house_clearance_tiles)):
 			return "Muito perto da casa inicial."
