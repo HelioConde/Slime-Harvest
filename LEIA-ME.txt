@@ -1,0 +1,6 @@
+Slimekeepers: Lost Valley — Wallpaper original sem slimes.
+Extrair ZIP. Rodar INSTALAR_NO_PROJETO.ps1 no PowerShell ou copiar assets/ui/main_menu/vale_encantado.png para C:\FarmSlime\assets\ui\main_menu\vale_encantado.png.
+O menu carrega esse caminho automaticamente.
+A imagem original permanece em 1672x941 e sem perda de qualidade.
+
+O script pede confirmacao, nao apaga saves e nao executa git push sem voce decidir.
