@@ -92,3 +92,13 @@ jobs:
             exit 1
           fi
           grep -F "PASS world-hoe: green-ground tilling, occupied cells, fixed house, save and load" world-hoe.log
+
+      - name: Test removable world objects (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/ClearableObjectsTest.tscn --quit-after 900 2>&1 | tee clearable.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL clearable" clearable.log; then
+            exit 1
+          fi
+          grep -F "PASS clearable: bushes logs sprouts and stumps can be cleared with original sprites" clearable.log
