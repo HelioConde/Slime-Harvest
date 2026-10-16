@@ -60,3 +60,13 @@ jobs:
           if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL gameplay" resource-gameplay.log; then
             exit 1
           fi
+
+      - name: Test gameplay polish (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/PolishGameplayTest.tscn --quit-after 1200 2>&1 | tee polish-gameplay.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL polish" polish-gameplay.log; then
+            exit 1
+          fi
+          grep -F "PASS polish: animation timing, persistence, resource variants and collision" polish-gameplay.log
