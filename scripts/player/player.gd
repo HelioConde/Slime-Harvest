@@ -5,6 +5,8 @@ signal interaction_requested(target: Node)
 signal tool_use_requested(origin: Vector2, direction: Vector2)
 signal tool_action_requested(tool_id: StringName, world_position: Vector2)
 
+const PLAYER_SKINS = preload("res://scripts/player/player_skins.gd")
+const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
 const HOTBAR_SCENE: PackedScene = preload("res://scenes/ui/ToolHotbar.tscn")
 
@@ -40,6 +42,7 @@ func _ready() -> void:
 		push_error("Player: mantenha AnimatedSprite2D como filho direto.")
 		set_physics_process(false)
 		return
+	_apply_selected_appearance()
 	add_to_group("resource_collectors")
 	animation.animation_finished.connect(_on_action_animation_finished)
 	animation.frame_changed.connect(_on_tool_frame_changed)
@@ -433,3 +436,15 @@ func set_controls_enabled(enabled: bool) -> void:
 	controls_enabled = enabled
 	if not enabled:
 		velocity = Vector2.ZERO
+
+## A escolha pertence ao slot ativo; partidas antigas recebem a opcao masculina.
+func _apply_selected_appearance() -> void:
+    var appearance := "masculino"
+    var slots: RefCounted = SAVE_SLOTS.new()
+    if bool(slots.call("initialize")):
+        var active: int = int(slots.call("active_slot"))
+        if active > 0:
+            var metadata: Dictionary = slots.call("slot_metadata", active)
+            appearance = str(metadata.get("appearance", "masculino"))
+    if not PLAYER_SKINS.apply(animation, appearance):
+        push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")

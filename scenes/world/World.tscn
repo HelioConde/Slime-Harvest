@@ -26,6 +26,8 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry.tscn" id="23_0qn2w"]
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry_leaf.tscn" id="24_l5iln"]
 
+[ext_resource type="Script" path="res://scripts/slimes/world_population.gd" id="26_population"]
+
 [node name="World2" type="Node2D" unique_id=2045392138]
 
 [node name="Actors" type="Node2D" parent="." unique_id=564082091]
@@ -139,3 +141,7 @@ position = Vector2(169, 224)
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("3_v5dby")]
 z_index = 10
 position = Vector2(2, -157)
+
+[node name="SlimePopulation" type="Node2D" parent="Actors"]
+y_sort_enabled = true
+script = ExtResource("26_population")

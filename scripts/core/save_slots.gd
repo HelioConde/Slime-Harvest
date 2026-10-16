@@ -327,3 +327,20 @@ func reset_active_world() -> bool:
 		_write_index()
 		return false
 	return true
+
+## Salva o avatar no indice, junto ao slot, sem alterar os arquivos da fazenda.
+func set_active_appearance(appearance: String) -> bool:
+    if appearance not in ["masculino", "feminino"]:
+        error_message = "Aparencia de personagem invalida."
+        return false
+    var slot: int = active_slot()
+    if slot <= 0:
+        error_message = "Nenhum espaco de jogo ativo."
+        return false
+    var records: Dictionary = _index.get("slots", {})
+    var record: Dictionary = records.get(str(slot), {})
+    if record.is_empty():
+        return false
+    record["appearance"] = appearance
+    records[str(slot)] = record
+    return _write_index()
