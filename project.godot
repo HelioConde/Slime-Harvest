@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameCalendar="*res://scripts/core/game_calendar.gd"
 TreePersistence="*res://scripts/trees/tree_persistence.gd"
 ResourceBag="*res://scripts/items/resource_bag.gd"
+WorldReset="*res://scripts/core/world_reset.gd"
 
 [display]
 
