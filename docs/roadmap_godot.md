@@ -16,6 +16,8 @@
 - [x] Hotbar inferior com 10 slots do spritesheet original, contadores de recursos, grupos, atalhos e persistencia da selecao.
 - [x] Sistema de drops e contadores persistentes de troncos, pedras, flores e cogumelos.
 - [x] Picareta minerando pedras por nivel, toco removivel em tres golpes e coleta de flores/cogumelos com clique.
+- [x] Refinamentos: golpes sincronizados, efeitos com sprites existentes, audio local, magnetismo com parede, movimento suave e progresso parcial de arvore/toco.
+- [x] Flores/cogumelos reaparecem apos dias configuraveis e pedras pequenas usam recurso proprio do atlas.
 - [ ] Mochila visual completa, energia, moedas e colecoes.
 - [ ] Três tipos de cultivos, colheita e venda em um ponto do mapa.
 - [ ] Salvar e carregar posição do jogador, mundo, casa e inventário de modo consistente.

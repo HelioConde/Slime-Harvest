@@ -81,3 +81,8 @@ GitHub Actions executa o Godot 4.7.1 em modo headless e chama tests/ResourceGame
 Todos os itens no chao — troncos, pedras, flores e cogumelos — aguardam um instante antes de serem atraidos. A partir de **72 px do mundo** (valor padrao) o drop comeca a se deslocar suavemente ate o jogador, e quando chega a **12 px** e coletado automaticamente. Ele tambem pode ser recolhido manualmente com clique. O alcance, a velocidade e o atraso inicial sao editaveis em `scripts/items/resource_drop.gd`: `magnet_radius`, `pickup_radius`, `magnet_speed` e `pickup_delay`. Todos os drops seguem o mesmo comportamento.
 
 A coleta da flor/cogumelo agora acontece em duas etapas: 1) o clique gera um item no chao e marca a planta como retirada; 2) aproximar o personagem (ou clicar no drop) credita o recurso no inventario. Os drops persistentes mantem a arte e a animacao da planta no save, inclusive apos recarregar o jogo. A cena de testes mantem os objetos repostos a cada execucao, sem alterar o progresso do mapa principal.
+
+
+## Refinamento da jogabilidade
+
+A hotbar agora identifica o item selecionado e aceita roda do mouse; a picareta (P) nao ocupa os sprites originais. O impacto e sincronizado com o quadro da animacao. Para detalhes de drops, efeitos, regrowth e testes, consulte [refinamentos](gameplay_polish.md).
