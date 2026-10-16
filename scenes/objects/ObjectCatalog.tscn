@@ -55,29 +55,7 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_02.tscn" id="object_52"]
 [ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_03.tscn" id="object_53"]
 [ext_resource type="PackedScene" path="res://scenes/objects/plants/sprout_04.tscn" id="object_54"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_01.tscn" id="object_55"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_02.tscn" id="object_56"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_03.tscn" id="object_57"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_04.tscn" id="object_58"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_05.tscn" id="object_59"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_06.tscn" id="object_60"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_07.tscn" id="object_61"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_08.tscn" id="object_62"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_09.tscn" id="object_63"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_10.tscn" id="object_64"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_11.tscn" id="object_65"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_warm_12.tscn" id="object_66"]
 [ext_resource type="PackedScene" uid="uid://crbe8iaa6ro7q" path="res://scenes/objects/flowers/flower_pink.tscn" id="object_67"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_02.tscn" id="object_68"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_03.tscn" id="object_69"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_05.tscn" id="object_70"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_06.tscn" id="object_71"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_07.tscn" id="object_72"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_08.tscn" id="object_73"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_09.tscn" id="object_74"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_10.tscn" id="object_75"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_11.tscn" id="object_76"]
-[ext_resource type="PackedScene" path="res://scenes/objects/flowers/flower_cool_12.tscn" id="object_77"]
 
 [node name="ObjectCatalog" type="Node2D"]
 texture_filter = 1
@@ -250,71 +228,5 @@ position = Vector2(264, 560)
 [node name="sprout_04" parent="Objects" instance=ExtResource("object_54")]
 position = Vector2(336, 560)
 
-[node name="flower_warm_01" parent="Objects" instance=ExtResource("object_55")]
-position = Vector2(408, 560)
-
-[node name="flower_warm_02" parent="Objects" instance=ExtResource("object_56")]
-position = Vector2(480, 560)
-
-[node name="flower_warm_03" parent="Objects" instance=ExtResource("object_57")]
-position = Vector2(552, 560)
-
-[node name="flower_warm_04" parent="Objects" instance=ExtResource("object_58")]
-position = Vector2(624, 560)
-
-[node name="flower_warm_05" parent="Objects" instance=ExtResource("object_59")]
-position = Vector2(696, 560)
-
-[node name="flower_warm_06" parent="Objects" instance=ExtResource("object_60")]
-position = Vector2(48, 656)
-
-[node name="flower_warm_07" parent="Objects" instance=ExtResource("object_61")]
-position = Vector2(120, 656)
-
-[node name="flower_warm_08" parent="Objects" instance=ExtResource("object_62")]
-position = Vector2(192, 656)
-
-[node name="flower_warm_09" parent="Objects" instance=ExtResource("object_63")]
-position = Vector2(264, 656)
-
-[node name="flower_warm_10" parent="Objects" instance=ExtResource("object_64")]
-position = Vector2(336, 656)
-
-[node name="flower_warm_11" parent="Objects" instance=ExtResource("object_65")]
-position = Vector2(408, 656)
-
-[node name="flower_warm_12" parent="Objects" instance=ExtResource("object_66")]
-position = Vector2(480, 656)
-
 [node name="flower_cool_01" parent="Objects" instance=ExtResource("object_67")]
 position = Vector2(552, 656)
-
-[node name="flower_cool_02" parent="Objects" instance=ExtResource("object_68")]
-position = Vector2(624, 656)
-
-[node name="flower_cool_03" parent="Objects" instance=ExtResource("object_69")]
-position = Vector2(696, 656)
-
-[node name="flower_cool_05" parent="Objects" instance=ExtResource("object_70")]
-position = Vector2(48, 752)
-
-[node name="flower_cool_06" parent="Objects" instance=ExtResource("object_71")]
-position = Vector2(120, 752)
-
-[node name="flower_cool_07" parent="Objects" instance=ExtResource("object_72")]
-position = Vector2(192, 752)
-
-[node name="flower_cool_08" parent="Objects" instance=ExtResource("object_73")]
-position = Vector2(264, 752)
-
-[node name="flower_cool_09" parent="Objects" instance=ExtResource("object_74")]
-position = Vector2(336, 752)
-
-[node name="flower_cool_10" parent="Objects" instance=ExtResource("object_75")]
-position = Vector2(408, 752)
-
-[node name="flower_cool_11" parent="Objects" instance=ExtResource("object_76")]
-position = Vector2(480, 752)
-
-[node name="flower_cool_12" parent="Objects" instance=ExtResource("object_77")]
-position = Vector2(552, 752)
