@@ -17,3 +17,11 @@ Validação: parser GDScript aprovado. Execução e aparência pendentes de test
 ## Casa inicial fixa
 
 Ao construir a primeira célula de piso da casa inicial, ela é registrada como âncora permanente. Após isso, o editor pode expandir ou modificar a casa, mas não pode apagar essa célula para realocar a construção. Desfazer e carregar outro desenho também respeitam a âncora. O save v2 mantém compatibilidade, adicionando o campo opcional anchor; um save anterior ganha âncora ao abrir. A construção salva é carregada na inicialização do World. A enxada não altera o piso nem a margem de segurança ao redor da casa. Detalhes no [guia de preparo de terreno](world_hoe.md).
+
+## Distancia do spawn e seguranca de construcao
+
+A casa inicial so pode ser construida e ampliada dentro de um raio de 12 blocos do spawn, armazenado na inicializacao do World. Esse valor pode ser alterado pelo parametro max_spawn_distance_tiles no Inspector do HouseBuilder (2 a 64).
+
+O bloco atual do jogador e os oito blocos imediatamente vizinhos nao podem receber pisos, paredes ou telhados novos. Tambem e proibido construir pisos que gerariam paredes automaticamente perto do jogador. Essa distancia e configuravel em player_build_clearance_tiles (padrao 1). O indicador fica vermelho e explica o motivo.
+
+Casas anteriormente salvas continuam no local e nao sao movidas automaticamente. A posicao original da casa continua fixa. Testes em tests/HousePlacementTest.tscn validam o raio, inclusive diagonais, o bloqueio na posicao do personagem e a area de geracao de paredes.
