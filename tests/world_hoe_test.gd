@@ -100,7 +100,7 @@ func _run() -> void:
 		get_tree().quit(1)
 		return
 	# Soltar o drop nao autoriza arar em cima do item: recolha-o primeiro.
-	if not _check(hoe.call("rejection_reason", object_cell) != "", "unc ollected drop still blocks hoe"):
+	if not _check(hoe.call("rejection_reason", object_cell) != "", "uncollected drop still blocks hoe"):
 		get_tree().quit(1)
 		return
 	for candidate in get_tree().get_nodes_in_group("world_drops"):
@@ -117,6 +117,16 @@ func _run() -> void:
 			get_tree().quit(1)
 			return
 
+	# Deixar o save de teste e o mapa apenas em memoria; nenhum mundo principal e sobrescrito.
+	if not _check(FileAccess.file_exists("user://slimekeepers_world_hoeing_v1.json"), "prepared soil is saved to a separate file"):
+		get_tree().quit(1)
+		return
+	hoe.set("_prepared", {})
+	hoe.clear()
+	hoe.call("_load_cells")
+	if not _check(bool(hoe.call("is_tilled", chosen)), "saved ground can be restored from JSON"):
+		get_tree().quit(1)
+		return
 	var house_cell: Vector2i = free_cells[2]
 	var house_center: Vector2 = hoe.to_global(hoe.map_to_local(house_cell))
 	var floor_layer: TileMapLayer = house.get("floor_layer") as TileMapLayer
@@ -139,16 +149,6 @@ func _run() -> void:
 	footprint.erase(house_anchor)
 	house.call("_undo")
 	if not _check(house.get("footprint").has(house_anchor), "undo cannot relocate initial house"):
-		get_tree().quit(1)
-		return
-	# Deixar o save de teste e o mapa apenas em memoria; nenhum mundo principal e sobrescrito.
-	if not _check(FileAccess.file_exists("user://slimekeepers_world_hoeing_v1.json"), "prepared soil is saved to a separate file"):
-		get_tree().quit(1)
-		return
-	hoe.set("_prepared", {})
-	hoe.clear()
-	hoe.call("_load_cells")
-	if not _check(bool(hoe.call("is_tilled", chosen)), "saved ground can be restored from JSON"):
 		get_tree().quit(1)
 		return
 	print("PASS world-hoe: green-ground tilling, occupied cells, fixed house, save and load")
