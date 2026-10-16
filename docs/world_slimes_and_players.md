@@ -22,3 +22,12 @@
 - Os quadros gerados por IA tem espacamento 1774x887 dividido em 8 colunas e 4 linhas; recortes podem necessitar ajustes visuais (alinhar pes e armas). O runtime usa as texturas originais e escala para aproximar 48px da arte anterior.
 - Os slimes nao contam com interacoes, tarefas, combate, domar, salvamento de posicao ou reproducao. Isso exige nova fase de gameplay.
 - Teste visual local no Godot e validacao do desempenho com 32 entidades sao necessarios.
+
+## Correcao de visibilidade (16/10/2026)
+
+- `grass2` usa z-index 1 e `TilledSoil` z-index 2; antes, os slimes ficavam no z 0 e eram escondidos pela grama. `Actors/SlimePopulation` agora usa z-index 3 para mostrar os slimes acima do solo. Ainda falta refinar a oclusao nas copas das arvores grandes.
+- `scenes/player/Player.tscn` agora referencia `assets/Characters/animation/player_masculino_frames.tres` **diretamente no inspetor**. O recurso possui 28 animacoes e e exibido mesmo sem rodar o jogo.
+- A versao feminina pode ser visualizada em `scenes/player/FemaleSpritePreview.tscn` ou em `assets/Characters/animation/player_feminino_frames.tres`. Ao criar uma nova fazenda e selecionar Feminino, o controlador troca o SpriteFrames do Player no runtime.
+- As folhas originais permanecem em `assets/Characters/new/`. Os 28 estados incluem 8 quadros por direcao, em recortes das imagens originais 1774x887. Escala de exibição 0.25 para manter proporcao com o mapa.
+- **Observacao:** o pacote masculino nao contem uma sequencia exclusiva de caminhada distinta da corrida: a caminhada usa a folha de corrida em velocidade menor, ate ser produzido um spritesheet proprio.
+- Teste importante: abrir Player.tscn e verificar `AnimatedSprite2D > Sprite Frames` no inspetor. Validar os 4 lados, armas e posicao dos pes no mapa.
