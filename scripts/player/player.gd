@@ -272,16 +272,30 @@ func _apply_queued_impact() -> void:
 		return
 	_impact_applied = true
 	var tool_id: StringName = _queued_tool
+	var successful: bool = false
 	if is_instance_valid(_queued_target):
 		if global_position.distance_to(_queued_target.global_position) <= tool_reach:
 			if tool_id == &"axe" and _queued_target.has_method("can_accept_axe_hit"):
 				if bool(_queued_target.call("can_accept_axe_hit")):
-					_queued_target.call("take_axe_hit", self)
+					successful = bool(_queued_target.call("take_axe_hit", self))
 			elif tool_id == &"pickaxe" and _queued_target.has_method("can_accept_pickaxe_hit"):
 				if bool(_queued_target.call("can_accept_pickaxe_hit")):
-					_queued_target.call("take_pickaxe_hit", self)
+					successful = bool(_queued_target.call("take_pickaxe_hit", self))
 	elif tool_id in [&"hoe", &"watering_can"]:
 		tool_action_requested.emit(tool_id, _queued_position)
+	if successful:
+		_camera_impact()
+
+
+func _camera_impact() -> void:
+	# Leve vibracao localizada, sem qualquer sprite ou imagem nova.
+	var camera := get_node_or_null("Camera2D") as Camera2D
+	if camera == null:
+		return
+	var tween: Tween = create_tween()
+	tween.tween_property(camera, "offset", Vector2(0.65, -0.45), 0.045)
+	tween.tween_property(camera, "offset", Vector2(-0.55, 0.3), 0.045)
+	tween.tween_property(camera, "offset", Vector2.ZERO, 0.09)
 
 
 func _use_non_axe(target_world: Vector2) -> bool:

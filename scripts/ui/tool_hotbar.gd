@@ -38,14 +38,17 @@ var _selection_tween: Tween
 var _pulse_button: Button
 var _toast: Label
 var _toast_tween: Tween
+var _selection_label: Label
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_build_panel()
 	_build_toast()
+	_build_selection_label()
 	_layout_bar()
 	_refresh_selection()
+	_update_selection_label()
 	ResourceBag.amount_changed.connect(_on_amount_changed)
 	ResourceBag.item_collected.connect(_on_item_collected)
 	for item_id in SLOT_IDS:
@@ -94,7 +97,7 @@ func _make_slot(index: int) -> void:
 	button.mouse_filter = Control.MOUSE_FILTER_STOP
 	button.tooltip_text = "%d - %s" % [index + 1, SLOT_NAMES[index]]
 	if index >= 3:
-		button.tooltip_text += " | recurso (coleta em desenvolvimento)"
+		button.tooltip_text += " | quantidade coletada"
 	button.add_to_group("hotbar_" + String(item_id))
 	button.pressed.connect(_slot_pressed.bind(item_id))
 	_strip.add_child(button)
@@ -176,6 +179,9 @@ func _layout_bar() -> void:
 	_panel.custom_minimum_size = Vector2(real_width, bar_height)
 	_panel.size = Vector2(real_width, bar_height)
 	_panel.position = Vector2(roundf((size.x - real_width) * 0.5), roundf(size.y - bar_height - BAR_BOTTOM_MARGIN))
+	if _selection_label != null:
+		_selection_label.position = Vector2(_panel.position.x, _panel.position.y - 22.0)
+		_selection_label.size = Vector2(real_width, 18.0)
 
 
 func get_slot_item(index: int) -> StringName:
@@ -188,6 +194,7 @@ func set_selected_tool(tool_id: StringName) -> void:
 	var changed: bool = tool_id != _selected
 	_selected = tool_id
 	_refresh_selection()
+	_update_selection_label()
 	if changed:
 		_animate_selection(tool_id)
 
@@ -224,6 +231,31 @@ func _slot_style(active: bool, hover: bool = false) -> StyleBoxFlat:
 	return style
 
 
+func _build_selection_label() -> void:
+	_selection_label = Label.new()
+	_selection_label.name = "SelectedItemName"
+	_selection_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_selection_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_selection_label.add_theme_font_size_override("font_size", 10)
+	_selection_label.add_theme_color_override("font_color", GOLD)
+	_selection_label.add_theme_constant_override("outline_size", 2)
+	_selection_label.add_theme_color_override("font_outline_color", Color("#14271d"))
+	add_child(_selection_label)
+
+
+func _update_selection_label() -> void:
+	if _selection_label == null:
+		return
+	if _selected == &"pickaxe":
+		_selection_label.text = "P | Picareta"
+		return
+	for i in range(SLOT_IDS.size()):
+		if SLOT_IDS[i] == _selected:
+			_selection_label.text = "%d | %s" % [(i + 1) % 10, SLOT_NAMES[i]]
+			return
+	_selection_label.text = ""
+
+
 func _build_toast() -> void:
 	_toast = Label.new()
 	_toast.name = "LastPickup"
@@ -252,7 +284,7 @@ func _on_amount_changed(item_id: StringName, count: int) -> void:
 	var label: Label = button.get_node("OwnedCount") as Label
 	label.visible = count > 0
 	if count > 0:
-		label.text = str(count)
+		label.text = "999+" if count > 999 else str(count)
 
 
 func _on_item_collected(item_id: StringName, amount: int) -> void:

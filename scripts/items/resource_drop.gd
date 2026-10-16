@@ -18,6 +18,7 @@ const ICON_INDEX := {"trunk": 6, "large_stone": 9, "wood": 5, "twigs": 7, "plank
 var _sprite: Sprite2D
 var _picked := false
 var _age: float = 0.0
+var _pull_speed: float = 0.0
 
 
 func _ready() -> void:
@@ -28,9 +29,20 @@ func _ready() -> void:
 	_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_sprite.texture = _get_visual_texture()
 	add_child(_sprite)
-	var bob := create_tween()
+	# Entrada fisica simples com a textura existente: salta, pousa e depois flutua.
+	_sprite.position.y = -7.0
+	var landing: Tween = create_tween()
+	landing.tween_property(_sprite, "position:y", -17.0, 0.13).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	landing.tween_property(_sprite, "position:y", -7.0, 0.20).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+	landing.tween_callback(_begin_bobbing)
+
+
+func _begin_bobbing() -> void:
+	if _picked:
+		return
+	var bob: Tween = create_tween()
 	bob.set_loops()
-	bob.tween_property(_sprite, "position:y", -10.0, 0.55).set_trans(Tween.TRANS_SINE)
+	bob.tween_property(_sprite, "position:y", -9.0, 0.55).set_trans(Tween.TRANS_SINE)
 	bob.tween_property(_sprite, "position:y", -7.0, 0.55).set_trans(Tween.TRANS_SINE)
 
 
@@ -47,20 +59,36 @@ func _physics_process(delta: float) -> void:
 		if player == null or not is_instance_valid(player):
 			continue
 		var measured: float = global_position.distance_to(player.global_position)
-		if measured < distance:
+		if measured < distance and _has_clear_path(player):
 			closest = player
 			distance = measured
 	if closest == null:
+		_pull_speed = 0.0
 		return
 	if distance <= pickup_radius:
 		pickup(closest)
 		return
 	var target: Vector2 = closest.global_position + Vector2(0, -4)
 	var proximity: float = 1.0 - distance / magnet_radius
-	var speed: float = magnet_speed * (0.55 + proximity)
+	_pull_speed = move_toward(_pull_speed, magnet_speed, magnet_speed * 5.0 * delta)
+	var speed: float = _pull_speed * (0.55 + proximity)
 	global_position = global_position.move_toward(target, speed * delta)
 	if global_position.distance_to(closest.global_position) <= pickup_radius:
 		pickup(closest)
+
+
+func _has_clear_path(player: Node2D) -> bool:
+	# Bloquear magnetismo atraves de muros, arvores e objetos no layer World (1).
+	# Ignora o corpo do coletor para nao bloquear o proprio destino.
+	var excluded: Array[RID] = []
+	var body := player as CollisionObject2D
+	if body != null:
+		excluded.append(body.get_rid())
+	var query := PhysicsRayQueryParameters2D.create(
+		global_position, player.global_position, 1, excluded
+	)
+	var obstruction: Dictionary = get_world_2d().direct_space_state.intersect_ray(query)
+	return obstruction.is_empty()
 
 
 func _get_visual_texture() -> Texture2D:
