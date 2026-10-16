@@ -132,5 +132,41 @@ func _run() -> void:
 		get_tree().quit(1)
 		return
 
+	# Reaparecimento apos um dia simulado: sprite original e inventario separados.
+	var original_day: int = GameCalendar.day
+	var respawn_key: String = "test-polish-regrow-" + str(original_day)
+	var drop_key: String = respawn_key + ":plant_drop:" + str(original_day)
+	ResourceBag._picked_plants.erase(respawn_key)
+	ResourceBag._drops.erase(drop_key)
+	ResourceBag._claimed.erase(drop_key)
+	var flower_scene: PackedScene = load("res://scenes/objects/flowers/flower_blue.tscn")
+	var regrowing: Node2D = flower_scene.instantiate() as Node2D
+	regrowing.set("persistent_id", respawn_key)
+	regrowing.set("start_fully_grown", true)
+	regrowing.set("regrow_days", 1)
+	demo.add_child(regrowing)
+	regrowing.global_position = Vector2(1080, 1080)
+	player.global_position = Vector2(1200, 1200)
+	if not _check(bool(regrowing.call("pick_by_click", player)), "harvest makes floor drop without direct inventory credit"):
+		get_tree().quit(1)
+		return
+	if not _check(not bool(regrowing.call("can_pick")) and not regrowing.get_node("AnimatedSprite2D").visible, "plant hidden after harvest"):
+		get_tree().quit(1)
+		return
+	GameCalendar.advance_days(1)
+	if not _check(bool(regrowing.call("can_pick")) and regrowing.get_node("AnimatedSprite2D").visible, "harvested plant regrows after chosen day interval"):
+		get_tree().quit(1)
+		return
+	regrowing.queue_free()
+	for node in get_tree().get_nodes_in_group("world_drops"):
+		if node.get("source_key") == drop_key:
+			node.queue_free()
+	ResourceBag._picked_plants.erase(respawn_key)
+	ResourceBag._drops.erase(drop_key)
+	ResourceBag._claimed.erase(drop_key)
+	ResourceBag.call("_save_state")
+	GameCalendar.day = original_day
+	GameCalendar.call("_save_calendar")
+
 	print("PASS polish: animation timing, persistence, resource variants and collision")
 	get_tree().quit(1 if _failed else 0)
