@@ -4,6 +4,7 @@
 [ext_resource type="TileSet" uid="uid://d2u83cq3s7ay3" path="res://data/tilesets/world_tileset.tres" id="2_6m72w"]
 [ext_resource type="PackedScene" uid="uid://e41u5bfsawlk" path="res://scenes/player/Player.tscn" id="3_v5dby"]
 [ext_resource type="Script" path="res://scripts/world/world_hoeing.gd" id="4_hoe"]
+[ext_resource type="Script" path="res://scripts/world/terrain_edge_collision.gd" id="5_collision"]
 
 [node name="World2" type="Node2D" unique_id=2045392138]
 
@@ -12,6 +13,16 @@ y_sort_enabled = true
 
 [node name="Map" type="Node2D" parent="Actors" unique_id=1658055105]
 y_sort_enabled = true
+
+[node name="TerrainEdgeCollision" type="StaticBody2D" parent="Actors/Map"]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("5_collision")
+water_path = NodePath("../water")
+grass_path = NodePath("../grass2")
+shore_path = NodePath("../soil_water")
+alpha_threshold = 0.2
+max_collision_rectangles = 4096
 
 [node name="HouseBuilder" parent="Actors/Map" unique_id=277812168 instance=ExtResource("1_1fp7r")]
 player_path = NodePath("../../Player")
