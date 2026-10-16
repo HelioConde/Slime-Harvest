@@ -1,6 +1,6 @@
 # TileSets do mundo
 
-Abra scenes/world/world2.tscn. Sua pintura original e a instância do Player foram preservadas. A camada existente usa data/tilesets/world_tileset.tres, com os atlases adicionados.
+Abra scenes/world/World.tscn. A pintura original e a instância do Player foram preservadas. As camadas existentes usam data/tilesets/world_tileset.tres, com os atlases disponíveis.
 
 ## Pintura
 
@@ -73,3 +73,7 @@ Recortes individuais do pacote, imagens de exemplo e referências de bitmask for
 Verificadas as referências a arquivos, presença das 16 máscaras únicas por terrain, dimensões e preservação exata dos dados pintados em world2. Execução e encaixe visual ainda devem ser conferidos no Godot. A cena inicial do projeto continua World.tscn; para conferir seu mapa, abra world2 e use F6.
 
 Próxima etapa: desenhar o mundo com os atlases escolhidos, depois definir colisões por camada e altura. Os novos atlases não recebem colisões globais automaticamente: solo é caminhável, e prédios/encostas precisam de limites definidos de acordo com o mapa.
+
+## Reutilizar superfícies
+
+Foi adicionado um TileMapLayer reutilizável em scenes/world/TerrainPatch.tscn e seis superfícies na cena scenes/world/TerrainGallery.tscn. Todos referenciam world_tileset.tres. Os índices de terrain são: grama 9, grama escura 3, terra 11, terra escura 5, pedra 13 e terra arada 17. O gerador só preenche camadas vazias e respeita pintura manual. [Guia completo](fruit_trees_terrains.md).

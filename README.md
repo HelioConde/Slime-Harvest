@@ -35,3 +35,7 @@ Documentos: [refinamentos](docs/gameplay_polish.md), [ferramentas](docs/tool_inv
 O repositorio e [HelioConde/Slime-Harvest](https://github.com/HelioConde/Slime-Harvest). O projeto Roblox 3D e separado e utiliza [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley).
 
 A implementacao foi verificada por inspecao dos arquivos GitHub, mas requer validacao de execucao local no Godot.
+
+## Árvores frutíferas e terreno reutilizável
+
+A macieira animada agora serve de modelo para laranjeira, pessegueiro e pereira usando os sprites existentes. O TileSet do mundo é reutilizado em seis superfícies de exemplo, preservando o World original. Abra scenes/trees/FruitTreesDemo.tscn ou scenes/world/TerrainGallery.tscn e pressione F6. Para inserir um terreno em outro mapa, instancie scenes/world/TerrainPatch.tscn. Detalhes: [árvores e terrenos](docs/fruit_trees_terrains.md).

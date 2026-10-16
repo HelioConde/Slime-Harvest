@@ -14,6 +14,8 @@
 - [ ] Integrar os canteiros ao novo mapa principal e confirmar as cenas visualmente no Godot.
 - [x] Machado corta arvores em **5 golpes**, respeita o balanco antes de cada novo golpe, executa queda sem loop e cria toco persistente (teste visual local pendente).
 - [x] Hotbar inferior com 10 slots do spritesheet original, contadores de recursos, grupos, atalhos e persistencia da selecao.
+- [x] Árvores de maçã, laranja, pêssego e pera animadas a partir da primeira macieira, com spritesheets próprios.
+- [x] Componente de terreno reutilizável e galeria de seis variações usando o TileSet original, sem alterar o mapa principal.
 - [x] Sistema de drops e contadores persistentes de troncos, pedras, flores e cogumelos.
 - [x] Picareta minerando pedras por nivel, toco removivel em tres golpes e coleta de flores/cogumelos com clique.
 - [x] Refinamentos: golpes sincronizados, efeitos com sprites existentes, audio local, magnetismo com parede, movimento suave e progresso parcial de arvore/toco.

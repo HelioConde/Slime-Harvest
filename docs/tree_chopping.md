@@ -51,3 +51,7 @@ A arvore deixa um tronco apos `tree_fall.tscn`; o stump exige tres golpes e deix
 Depois das cinco machadadas na arvore, aguarde terminar tree_fall.tscn. O efeito agora solta um tronco no chao e instancia stump.tscn. O toco exige mais tres machadadas para desaparecer e soltar outro tronco. Clique nos dois drops para recolher; eles entram no slot 7 da hotbar.
 
 As arvores e os tocos do mundo principal mantem o estado no save. Na cena TreeChopDemo, o corte nao e persistente para facilitar repeticoes. Foi acrescentado um teste com execucao real do motor Godot, incluindo arvore, toco e drops.
+
+## Quatro espécies animadas
+
+As cenas de maçã, laranja, pêssego e pera usam o modelo de animação da primeira macieira com seus próprios spritesheets. São 5 golpes, balanço de 6 quadros, queda de 12 quadros sem loop e toco de 3 golpes. Teste em scenes/trees/FruitTreesDemo.tscn (F6). [Guia](fruit_trees_terrains.md).
