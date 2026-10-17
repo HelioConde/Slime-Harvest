@@ -68,6 +68,42 @@ func _run() -> void:
 	gota.call("_finish_absorbing")
 	if not _check(is_equal_approx(float(gota.get("need_level")), 100.0), "Gota restores reserve from water"):
 		return
+	# O slime nao pode recuperar energia de um recurso ja removido.
+	gota.set("need_level", 39.0)
+	gota.set("_goal", Vector2(100000.0, 100000.0))
+	gota.call("_begin_absorbing")
+	if not _check(str(gota.get("life_state")) != "absorbing", "removed or invalid resource cancels absorption"):
+		return
+	if not _check(is_equal_approx(float(gota.get("need_level")), 39.0), "failed absorption gives no free energy"):
+		return
+
+	# Ao surgir um novo obstaculo, a proxima rota reconstroi sua navegacao.
+	var path_origin: Vector2 = population.get("_grass_sites")[0]
+	var obstacle := StaticBody2D.new()
+	obstacle.collision_layer = 1
+	obstacle.collision_mask = 0
+	obstacle.global_position = path_origin
+	var obstacle_shape := CollisionShape2D.new()
+	var obstacle_circle := CircleShape2D.new()
+	obstacle_circle.radius = 8.0
+	obstacle_shape.shape = obstacle_circle
+	obstacle.add_child(obstacle_shape)
+	world.get_node("Actors/Map").add_child(obstacle)
+	await get_tree().physics_frame
+	population.call("invalidate_navigation")
+	population.call("get_ground_path", path_origin, path_origin + Vector2(16, 0))
+	var nav: AStarGrid2D = population.get("_navigation")
+	var grass: TileMapLayer = world.get_node("Actors/Map/grass2") as TileMapLayer
+	var blocked_cell: Vector2i = grass.local_to_map(grass.to_local(path_origin))
+	if not _check(nav.is_point_solid(blocked_cell), "new solid obstacle is included in route planning"):
+		return
+	obstacle.queue_free()
+	await get_tree().physics_frame
+	population.call("invalidate_navigation")
+	population.call("get_ground_path", path_origin, path_origin + Vector2(16, 0))
+	if not _check(not nav.is_point_solid(blocked_cell), "removing obstacle restores a walkable cell"):
+		return
+
 	var terrinho := population.get_node("terrinho") as CharacterBody2D
 	if not _check(terrinho.get("need_type") == "soil", "Terrinho seeks its own soil resource"):
 		return
