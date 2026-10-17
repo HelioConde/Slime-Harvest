@@ -4,7 +4,7 @@
 
 - `World.tscn` instancia `SlimePopulation`, que carrega as 32 especies do manifesto do bestiario (`assets/slimes/bestiary/bestiario.json`). Usa uma unidade de cada especie, em pontos livres do gramado, sem sobrescrever casas, terreno ou saves.
 - Cada unidade tem `CharacterBody2D`, collider circular e `slime_wander.gd`, com deslocamento e pausas aleatorias, desvio de bloqueios fisicos da layer World e limite de distancia da origem. Nao anda sobre agua ou fora do gramado; outras especies nao precisam de cenas reeditadas.
-- **Por enquanto a IA e somente ambiental**: nao planta, nao rega, nao ataca e nao salva posicoes. Os slimes reaparecem redistribuidos ao abrir o World. O bestiario continua independente.
+- **IA selvagem**: as 32 especies possuem necessidades, temperamento, fuga, curiosidade, afeicao e ataques territoriais/agressivos; nao executam trabalhos de fazenda nem salvam posicoes. Os slimes reaparecem distribuidos ao abrir o World. O bestiario continua independente.
 - O jogador usa os PNGs novos de `assets/Characters/new` com nomes de animacao iguais aos antigos (`idle_*, walk_*, run_*, axe_*, pick_*, hoe_*, watering_*`). Os PNGs nao foram alterados ou regravados.
 - Ao iniciar uma nova fazenda, escolha Masculino/Feminino junto ao nome. A escolha e salva no metadado do slot. Saves antigos continuam disponiveis e usam masculino por padrao.
 - O PNG masculino especifico de idle nao estava entre as 15 folhas de 8x4 importadas; ate esse material chegar, a postura idle usa o primeiro frame de caminhada do mesmo visual. A transicao nao usa recortes do atlas antigo. O idle feminino usa a folha dedicada.
@@ -20,7 +20,7 @@
 ## Limitacoes conhecidas
 
 - Os quadros gerados por IA tem espacamento 1774x887 dividido em 8 colunas e 4 linhas; recortes podem necessitar ajustes visuais (alinhar pes e armas). O runtime usa as texturas originais e escala para aproximar 48px da arte anterior.
-- Os slimes nao contam com interacoes, tarefas, combate, domar, salvamento de posicao ou reproducao. Isso exige nova fase de gameplay.
+- Ja existem reacoes selvagens de proximidade e ataques simples ao jogador. Ainda faltam combate profundo, interacoes entre especies, tarefas, domesticacao, salvamento de posicao e reproducao.
 - Teste visual local no Godot e validacao do desempenho com 32 entidades sao necessarios.
 
 ## Correcao de visibilidade (16/10/2026)
