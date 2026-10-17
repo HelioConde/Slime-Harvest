@@ -79,6 +79,30 @@ func _populate() -> void:
     print("SlimePopulation: %d/%d slimes criados no mundo." % [count, (manifest["species"] as Array).size()])
 
 
+## Procura social sem combate. Apenas slimes selvagens vivos e saudaveis
+## participam; busca local executada a cada poucos segundos por individuo.
+func find_nearby_wild_slime(requester: Node2D, max_distance: float = 84.0) -> Node2D:
+    if requester == null or not is_instance_valid(requester):
+        return null
+    var nearest: Node2D = null
+    var best_distance: float = max_distance * max_distance
+    for candidate in get_children():
+        var other := candidate as Node2D
+        if other == null or other == requester or other.is_queued_for_deletion():
+            continue
+        if not other.has_method("get_survival_status"):
+            continue
+        if str(other.get("life_state")) != "wandering":
+            continue
+        if float(other.get("need_level")) <= NEEDS.SEEK_BELOW:
+            continue
+        var distance: float = requester.global_position.distance_squared_to(other.global_position)
+        if distance < best_distance:
+            best_distance = distance
+            nearest = other
+    return nearest
+
+
 func _find_spawn(cells: Array[Vector2i], habitat: String = "") -> Vector2:
     for separation in [38.0, 25.0, 14.0]:
         for attempt in range(320):
