@@ -16,6 +16,11 @@ var _navigation: AStarGrid2D
 
 
 func _ready() -> void:
+    # Aguarda a criacao de rochas, plantas e arvores do WorldPopulation.
+    call_deferred("_populate")
+
+
+func _populate() -> void:
     _rng.randomize()
     if grass == null or player == null:
         push_error("SlimePopulation: grass2 ou Player nao encontrado no World.")
@@ -84,6 +89,10 @@ func _find_spawn(cells: Array[Vector2i], habitat: String = "") -> Vector2:
                 continue
             if habitat == "water" and not _near_water(point, 90.0):
                 continue
+            if habitat not in ["soil", "grass", "open_air", "sun", "water"]:
+                var match: Dictionary = find_need_target(habitat, point)
+                if match.is_empty() or point.distance_to(match["point"]) > 185.0:
+                    continue
             var far_enough := true
             for other in _occupied:
                 if point.distance_to(other) < separation:
@@ -191,7 +200,7 @@ func find_need_target(need: String, from_point: Vector2) -> Dictionary:
         return from_point.distance_squared_to(a) < from_point.distance_squared_to(b)
     )
     # Testa alternativas quando a mais proxima estiver inacessivel.
-    for i in range(mini(12, candidates.size())):
+    for i in range(candidates.size()):
         var destination: Vector2 = candidates[i]
         var path: PackedVector2Array = get_ground_path(from_point, destination)
         if not path.is_empty():
