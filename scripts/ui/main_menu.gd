@@ -3,6 +3,7 @@ extends Control
 ## Multiplayer e saves multiplos nao estao ativos: preservar user:// legado.
 const WORLD_SCENE := "res://scenes/world/World.tscn"
 const SLOTS_SCRIPT = preload("res://scripts/core/save_slots.gd")
+const UI_SCALE_CONTROLS = preload("res://scripts/ui/ui_scale_controls.gd")
 const WALLPAPER := "res://assets/ui/main_menu/vale_encantado.png"
 const FARM_WALLPAPER := "res://assets/ui/main_menu/fazenda_wallpaper.png"
 const ART_DIR := "res://assets/ui/main_menu/"
@@ -395,7 +396,10 @@ func _on_multiplayer() -> void:
 
 
 func _on_options() -> void:
-	_show_message("Opcoes completas estao em desenvolvimento.\n\nPor enquanto, use as teclas configuradas no jogo.")
+	_show_actions("Opcoes", "Ajuste a interface conforme sua tela.", [])
+	_popup_fields.visible = true
+	_popup_fields.add_child(UI_SCALE_CONTROLS.new())
+
 
 
 func _on_credits() -> void:
