@@ -8,7 +8,7 @@ extends Node2D
 const SAVE_VERSION := 1
 const SAVE_PREFIX := "world_random_v1_"
 const DEFINITIONS: Array[Dictionary] = [
-	{"kind": "tree", "count": 13, "space": 34.0, "margin": 3, "paths": [
+	{"kind": "tree", "count": 10, "space": 34.0, "margin": 3, "paths": [
 		"res://scenes/objects/trees/tree.tscn",
 		"res://scenes/objects/trees/tree_small.tscn",
 		"res://scenes/objects/trees/tree_large.tscn",
@@ -17,11 +17,11 @@ const DEFINITIONS: Array[Dictionary] = [
 		"res://scenes/objects/trees/tree_pear.tscn",
 		"res://scenes/objects/trees/tree_peach.tscn"
 	]},
-	{"kind": "wood", "count": 9, "space": 22.0, "margin": 2, "paths": [
+	{"kind": "wood", "count": 7, "space": 22.0, "margin": 2, "paths": [
 		"res://scenes/objects/logs/log_small.tscn",
 		"res://scenes/objects/logs/log_large.tscn"
 	]},
-	{"kind": "rock", "count": 14, "space": 21.0, "margin": 2, "paths": [
+	{"kind": "rock", "count": 10, "space": 21.0, "margin": 2, "paths": [
 		"res://scenes/objects/rocks/rock_01.tscn",
 		"res://scenes/objects/rocks/rock_02.tscn",
 		"res://scenes/objects/rocks/rock_03.tscn",
@@ -29,19 +29,18 @@ const DEFINITIONS: Array[Dictionary] = [
 		"res://scenes/objects/rocks/rock_05.tscn",
 		"res://scenes/objects/rocks/rock_large.tscn"
 	]},
-	{"kind": "flower", "count": 22, "space": 15.0, "margin": 2, "paths": [
+	{"kind": "mushroom", "count": 9, "space": 17.0, "margin": 2, "paths": [
+		"res://scenes/objects/mushrooms/mushroom_red.tscn"
+	]},
+	{"kind": "flower", "count": 15, "space": 15.0, "margin": 2, "paths": [
 		"res://scenes/objects/flowers/flower_blue.tscn",
 		"res://scenes/objects/flowers/flower_light_blue.tscn",
 		"res://scenes/objects/flowers/flower_light_yellow.tscn",
 		"res://scenes/objects/flowers/flower_pink.tscn",
 		"res://scenes/objects/flowers/flower_purple.tscn",
 		"res://scenes/objects/flowers/flower_yellow.tscn"
-	]},
-	{"kind": "mushroom", "count": 13, "space": 17.0, "margin": 2, "paths": [
-		"res://scenes/objects/mushrooms/mushroom_red.tscn"
 	]}
 ]
-
 @onready var grass: TileMapLayer = get_node_or_null("../grass2") as TileMapLayer
 @onready var water: TileMapLayer = get_node_or_null("../water") as TileMapLayer
 @onready var house: Node2D = get_node_or_null("../HouseBuilder") as Node2D
