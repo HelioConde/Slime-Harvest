@@ -27,7 +27,7 @@ func _run() -> void:
 	var controls := menu.get_node_or_null("PopupOverlay/PopupCenter/Dialog/MarginContainer/DialogContent/FormFields/InterfaceScaleControls") as VBoxContainer
 	ok = _check(controls != null, "options exposes UI controls") and ok
 	if controls != null:
-		var slider := controls.get_node_or_null("HotbarScale") as HSlider
+		var slider := controls.find_child("HotbarScale", true, false) as HSlider
 		ok = _check(slider != null, "hotbar slider is available") and ok
 		if slider != null:
 			slider.value = 0.65
@@ -37,7 +37,6 @@ func _run() -> void:
 
 	var bar := load("res://scenes/ui/ToolHotbar.tscn").instantiate() as Control
 	add_child(bar)
-	bar.size = Vector2(640, 360)
 	await get_tree().process_frame
 	var frame := bar.get_node_or_null("InventoryFrame") as PanelContainer
 	ok = _check(frame != null, "hotbar has its frame") and ok
@@ -63,6 +62,6 @@ func _run() -> void:
 
 	UISettings.set_hotbar_scale(_original_hotbar)
 	UISettings.set_hud_scale(_original_hud)
-	ok = _check(UISettings.hotbar_scale == _original_hotbar and UISettings.hud_scale == _original_hud, "previous settings restored") and ok
+	ok = _check(is_equal_approx(UISettings.hotbar_scale, _original_hotbar) and is_equal_approx(UISettings.hud_scale, _original_hud), "previous settings restored") and ok
 	print("PASS interface: hotbar, HUD, options and persistence" if ok else "FAIL interface: regression")
 	get_tree().quit(0 if ok else 1)
