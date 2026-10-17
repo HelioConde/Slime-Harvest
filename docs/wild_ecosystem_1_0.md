@@ -6,6 +6,14 @@ Escopo: Godot 2D. **Nao inclui captura, domesticacao, cuidado pelo jogador, mapa
 
 **Nao ha luta entre slimes.** Nenhum slime selvagem ataca, fere, persegue para combate ou mata outro slime. Diferencas de temperamento produzem apenas brincadeiras, curiosidade, amizade, ajuda ou afastamento pacifico. O combate selvagem existente tem como alvo exclusivamente o jogador. Nao introduzir predacao, ataques entre especies ou disputas violentas em etapas futuras.
 
+## Progressao futura que deve orientar esta fundacao
+
+Cada territorio tera **uma especie nativa** e um chefe regional condicionado ao ambiente. Cumprir objetivos especificos (como derrotar monstros hostis ou oferecer cargas de lava no vulcao) faz aparecer esse chefe. Apos derrota, os slimes daquela regiao ficam mais receptivos a amizade, sem deixar de ser selvagens. **Slimes nao lutam entre si**, e os alvos dos objetivos de combate nao sao slimes.
+
+O motor de objetivos, chefes e pacificacao sera desenvolvido/testado em cena artificial **depois** de estabilizar o Wild Ecosystem 1.0, mas **antes** de construir o mapa definitivo e a historia. Nao implementar captura ou domesticacao agora.
+
+Ver [Especificacao de territorios e amizade](territorios_bosses_afinidade.md).
+
 ## Estado e criterios de aceite
 
 | Area | Estado | Criterio de conclusao |
