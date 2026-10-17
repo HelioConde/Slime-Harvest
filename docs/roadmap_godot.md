@@ -47,6 +47,19 @@
 
 Checklist e criterios de conclusao: [Wild Ecosystem 1.0](wild_ecosystem_1_0.md).
 
+## Progressao regional futura: chefes e amizade
+
+- [ ] Criar definicoes de territorios com **uma especie nativa de slime por territorio**.
+- [ ] Criar gatilhos ambientais configuraveis (ex.: derrotar monstros hostis ou oferecer lava no vulcao).
+- [ ] Fazer o chefe regional surgir somente depois das condicoes, sem duplicatas.
+- [ ] Persistir derrota do chefe e pacificacao individual de cada territorio.
+- [ ] Tornar os slimes da regiao mais amigaveis e a futura amizade mais facil apos a derrota.
+- [ ] Validar esse motor em cenario artificial antes de desenhar mapa definitivo e historia.
+
+**Regra:** slimes nunca lutam entre si; monstros de objetivos sao inimigos hostis separados. Captura/domesticacao continuam fora do escopo atual.
+
+Especificacao detalhada: [Territorios, bosses e amizade](territorios_bosses_afinidade.md).
+
 ## Organização e escopo
 
 Esta trilha é **Godot 2D**, não a implementação 3D/Roblox existente em outro repositório. Compartilhamos conceito e identidade, mas não portamos recursos entre motores sem adequação.
