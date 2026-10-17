@@ -35,6 +35,16 @@ jobs:
             exit 1
           fi
 
+      - name: Test interface scale and settings (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/InterfaceScaleTest.tscn --quit-after 500 2>&1 | tee interface-scale.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL interface" interface-scale.log; then
+            exit 1
+          fi
+          grep -F "PASS interface: hotbar, HUD, options and persistence" interface-scale.log
+
       - name: Smoke test constructed scenes
         shell: bash
         run: |
