@@ -103,6 +103,16 @@ jobs:
           fi
           grep -F "PASS wild-behavior: flee, observe, affection, charged hits, cooldown and safe respawn" wild-behavior.log
 
+      - name: Test wild slime peaceful peer interactions (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SlimePeerTest.tscn --quit-after 700 2>&1 | tee slime-peer.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL slime-peer" slime-peer.log; then
+            exit 1
+          fi
+          grep -F "PASS slime-peer: play, curiosity, spacing, survival priority and nonviolence" slime-peer.log
+
       - name: Test wild slime ecology and water need (headless)
         shell: bash
         run: |
