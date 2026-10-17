@@ -4,6 +4,7 @@ extends CharacterBody2D
 signal wild_slime_died(species_id: String, at_position: Vector2)
 signal wild_reaction(species_id: String, reaction: String)
 signal wild_attack_hit(species_id: String, target: Node2D)
+signal wild_peer_reaction(species_id: String, partner_species: String, reaction: String)
 const NEEDS = preload("res://scripts/slimes/slime_needs.gd")
 const TEMPERAMENTS = preload("res://scripts/slimes/slime_temperaments.gd")
 
@@ -24,6 +25,11 @@ var _social_timer: float = 0.0
 var _awareness_left: float = 0.0
 var _attack_cooldown_left: float = 0.0
 var _social_cooldown_left: float = 0.0
+var _peer_mode: String = "none"
+var _peer_timer: float = 0.0
+var _peer_check_left: float = 0.0
+var _peer_cooldown_left: float = 0.0
+var _peer_partner: Node2D
 var _rng := RandomNumberGenerator.new()
 var _walk_direction := Vector2.ZERO
 var _decision_left := 0.0
@@ -62,6 +68,7 @@ func _ready() -> void:
     _last_position = global_position
     _decision_left = _rng.randf_range(0.2, 1.8)
     _search_left = _rng.randf_range(2.0, float(_profile["search_interval"]))
+    _peer_check_left = _rng.randf_range(2.0, 4.0)
     _set_animation(&"idle")
 
 
@@ -70,6 +77,7 @@ func _physics_process(delta: float) -> void:
         return
     _attack_cooldown_left = maxf(0.0, _attack_cooldown_left - delta)
     _social_cooldown_left = maxf(0.0, _social_cooldown_left - delta)
+    _peer_cooldown_left = maxf(0.0, _peer_cooldown_left - delta)
     need_level = maxf(0.0, need_level - float(_profile["drain_per_second"]) * delta)
     if need_level <= 0.0:
         _unmet_seconds += delta
@@ -90,6 +98,11 @@ func _physics_process(delta: float) -> void:
         return
 
     if _tick_wild_social(delta):
+        if _peer_mode != "none":
+            _end_peer_visit()
+        return
+
+    if _tick_wild_peer(delta):
         return
 
     _search_left -= delta
@@ -133,6 +146,7 @@ func _try_find_food() -> void:
     _path_index = 0
     _stuck_seconds = 0.0
     _last_position = global_position
+    _end_peer_visit()
     life_state = "seeking"
     _moving = true
     _set_animation(&"move")
@@ -250,7 +264,8 @@ func _die() -> void:
 func get_survival_status() -> Dictionary:
     return {"species": species_id, "need": need_type,
         "reserve": need_level, "state": life_state, "target": _goal,
-        "temperament": temperament, "reaction": _social_mode}
+        "temperament": temperament, "reaction": _social_mode,
+        "peer_reaction": _peer_mode}
 
 
 func _stop_wandering() -> void:
@@ -290,6 +305,96 @@ func _set_animation(anim: StringName) -> void:
 
 ## As reacoes sociais nao substituem o ciclo de hidratar, alimentar e descansar.
 ## Prioriza sobrevivencia quando a reserva esta criticamente baixa.
+## Contatos selvagens sem luta, captura ou vinculo ao jogador.
+## Usa temporizadores esparsos para nao comparar 32 slimes a cada frame.
+func _end_peer_visit() -> void:
+    _peer_mode = "none"
+    _peer_timer = 0.0
+    _peer_partner = null
+    velocity = Vector2.ZERO
+
+
+func _begin_peer_visit(other: Node2D) -> void:
+    _peer_partner = other
+    _peer_timer = _rng.randf_range(1.5, 2.8)
+    _peer_cooldown_left = _rng.randf_range(5.0, 8.0)
+    match temperament:
+        "friendly":
+            _peer_mode = "approach"
+            _set_animation(&"move")
+        "shy":
+            _peer_mode = "give_space"
+            _set_animation(&"move")
+        "territorial":
+            _peer_mode = "give_space" if global_position.distance_to(other.global_position) < 30.0 else "observe"
+            _set_animation(&"move" if _peer_mode == "give_space" else &"idle")
+        _:
+            # Inclusive slimes agressivos sao inteiramente pacificos entre si.
+            _peer_mode = "observe"
+            _set_animation(&"idle")
+    wild_peer_reaction.emit(species_id, str(other.get("species_id")), _peer_mode)
+
+
+func _tick_wild_peer(delta: float) -> bool:
+    # Fome, sede, absorcao e perigo do jogador possuem prioridade absoluta.
+    if life_state != "wandering" or need_level <= NEEDS.SEEK_BELOW or _social_mode != "none":
+        if _peer_mode != "none":
+            _end_peer_visit()
+        return false
+
+    if _peer_mode == "none":
+        _peer_check_left -= delta
+        if _peer_check_left > 0.0 or _peer_cooldown_left > 0.0:
+            return false
+        _peer_check_left = _rng.randf_range(2.5, 4.0)
+        if not is_instance_valid(world_guard) or not world_guard.has_method("find_nearby_wild_slime"):
+            return false
+        var other: Node2D = world_guard.call("find_nearby_wild_slime", self, 84.0) as Node2D
+        if other == null:
+            return false
+        _begin_peer_visit(other)
+
+    if not is_instance_valid(_peer_partner) or _peer_partner.is_queued_for_deletion():
+        _end_peer_visit()
+        return false
+    if str(_peer_partner.get("life_state")) != "wandering" or float(_peer_partner.get("need_level")) <= NEEDS.SEEK_BELOW:
+        _end_peer_visit()
+        return false
+
+    var distance: float = global_position.distance_to(_peer_partner.global_position)
+    if distance > 106.0:
+        _end_peer_visit()
+        return false
+    _peer_timer -= delta
+    if _peer_timer <= 0.0:
+        _end_peer_visit()
+        return false
+
+    if _peer_mode == "approach":
+        if distance > 29.0:
+            _move_social(_peer_partner.global_position - global_position, delta, 0.65)
+        else:
+            _peer_mode = "play"
+            _peer_timer = 1.4
+            velocity = Vector2.ZERO
+            _set_animation(&"happy")
+            _show_heart()
+            wild_peer_reaction.emit(species_id, str(_peer_partner.get("species_id")), "play")
+    elif _peer_mode == "give_space":
+        if distance < 35.0:
+            var retreat: Vector2 = global_position - _peer_partner.global_position
+            if retreat.length_squared() <= 0.001:
+                retreat = Vector2.RIGHT if get_instance_id() % 2 == 0 else Vector2.LEFT
+            _move_social(retreat, delta, 0.75)
+        else:
+            velocity = Vector2.ZERO
+            _set_animation(&"idle")
+    else:
+        velocity = Vector2.ZERO
+        # Observe e play sao pacificos, sem dano ou perseguicao.
+    return true
+
+
 func _wild_player() -> Node2D:
     if not is_instance_valid(world_guard):
         return null
