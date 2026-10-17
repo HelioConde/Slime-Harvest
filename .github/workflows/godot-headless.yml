@@ -93,6 +93,16 @@ jobs:
           fi
           grep -F "PASS fruit-terrain: all four fruit trees and six terrain patches validated" fruit-terrain.log
 
+      - name: Test wild slime reaction and attacks (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SlimeBehaviorTest.tscn --quit-after 600 2>&1 | tee wild-behavior.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL wild-behavior" wild-behavior.log; then
+            exit 1
+          fi
+          grep -F "PASS wild-behavior: flee, observe, affection, charged hits, cooldown and safe respawn" wild-behavior.log
+
       - name: Test wild slime ecology and water need (headless)
         shell: bash
         run: |
