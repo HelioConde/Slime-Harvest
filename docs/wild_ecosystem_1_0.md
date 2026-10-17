@@ -1,0 +1,40 @@
+# Wild Ecosystem 1.0 — congelamento da fundacao do mundo selvagem
+
+Escopo: Godot 2D. **Nao inclui captura, domesticacao, cuidado pelo jogador, mapa definitivo ou historia.**
+
+## Estado e criterios de aceite
+
+| Area | Estado | Criterio de conclusao |
+| --- | --- | --- |
+| P0 — Colisoes e mundo | Testes automatizados passando; QA visual pendente | Sem paredes invisiveis, atravessar agua exposta, atravessar objetos ou ficar preso |
+| P1 — Navegacao | Recalculo sob obstrucao e testes automatizados implementados; QA de trajetos longos pendente | Rotas validas em diferentes layouts e sem repeticao infinita de destinos inacessiveis |
+| P2 — Necessidades | 32 perfis e revalidacao da fonte antes de absorver; balanceamento pendente | Absorver apenas recursos acessiveis existentes, descanso e fadiga consistentes |
+| P3 — Relacoes entre slimes | Pendente | Slimes observar, fugir, formar afinidade ou reagir a outras especies sem o jogador |
+| P4 — Combate | Reacoes e dano basico testados; sistema de projeteis reais pendente | Ataque com telegráfico, colisoes, cooldown, escalonamento e defesa previsivel |
+| P5 — Populacao | Geracao inicial testada; ciclo de vida persistente pendente | Densidade controlada, desaparecimento e reposicao sem duplicatas |
+| P6 — Persistencia selvagem | Pendente | Identidade, posicao, energia, morte e respawn coerentes por slot e save legado |
+| P7 — Animacoes e sons | Parcial | Quadros coerentes, sem sliding, clipes corretos para os 32 perfis |
+| P8 — Desempenho e regressao | Testes headless; QA de longa duracao pendente | 60 FPS no PC de referencia com 32 slimes, 60 min sem falhas graves |
+
+## Conquistas de estabilidade
+
+- `tests/TerrainEdgeTest.tscn` testa agua real exposta e confirma que agua totalmente ocultada pelo gramado nao produz colisoes invisiveis. O teste expoe uma celula **apenas temporariamente em memoria** e restaura a pintura.
+- `scripts/slimes/world_population.gd` inclui barreiras fisicas do mundo na grade de navegacao e oferece `invalidate_navigation()` para atualizar a grade quando uma rota bloquear.
+- `scripts/slimes/slime_wander.gd` interrompe absorcao quando a fonte nao existe mais; nao recupera energia sem recurso valido.
+- `tests/SlimeSurvivalTest.tscn` verifica o desaparecimento da fonte, novos obstaculos e a liberacao da passagem apos sua remocao.
+- `tests/SlimeBehaviorTest.tscn` cobre medo, afeicao, curiosidade, ataques com aviso, cooldown, esquiva, linha de visao e prioridade da sobrevivencia.
+
+### Detalhe da camada de agua
+
+No `World.tscn` atual, as 336 celulas da camada `water` tambem estao cobertas por `grass2`. Portanto, a colisao precisa distinguir **agua visualmente exposta** de **agua logica sobreposta por solo**. Criar blocos fisicos em todas as celulas de `water` bloquearia area desenhada como grama. Ao pintar cursos de agua definitivos, atualizar ambas as camadas e revisar os contornos visuais.
+
+## Proximas etapas antes de mapear o jogo definitivo
+
+1. Interacao **slime x slime**: deteccao, limite de grupos e fuga de predadores.
+2. Sincronizacao de golpes/efeitos com hitboxes reais; evitar que linhas visuais sejam confundidas com projeteis fisicos.
+3. Persistencia do mundo selvagem por slot e testes de migracao/rollback.
+4. Ciclo de nascimento/morte natural e equilibrio dos habitats.
+5. Testes visuais de 32 especies, performance e sessao prolongada no Windows.
+6. Congelar recursos novos e repetir todos os testes antes de marcar **Wild Ecosystem 1.0 = aprovado**.
+
+**Regra de qualidade:** um teste automatizado verde e necessario, mas nao substitui os testes de aparencia, controle e estabilidade no jogo aberto. Nunca declarar o marco 100% antes dos dois tipos de validacao.
