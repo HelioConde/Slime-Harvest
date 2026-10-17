@@ -39,7 +39,8 @@
 - [x] Corrigir o teste de agua oculta, validando a fisica apenas da agua efetivamente exposta.
 - [x] Atualizar a navegacao dos slimes quando novos obstaculos surgirem ou forem removidos.
 - [x] Impedir absorcao de recursos indisponiveis.
-- [ ] Completar relacoes pacificas entre os proprios slimes: curiosidade, brincadeiras, afinidade, ajuda, convivencia e afastamento sem confronto.
+- [x] Implementar encontros selvagens sem jogador: aproximacao, brincadeira, curiosidade e afastamento pacifico, testados automaticamente.
+- [ ] Completar relacoes duradouras entre slimes: afinidades persistentes, ajuda, convivencia em grupos e afastamento sem confronto.
 - [ ] Testar projeteis e colisao de combate fisico, alem de efeitos visuais.
 - [ ] Persistir estados individuais dos slimes nos saves.
 - [ ] Concluir simulacao ecologica e limite de populacao por bioma.
