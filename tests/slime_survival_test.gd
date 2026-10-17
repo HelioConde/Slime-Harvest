@@ -46,6 +46,9 @@ func _run() -> void:
 	for kind in unique_needs:
 		var representative: Node2D = population.get_node(str(unique_needs[kind])) as Node2D
 		var site: Dictionary = population.call("find_need_target", str(kind), representative.global_position)
+		if site.is_empty():
+			var raw_sites: Array[Vector2] = population.call("_object_sites", str(kind).trim_suffix("s"))
+			print("DIAGNOSTIC slime-survival: need=", kind, " candidate_sites=", raw_sites.size(), " representative=", representative.global_position)
 		if not _check(not site.is_empty(), "habitat resource accessible: " + str(kind)):
 			return
 	var gota := population.get_node_or_null("gota") as CharacterBody2D
