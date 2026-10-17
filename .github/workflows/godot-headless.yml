@@ -93,6 +93,16 @@ jobs:
           fi
           grep -F "PASS fruit-terrain: all four fruit trees and six terrain patches validated" fruit-terrain.log
 
+      - name: Test wild slime ecology and water need (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SlimeSurvivalTest.tscn --quit-after 1200 2>&1 | tee slime-survival.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL slime-survival" slime-survival.log; then
+            exit 1
+          fi
+          grep -F "PASS slime-survival: species habitats, Gota hydration and wild exhaustion" slime-survival.log
+
       - name: Test generated world resources and persistence (headless)
         shell: bash
         run: |
