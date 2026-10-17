@@ -37,6 +37,17 @@ func _run() -> void:
 	var water_sites: Array[Vector2] = population.get("_water_sites")
 	if not _check(not water_sites.is_empty(), "shoreline provides water from grass2"):
 		return
+	# Cada uma das necessidades diferentes deve apontar para algo que exista no mapa.
+	var unique_needs: Dictionary = {}
+	for species in manifest["species"]:
+		var slime_id: String = str(species["id"])
+		var profile: Dictionary = NEEDS.for_species(slime_id)
+		unique_needs[str(profile["need"])] = slime_id
+	for kind in unique_needs:
+		var representative: Node2D = population.get_node(str(unique_needs[kind])) as Node2D
+		var site: Dictionary = population.call("find_need_target", str(kind), representative.global_position)
+		if not _check(not site.is_empty(), "habitat resource accessible: " + str(kind)):
+			return
 	var gota := population.get_node_or_null("gota") as CharacterBody2D
 	if not _check(gota != null and gota.get("need_type") == "water", "Gota has water as essential need"):
 		return
