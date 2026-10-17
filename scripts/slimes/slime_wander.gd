@@ -158,7 +158,7 @@ func _follow_need_path(delta: float) -> void:
     var direction: Vector2 = step.normalized()
     var next_point: Vector2 = global_position + direction * wander_speed * delta * 2.0
     if not _can_walk(next_point):
-        _stop_seeking()
+        _stop_seeking(true)
         return
     velocity = direction * wander_speed
     move_and_slide()
@@ -170,11 +170,11 @@ func _follow_need_path(delta: float) -> void:
         _stuck_seconds = 0.0
     _last_position = global_position
     if _stuck_seconds > 1.3:
-        _stop_seeking()
+        _stop_seeking(true)
 
 
 func _begin_absorbing() -> void:
-    if not _can_walk(global_position):
+    if not _resource_still_available() or not _can_walk(global_position):
         _stop_seeking()
         return
     life_state = "absorbing"
@@ -185,6 +185,9 @@ func _begin_absorbing() -> void:
 
 
 func _finish_absorbing() -> void:
+    if not _resource_still_available():
+        _stop_seeking()
+        return
     need_level = NEEDS.REFILL_TO
     _unmet_seconds = 0.0
     if _sprite != null:
@@ -200,7 +203,9 @@ func _finish_absorbing() -> void:
     _set_animation(&"happy")
 
 
-func _stop_seeking() -> void:
+func _stop_seeking(blocked_route: bool = false) -> void:
+    if blocked_route and is_instance_valid(world_guard) and world_guard.has_method("invalidate_navigation"):
+        world_guard.call("invalidate_navigation")
     _moving = false
     velocity = Vector2.ZERO
     life_state = "wandering"
@@ -209,6 +214,15 @@ func _stop_seeking() -> void:
     # Permite tentar outra rota na proxima verificacao.
     _search_left = minf(_search_left, 3.0)
     _set_animation(&"idle")
+
+
+func _resource_still_available() -> bool:
+    if not is_instance_valid(world_guard):
+        return false
+    if not world_guard.has_method("is_need_resource_available"):
+        # Preserve lightweight previews which use mock habitat providers.
+        return true
+    return bool(world_guard.call("is_need_resource_available", need_type, _goal))
 
 
 func _show_fatigue() -> void:
