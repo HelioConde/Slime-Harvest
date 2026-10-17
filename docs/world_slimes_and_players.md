@@ -4,7 +4,7 @@
 
 - `World.tscn` instancia `SlimePopulation`, que carrega as 32 especies do manifesto do bestiario (`assets/slimes/bestiary/bestiario.json`). Usa uma unidade de cada especie, em pontos livres do gramado, sem sobrescrever casas, terreno ou saves.
 - Cada unidade tem `CharacterBody2D`, collider circular e `slime_wander.gd`, com deslocamento e pausas aleatorias, desvio de bloqueios fisicos da layer World e limite de distancia da origem. Nao anda sobre agua ou fora do gramado; outras especies nao precisam de cenas reeditadas.
-- **IA selvagem**: as 32 especies possuem necessidades, temperamento, fuga, curiosidade, afeicao e ataques territoriais/agressivos; nao executam trabalhos de fazenda nem salvam posicoes. Os slimes reaparecem distribuidos ao abrir o World. O bestiario continua independente.
+- **IA selvagem**: as 32 especies possuem necessidades, temperamento, fuga, curiosidade, afeicao e ataques territoriais/agressivos somente contra o jogador; slimes nunca atacam outros slimes. Nao executam trabalhos de fazenda nem salvam posicoes. Os slimes reaparecem distribuidos ao abrir o World. O bestiario continua independente.
 - O jogador usa os PNGs novos de `assets/Characters/new` com nomes de animacao iguais aos antigos (`idle_*, walk_*, run_*, axe_*, pick_*, hoe_*, watering_*`). Os PNGs nao foram alterados ou regravados.
 - Ao iniciar uma nova fazenda, escolha Masculino/Feminino junto ao nome. A escolha e salva no metadado do slot. Saves antigos continuam disponiveis e usam masculino por padrao.
 - O PNG masculino especifico de idle nao estava entre as 15 folhas de 8x4 importadas; ate esse material chegar, a postura idle usa o primeiro frame de caminhada do mesmo visual. A transicao nao usa recortes do atlas antigo. O idle feminino usa a folha dedicada.
@@ -64,3 +64,7 @@ Gota possui postura territorial e a animacao `disparar_jato` com trilha visual a
 
 Testes: `tests/SlimeBehaviorTest.tscn` (fuga, curiosidade, afeicao, aviso de ataque, dano, recarga, defesa do Gota e respawn); `tests/SlimeSurvivalTest.tscn` (habitat, absorcao e fome). Testes visuais locais no Godot ainda sao recomendados.
 
+
+## Regra de convivencia selvagem
+
+**Slimes nao lutam entre si.** Independentemente de agressividade ou territorialidade, os slimes so podem interagir uns com os outros pacificamente: observar, brincar, mostrar afeicao, compartilhar recursos, ajudar ou se afastar. Slimes hostis podem atacar o **jogador**, mas nao outros slimes. Proibidos combate intraespecies, predacao, dano ou morte causada por outro slime. Nao implementar captura/domesticacao nesta fase.
