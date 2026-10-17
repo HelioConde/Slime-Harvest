@@ -8,9 +8,9 @@ Escopo: Godot 2D. **Nao inclui captura, domesticacao, cuidado pelo jogador, mapa
 
 ## Progressao futura que deve orientar esta fundacao
 
-Cada territorio tera **uma especie nativa** e um chefe regional condicionado ao ambiente. Cumprir objetivos especificos (como derrotar monstros hostis ou oferecer cargas de lava no vulcao) faz aparecer esse chefe. Apos derrota, os slimes daquela regiao ficam mais receptivos a amizade, sem deixar de ser selvagens. **Slimes nao lutam entre si**, e os alvos dos objetivos de combate nao sao slimes.
+Cada territorio tera **uma especie nativa** e um chefe regional. O jogador podera liberar o encontro e pacificar a regiao por **rotas alternativas equivalentes**: lutar (opcional), cozinhar e oferecer pratos ao chefe, concluir missoes de NPCs, restaurar o ambiente ou combinar essas atividades. **Nenhuma rota pacifica pode exigir matar ou derrotar seres.** Apos **pacificar** o chefe por qualquer caminho, os slimes daquele territorio ficam mais receptivos a amizade, sem deixar de ser selvagens. **Slimes nao lutam entre si**; monstros hostis de objetivos opcionais de combate nao sao slimes.
 
-O motor de objetivos, chefes e pacificacao sera desenvolvido/testado em cena artificial **depois** de estabilizar o Wild Ecosystem 1.0, mas **antes** de construir o mapa definitivo e a historia. Nao implementar captura ou domesticacao agora.
+O motor de objetivos, culinaria, eventos de NPCs, encontros, resolucoes pacificas e pacificacao sera desenvolvido/testado em cena artificial **depois** de estabilizar o Wild Ecosystem 1.0, mas **antes** de construir o mapa definitivo e a historia. Nao implementar captura ou domesticacao agora.
 
 Ver [Especificacao de territorios e amizade](territorios_bosses_afinidade.md).
 
