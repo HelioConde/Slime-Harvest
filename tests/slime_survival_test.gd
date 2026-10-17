@@ -101,6 +101,7 @@ func _run() -> void:
 	await get_tree().physics_frame
 	population.call("invalidate_navigation")
 	population.call("get_ground_path", path_origin, path_origin + Vector2(16, 0))
+	nav = population.get("_navigation")
 	if not _check(not nav.is_point_solid(blocked_cell), "removing obstacle restores a walkable cell"):
 		return
 
