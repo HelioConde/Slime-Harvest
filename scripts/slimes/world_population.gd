@@ -12,6 +12,7 @@ var _occupied: Array[Vector2] = []
 var _water_sites: Array[Vector2] = []
 var _grass_sites: Array[Vector2] = []
 var _navigation: AStarGrid2D
+var _navigation_dirty: bool = true
 
 
 
@@ -152,6 +153,10 @@ func _prepare_habitats() -> void:
     _build_navigation()
 
 
+func invalidate_navigation() -> void:
+    _navigation_dirty = true
+
+
 func _build_navigation() -> void:
     _navigation = AStarGrid2D.new()
     _navigation.region = grass.get_used_rect()
@@ -162,8 +167,12 @@ func _build_navigation() -> void:
     for y in range(rect.position.y, rect.end.y):
         for x in range(rect.position.x, rect.end.x):
             var cell := Vector2i(x, y)
-            if grass.get_cell_source_id(cell) == -1 or (water != null and water.get_cell_source_id(cell) != -1):
+            # O AStar tambem respeita barreiras fisicas: casas, arvores,
+            # pedras e terreno. Nao basta consultar apenas a grama.
+            var center: Vector2 = grass.to_global(grass.map_to_local(cell))
+            if not is_safe_ground(center):
                 _navigation.set_point_solid(cell)
+    _navigation_dirty = false
 
 
 func _near_water(point: Vector2, max_distance: float) -> bool:
@@ -241,6 +250,8 @@ func _object_sites(need: String) -> Array[Vector2]:
 
 func get_ground_path(from_point: Vector2, destination: Vector2) -> PackedVector2Array:
     var result := PackedVector2Array()
+    if _navigation == null or _navigation_dirty:
+        _build_navigation()
     if _navigation == null:
         return result
     var start: Vector2i = grass.local_to_map(grass.to_local(from_point))
@@ -256,3 +267,35 @@ func get_ground_path(from_point: Vector2, destination: Vector2) -> PackedVector2
         result.append(grass.to_global(grass.map_to_local(ids[i])))
     result.append(destination)
     return result
+
+
+## Confirma que o objeto ainda existe antes de entregar energia ao slime.
+## Evita absorver flores, madeira ou pedras que outro evento removeu.
+func is_need_resource_available(need: String, world_point: Vector2) -> bool:
+    if not is_safe_ground(world_point):
+        return false
+    match need:
+        "water":
+            return _near_water(world_point, 12.0)
+        "soil", "grass", "open_air", "sun":
+            return true
+        "trees", "shade":
+            return _near_object_resource("tree", world_point)
+        "wood":
+            return _near_object_resource("wood", world_point)
+        "rocks":
+            return _near_object_resource("rock", world_point)
+        "flowers":
+            return _near_object_resource("flower", world_point)
+        "plants":
+            return _near_object_resource("plant", world_point)
+        "mushrooms":
+            return _near_object_resource("mushroom", world_point)
+    return false
+
+
+func _near_object_resource(kind: String, point: Vector2) -> bool:
+    for site in _object_sites(kind):
+        if site.distance_squared_to(point) < 16.0 * 16.0:
+            return true
+    return false
