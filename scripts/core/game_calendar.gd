@@ -13,11 +13,14 @@ var seconds_into_day: float = 0.0
 var _planting_days: Dictionary = {}
 var _since_save: float = 0.0
 var _day_label: Label
+var _day_chip: PanelContainer
 
 
 func _ready() -> void:
     _load_calendar()
     _create_day_label()
+    UISettings.ui_scale_changed.connect(_apply_hud_scale)
+    _apply_hud_scale()
     _refresh_label()
 
 
@@ -114,6 +117,12 @@ func _create_day_label() -> void:
     _day_label.add_theme_font_size_override("font_size", 10)
     _day_label.add_theme_color_override("font_color", Color("#edf4e3"))
     chip.add_child(_day_label)
+    _day_chip = chip
+
+
+func _apply_hud_scale() -> void:
+    if is_instance_valid(_day_chip):
+        _day_chip.scale = Vector2.ONE * UISettings.hud_scale
 
 
 func _refresh_label() -> void:
