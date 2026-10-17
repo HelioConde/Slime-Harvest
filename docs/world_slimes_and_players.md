@@ -20,7 +20,7 @@
 ## Limitacoes conhecidas
 
 - Os quadros gerados por IA tem espacamento 1774x887 dividido em 8 colunas e 4 linhas; recortes podem necessitar ajustes visuais (alinhar pes e armas). O runtime usa as texturas originais e escala para aproximar 48px da arte anterior.
-- Ja existem reacoes selvagens de proximidade e ataques simples ao jogador. Ainda faltam combate profundo, interacoes entre especies, tarefas, domesticacao, salvamento de posicao e reproducao.
+- Ja existem reacoes selvagens ao jogador e visitas pacificas entre especies (observar, aproximar, brincar e se afastar). Ainda faltam combate profundo, interacoes duradouras entre especies, tarefas, domesticacao, salvamento de posicao e reproducao.
 - Teste visual local no Godot e validacao do desempenho com 32 entidades sao necessarios.
 
 ## Correcao de visibilidade (16/10/2026)
@@ -68,3 +68,9 @@ Testes: `tests/SlimeBehaviorTest.tscn` (fuga, curiosidade, afeicao, aviso de ata
 ## Regra de convivencia selvagem
 
 **Slimes nao lutam entre si.** Independentemente de agressividade ou territorialidade, os slimes so podem interagir uns com os outros pacificamente: observar, brincar, mostrar afeicao, compartilhar recursos, ajudar ou se afastar. Slimes hostis podem atacar o **jogador**, mas nao outros slimes. Proibidos combate intraespecies, predacao, dano ou morte causada por outro slime. Nao implementar captura/domesticacao nesta fase.
+
+## Convivo selvagem sem combate (17/10/2026)
+
+`SlimePopulation` agora oferece `find_nearby_wild_slime()`, que encontra individuos selvagens vivos e saudaveis proximos, de maneira local e esparsa. `slime_wander.gd` alterna encontros de curta duracao e com cooldown: curiosos observam; amigaveis aproximam-se, brincam e mostram um coracao; medrosos e territoriais respeitam o espaco; agressivos **somente observam outros slimes**. Nao ha dano, predacao, captura, pontos de amizade persistentes ou ataques entre especies.
+
+As necessidades de agua, comida e habitat tem prioridade; o encontro acaba se faltar energia, se o parceiro for removido ou se o jogador trouxer perigo. A IA funciona mesmo sem o jogador na cena. O teste dedicado `tests/SlimePeerTest.tscn` valida estas regras, incluindo o encerramento seguro de encontros. Ficam pendentes afinidades persistentes, ajuda, convivencia em grupos, testes visuais e a criacao dos territorios definitivos.
