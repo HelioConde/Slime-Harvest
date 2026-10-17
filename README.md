@@ -16,6 +16,7 @@ Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolv
 - Casas: HouseBuilder integrado ao mapa principal scenes/world/World.tscn.
 - Arte: tilesets, personagens, flores, arvores, pedras e cogumelos presentes em assets/ e scenes/.
 - Catalogo: 78 cenas referenciadas, incluindo as 64 restauradas do historico.
+- Mundo selvagem: 32 especies de slimes com necessidade ecologica, cinco temperamentos (medroso, curioso, amigavel, territorial e agressivo), fuga, afeicao, ataque com aviso/cooldown e vida simples do jogador. Nao ha captura nem domesticacao.
 - Checagem estrutural de referencias: `py -3 tools/validate_godot_project.py`.
 
 ## Executar
