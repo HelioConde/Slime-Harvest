@@ -2,6 +2,10 @@
 
 Escopo: Godot 2D. **Nao inclui captura, domesticacao, cuidado pelo jogador, mapa definitivo ou historia.**
 
+## Regra permanente de design
+
+**Nao ha luta entre slimes.** Nenhum slime selvagem ataca, fere, persegue para combate ou mata outro slime. Diferencas de temperamento produzem apenas brincadeiras, curiosidade, amizade, ajuda ou afastamento pacifico. O combate selvagem existente tem como alvo exclusivamente o jogador. Nao introduzir predacao, ataques entre especies ou disputas violentas em etapas futuras.
+
 ## Estado e criterios de aceite
 
 | Area | Estado | Criterio de conclusao |
@@ -9,7 +13,7 @@ Escopo: Godot 2D. **Nao inclui captura, domesticacao, cuidado pelo jogador, mapa
 | P0 — Colisoes e mundo | Testes automatizados passando; QA visual pendente | Sem paredes invisiveis, atravessar agua exposta, atravessar objetos ou ficar preso |
 | P1 — Navegacao | Recalculo sob obstrucao e testes automatizados implementados; QA de trajetos longos pendente | Rotas validas em diferentes layouts e sem repeticao infinita de destinos inacessiveis |
 | P2 — Necessidades | 32 perfis e revalidacao da fonte antes de absorver; balanceamento pendente | Absorver apenas recursos acessiveis existentes, descanso e fadiga consistentes |
-| P3 — Relacoes entre slimes | Pendente | Slimes observar, fugir, formar afinidade ou reagir a outras especies sem o jogador |
+| P3 — Relacoes pacificas entre slimes | Pendente | Slimes observar, brincar, formar afinidades, compartilhar areas e se afastar sem lutar |
 | P4 — Combate | Reacoes e dano basico testados; sistema de projeteis reais pendente | Ataque com telegráfico, colisoes, cooldown, escalonamento e defesa previsivel |
 | P5 — Populacao | Geracao inicial testada; ciclo de vida persistente pendente | Densidade controlada, desaparecimento e reposicao sem duplicatas |
 | P6 — Persistencia selvagem | Pendente | Identidade, posicao, energia, morte e respawn coerentes por slot e save legado |
@@ -30,7 +34,7 @@ No `World.tscn` atual, as 336 celulas da camada `water` tambem estao cobertas po
 
 ## Proximas etapas antes de mapear o jogo definitivo
 
-1. Interacao **slime x slime**: deteccao, limite de grupos e fuga de predadores.
+1. Interacao **slime x slime** sem combate: deteccao, curiosidade, aproximacao, brincadeiras, afinidade, ajuda, coexistencia e afastamento pacifico.
 2. Sincronizacao de golpes/efeitos com hitboxes reais; evitar que linhas visuais sejam confundidas com projeteis fisicos.
 3. Persistencia do mundo selvagem por slot e testes de migracao/rollback.
 4. Ciclo de nascimento/morte natural e equilibrio dos habitats.
