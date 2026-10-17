@@ -21,7 +21,7 @@ Ver [Especificacao de territorios e amizade](territorios_bosses_afinidade.md).
 | P0 — Colisoes e mundo | Testes automatizados passando; QA visual pendente | Sem paredes invisiveis, atravessar agua exposta, atravessar objetos ou ficar preso |
 | P1 — Navegacao | Recalculo sob obstrucao e testes automatizados implementados; QA de trajetos longos pendente | Rotas validas em diferentes layouts e sem repeticao infinita de destinos inacessiveis |
 | P2 — Necessidades | 32 perfis e revalidacao da fonte antes de absorver; balanceamento pendente | Absorver apenas recursos acessiveis existentes, descanso e fadiga consistentes |
-| P3 — Relacoes pacificas entre slimes | Pendente | Slimes observar, brincar, formar afinidades, compartilhar areas e se afastar sem lutar |
+| P3 — Relacoes pacificas entre slimes | Parcial: visitas espontaneas, curiosidade, brincadeira e respeito ao espaco testados | Afinidades duradouras, ajuda e convivencia em grupos ainda pendentes |
 | P4 — Combate | Reacoes e dano basico testados; sistema de projeteis reais pendente | Ataque com telegráfico, colisoes, cooldown, escalonamento e defesa previsivel |
 | P5 — Populacao | Geracao inicial testada; ciclo de vida persistente pendente | Densidade controlada, desaparecimento e reposicao sem duplicatas |
 | P6 — Persistencia selvagem | Pendente | Identidade, posicao, energia, morte e respawn coerentes por slot e save legado |
@@ -35,6 +35,7 @@ Ver [Especificacao de territorios e amizade](territorios_bosses_afinidade.md).
 - `scripts/slimes/slime_wander.gd` interrompe absorcao quando a fonte nao existe mais; nao recupera energia sem recurso valido.
 - `tests/SlimeSurvivalTest.tscn` verifica o desaparecimento da fonte, novos obstaculos e a liberacao da passagem apos sua remocao.
 - `tests/SlimeBehaviorTest.tscn` cobre medo, afeicao, curiosidade, ataques com aviso, cooldown, esquiva, linha de visao e prioridade da sobrevivencia.
+- `tests/SlimePeerTest.tscn` valida encontros espontaneos e **nao violentos** entre slimes (amizade, brincadeira, curiosidade e afastamento), a ausencia de ataques entre slimes e a prioridade das necessidades vitais.
 
 ### Detalhe da camada de agua
 
