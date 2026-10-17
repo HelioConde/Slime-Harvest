@@ -10,8 +10,10 @@ const DATA_FILES: Array[String] = [
 	"slimekeepers_world_hoeing_v1.json",
 	"slimekeepers_felled_trees_v1.json",
 	"slimekeepers_equipment_v1.json",
+	"slimekeepers_world_spawns_v1.json",
 ]
 const PROGRESS_FILES: Array[String] = [
+	"slimekeepers_world_spawns_v1.json",
 	"house_terrain_test.json",
 	"slimekeepers_calendar_v1.json",
 	"slimekeepers_resources_v1.json",
@@ -269,6 +271,7 @@ func activate(slot: int) -> bool:
 
 
 const WORLD_FILES: Array[String] = [
+	"slimekeepers_world_spawns_v1.json",
 	"house_terrain_test.json",
 	"slimekeepers_world_hoeing_v1.json",
 	"slimekeepers_felled_trees_v1.json",
