@@ -1,94 +1,97 @@
-# Territorios, chefes regionais e amizade — especificacao de design (Godot 2D)
+# Territorios, chefes e caminhos de convivencia — especificacao (Godot 2D)
 
-> **Estado: design aprovado para planejamento, NAO implementado.**
-> Esta especificacao nao autoriza iniciar o desenho do mapa definitivo, a historia, a captura ou domesticacao agora.
-> Primeiro estabilizar o sistema Wild Ecosystem 1.0 e seus testes.
+> **Estado: design para desenvolvimento futuro, NAO implementado.**
+> Antes de desenhar o mapa definitivo e a historia, estabilizar o Wild Ecosystem 1.0 e testar o motor generico de progresso regional em um mapa artificial.
+> Captura, domesticacao e cuidados de slime nao fazem parte da fase atual.
 
-## Regra principal
+## Regra central: liberdade de estilo de jogo
 
-1. Cada territorio tem **uma especie nativa de slime**, com habitat, necessidade ambiental e temperamento proprios.
-2. A regiao comeca com slimes selvagens **mais cautelosos, desconfiados ou defensivos**.
-3. O chefe regional so aparece quando o jogador cumpre **condicoes ligadas ao ambiente** daquele territorio.
-4. O chefe so pode ser considerado derrotado mediante um evento de combate/objetivo registrado pelo sistema.
-5. **Depois de derrotar o chefe**, os slimes nativos daquele territorio ficam mais amigaveis, se aproximam com mais facilidade e aceitam melhor futuros sistemas de amizade.
-6. O resultado e **local**: libertar um territorio nao altera os slimes de outro.
-7. **Slimes nao lutam entre si.** Criaturas selvagens podem reagir/atacar o jogador segundo seu temperamento, mas nunca atacam outros slimes. Quando uma condicao exigir derrotar X monstros, trata-se de **inimigos hostis especificos**, nao dos slimes pacificos do bioma.
-8. Aumentar a facilidade de amizade **nao significa domesticar, capturar ou adicionar o slime ao inventario**. Essas mecanicas permanecem adiadas.
+- **Cada territorio tera uma especie nativa de slime**, com habitat, necessidades, comportamento e chefe regional proprios.
+- O jogador pode conquistar a confianca de uma regiao **sem atacar, derrotar ou matar nenhum inimigo**. O caminho pacifico deve ser completo e viavel.
+- Existem varias **vias equivalentes de resolucao**, com desafios diferentes: **combate opcional**, **culinaria/oferendas**, **missoes e diplomacia com NPCs**, **restauracao do ambiente** e **combinacoes** de atividades.
+- Cada caminho deve poder conduzir a um **encontro com o chefe** e a um **desfecho regional positivo**, sem forcar um combate ou uma receita obrigatoria para todos.
+- Depois que o chefe for **pacificado, convencido, satisfeito ou vencido**, a regiao fica pacificada; os slimes nativos ficam mais receptivos e futuros vinculos de amizade se tornam mais faceis.
+- Um desfecho pacifico nao e uma derrota disfarcada: mostrar animacoes, dialogos, gratidao e consequencias coerentes com a escolha.
+- Jogadores podem fazer atividades de caminhos distintos sem perder o progresso. Nenhum sistema deve obrigar a escolher uma classe moral, faccao ou via irreversivel.
+- **Slimes nunca lutam entre si.** Objetivos de combate, quando existirem, envolvem monstros hostis separados dos slimes da regiao ou um confronto opcional com o proprio chefe. Nao exigir matar slimes.
+- Chefes e slimes continuam criaturas vivas e com necessidades mesmo apos pacificar a area. Pacificacao nao significa captura, domesticacao ou acesso automatico ao inventario.
 
-## Ciclo de um territorio
+## Fluxo nao linear de um territorio
 
-`selvagem_bloqueado` -> `condicao_ambiental_cumprida` -> `chefe_ativo` -> `chefe_derrotado` -> `regiao_pacificada`
+`explorando` -> `caminhos_de_progresso` -> `encontro_com_chefe` -> `resolucao_da_regiao` -> `regiao_pacificada`
 
-- **Selvagem bloqueado:** a condicao de aparecimento do chefe ainda nao foi completada; slimes podem fugir, observar ou defender o habitat.
-- **Condicao cumprida:** o sistema confirma os objetivos e autoriza o surgimento do chefe em um local seguro e determinado.
-- **Chefe ativo:** o chefe regional esta presente; se o jogador sair, retomar sem duplicar o chefe ou perder progresso.
-- **Chefe derrotado:** registrar derrota uma unica vez e emitir um evento local.
-- **Regiao pacificada:** aplicar o modificador de comportamento/afinidade somente aos slimes da especie nativa do territorio.
+**Caminhos de progresso (paralelos e acumulaveis):**
 
-*Importante:* a convivencia amigavel **antes** da derrota nao precisa ser impossivel; a derrota reduz a desconfiança e a dificuldade de criar laços. Os valores numericos serao balanceados e testados em uma etapa futura.
+1. **Aventura/combate:** cumprir objetivos de aventura, eventualmente derrotar monstros hostis, despertar/desafiar o chefe e vence-lo em combate opcional.
+2. **Culinaria/acolhimento:** descobrir gostos e restricoes alimentares do chefe; cultivar, coletar ou trocar ingredientes; preparar e servir um prato relevante.
+3. **NPCs/diplomacia:** conhecer moradores, completar missoes, descobrir a causa do problema e negociar com o chefe.
+4. **Ecologia/exploracao:** recuperar lugares degradados, reparar estruturas naturais ou cumprir rituais ambientais sem combate.
+5. **Misto:** parte das missoes, uma receita e uma tarefa ambiental podem completar o mesmo progresso sem exigir nenhuma rota inteira.
 
-## Exemplos de condicoes ambientais (ilustrativos; X ainda a definir)
+**Gatilho de encontro:** a definicao regional descreve diferentes formas de abrir o encontro (ex.: desafio de combate OU presente culinario OU cadeia de missoes). Nao exigir *todos* os tipos de gatilho quando forem alternativas. Durante o encontro o jogador pode optar por resolver pacificamente, mesmo que tenha aberto o caminho por combate, caso as condicoes correspondentes estejam completas.
 
-| Exemplo de territorio | Especie nativa | Condicao para fazer aparecer o chefe | Transformacao apos o chefe |
+**Resolucao:** registrar `resolution_method` como `combat`, `culinary`, `diplomacy`, `restoration` ou `mixed` e `resolved=true`. O estado `boss_defeated` continua disponivel apenas como dado especifico de vitoria por combate, **nao** como exigencia de progresso.
+
+**Amizade regional:** a pacificacao e local, nao global; aumenta receptividade e reduz medo/hostilidade entre slimes nativos e o jogador. Valores serao balanceados depois. Ja deve ser possivel existir afeicao limitada antes do encontro; vencer ou convencer o chefe facilita a confianca, nao a inventa magicamente.
+
+## Exemplos apenas para prototipo do motor (nao canonicos)
+
+| Territorio | Especie nativa | Rota de aventura | Rota pacifica alternativa |
 | --- | --- | --- | --- |
-| Margens do lago | Gota | Restaurar X pontos de agua / concluir um evento aquatico | Gotas mais confiantes na presenca do jogador |
-| Vulcao | Brasinha | Entregar ou lancar X cargas de lava em pontos especificos do vulcao | Brasinhas menos hostis e mais receptivos |
-| Pedreiras | Pedrito | Derrotar X monstros **hostis** das minas ou reativar marcos rochosos | Pedritos reduzem a defesa territorial |
-| Bosque | Brotinho | Recuperar X pontos de vegetacao ou resolver uma anomalia ambiental | Brotinhos se aproximam com maior frequencia |
+| Lago | Gota | Superar uma ameaca hostil que ameaca a agua | Preparar uma refeicao hidratante, restaurar uma nascente ou ajudar o guardiao por missao de NPC |
+| Vulcao | Brasinha | Desafiar o chefe ao concluir objetivos de aventura | Cozinhar um prato especial de calor, oferecer X cargas de lava em receptaculos ou resolver uma missao de mineradores |
+| Pedreiras | Pedrito | Derrotar X monstros hostis da mina | Preparar comida mineral, consertar marcos rochosos ou negociar com exploradores locais |
+| Bosque | Brotinho | Resolver uma ameaca hostil ao bosque | Cultivar ingredientes, cozinhar uma refeicao, reflorestar ou ajudar moradores |
 
-Esses exemplos **nao** definem o mapa, o enredo, os nomes oficiais de chefes nem as quantidades definitivas. Sao exemplos para validar o motor de objetivos.
+Exemplos nao fixam mapas, narrativa, numero X, boss especifico, receitas finais ou especies adicionais.
 
-## Requisitos de arquitetura antes de criar os mapas
+## Motor de dados desacoplado dos mapas
 
-### Dados independentes do mapa
+Definicao de cada territorio:
+- `territory_id`: identificador persistente e unico.
+- `native_species_id`: ID existente no bestiario.
+- `biome_id` e regras ambientais.
+- `boss_id` e regras de apresentacao do encontro.
+- `progress_routes[]`: varias rotas independentes, cada qual com `route_id`, `route_type`, `requirements[]` e `completion_condition`.
+- `encounter_unlock`: expressao de alternativas (**OR**) e, dentro de cada rota, requisitos combinados (**AND**) quando necessario.
+- `resolution_options[]`: metodos aceitos para resolver o encontro sem violencia obrigatoria.
+- `boss_encounter_state`: `locked`, `available`, `active` ou `closed`.
+- `resolved`, `resolution_method`, `pacified` e modificadores regionais de afinidade.
 
-Uma definicao de territorio devera ter, no minimo:
-- `territory_id` estavel e unico.
-- `native_species_id` existente no bestiario.
-- `biome_id`/regras de habitat e limites fisicos.
-- `boss_id` e regras de spawn/despawn seguro.
-- Uma lista de `trigger_requirements` baseada em eventos validados, com alvos configuraveis.
-- `state` do territorio e seu `pacified` booleano derivado do estado.
-- Multiplicadores configuraveis de confianca/amistosidade **antes/depois**, sem alterar o temperamento de todos os slimes do jogo.
+Eventos previstos (nao implementados):
+- `enemy_defeated(enemy_id, territory_id, event_id)` — somente inimigos hostis permitidos, nunca slimes.
+- `recipe_prepared(recipe_id, quality, event_id)` e `food_offered(boss_id, recipe_id, quantity, territory_id, event_id)` — validar ingrediente/receita, qualidade opcional e consumo real uma vez.
+- `npc_quest_completed(quest_id, territory_id, event_id)` — apenas missao concluida de fato.
+- `environment_restored(objective_id, territory_id, event_id)` e `environment_offering(location_id, resource_id, quantity, territory_id, event_id)` — entrega validada.
+- `boss_resolved(boss_id, territory_id, resolution_method, event_id)` — um unico fechamento para qualquer caminho; `boss_defeated` e apenas uma das origens opcionais.
 
-### Eventos que o motor devera suportar
+## Salvamento e protecoes
 
-- `enemy_defeated(enemy_type, territory_id)`: conta **somente** inimigos hostis autorizados no territorio, sem duplicacao de mortes.
-- `environment_offering(altar_or_location_id, resource_id, quantity, territory_id)`: valida a entrega/uso ambiental (ex.: lava), descontando recurso apenas quando o evento realmente acontecer.
-- `environment_restored(objective_id, territory_id)`: objetivo ambiental concluido e confirmado.
-- `boss_defeated(boss_id, territory_id)`: registra o fim do encontro uma vez e ativa a pacificacao.
+- Salvar por slot progresso **separado por territorio, rota e objetivo**, eventos processados, estado do encontro, metodo de resolucao e pacificacao.
+- Repetir um evento, recarregar, trocar de mapa ou voltar ao encontro nao duplica recompensas, chefe, progresso nem desconta comida/recursos novamente.
+- Objetivos de tipos diferentes nao devem se substituir indevidamente; uma rota pacifica nao depende de mortes ou vitorias em combate.
+- Nao sobrescrever saves antigos; definir migracao para territorios ainda inexistentes.
+- Instanciar o chefe em local seguro para qualquer rota e permitir sair/retomar um encontro sem perder progresso.
+- Nao obrigar violencia por causa do desfecho escolhido; recompensas **funcionalmente equivalentes**, podendo variar em cosmeticos, cenas e dialogos.
+- A convivencia dos slimes entre si permanece nao violenta independentemente da rota.
 
-### Persistencia e consistencia
+## Testes de aceitacao previstos
 
-- Salvar por slot: `territory_id`, progresso validado dos gatilhos, estado atual, encontro ativo/encerrado e chefe derrotado.
-- Mudanca de mapa, pausa, derrota do jogador, fechamento e recarregamento **nao podem duplicar** chefes, itens oferecidos ou progresso.
-- Contadores nunca ultrapassam a meta e nao contam mortes/eventos de territorios diferentes.
-- O chefe nao deve nascer dentro de casa, parede, lago nao navegavel ou objetos.
-- Atualizacao de versao devera aceitar territorios ainda inexistentes em saves antigos.
+- Cada territorio tem exatamente uma especie nativa configurada.
+- Um jogador passa por TODA a progressao regional **sem atacar, matar ou derrotar nenhum ser**.
+- Uma rota de combate e uma pacifica podem chegar ao mesmo estado `pacified=true`.
+- Receitas/outras oferendas exigem ingredientes corretos e nao debitam itens em falhas; entregas repetidas nao contam em dobro.
+- Concluir missao de NPC e validar gatilho ambiental liberam encontro de maneira independente.
+- Progresso misto funciona, sem bloqueio irreversivel entre rotas.
+- O chefe fica disponivel so com os requisitos aplicaveis completos e nao aparece duas vezes.
+- O resultado modifica APENAS os slimes do territorio correspondente e sobrevive a salvar/carregar.
+- Nenhum slime machuca outro slime; nao existem requisitos de matar slimes.
+- Captura, domesticacao e sistemas de cuidado nao sao implementados nesta fase.
 
-### Comportamento selvagem apos a pacificacao
+## Sequencia de producao
 
-- Permanece selvagem e com sua necessidade de agua, minerais, plantas etc.
-- Reacoes ao jogador tornam-se menos hostis/medrosas de forma **regional**.
-- Estados de percepcao, fuga, curiosidade e afeto continuam baseados na especie e na situacao.
-- A futura facilidade de amizade usa o modificador regional; nao liberar automaticamente captura, inventario, tarefas ou cuidados.
-- Slimes continuam com convivencia pacifica entre si.
+1. **Agora:** finalizar o laboratorio selvagem Wild Ecosystem 1.0, convivencia pacifica, navegacao, animacoes, persistencia e desempenho.
+2. **Depois:** construir motor generico de territorios, rotas alternativas, receitas, eventos de NPC, encontro, resolucao e pacificacao em **cena artificial de testes**.
+3. **Por ultimo:** desenhar mapa e historia oficiais e inserir objetivos, receitas, dialogos, personagens e chefes reais.
 
-## Testes de aceitacao futuros
-
-- Uma especie nativa por territorio; perfis nao se misturam indevidamente.
-- Cada tipo de gatilho funciona com quantidades configuraveis e objetivo corretamente filtrado por territorio.
-- O chefe nao surge antes de **todas** as condicoes obrigatorias.
-- O chefe surge **uma unica vez** quando elas sao satisfeitas; eventos repetidos nao criam duplicatas.
-- Chefe ativo e progresso restaurados apos salvar/carregar; derrotar ativa a pacificacao de apenas uma regiao.
-- Reducao demonstravel da hostilidade/fuga e maior abertura a amizade **apos** a pacificacao, respeitando necessidades vitais.
-- Nenhuma luta entre slimes e nenhum objetivo exige matar slimes.
-- Sem captura, domesticacao ou cuidados do jogador nesta fase tecnica.
-
-## Sequencia de desenvolvimento
-
-1. **Agora:** concluir Wild Ecosystem 1.0, interacoes pacificas, navegacao e persistencia de vida selvagem.
-2. **Antes dos mapas:** construir/testar motor generico de territorio, eventos, chefes e pacificacao em uma **cena artificial de teste**, sem lore.
-3. **Depois de aprovar o motor:** desenhar mapa definitivo e historia e preencher definicoes concretas de regioes, monstros hostis e chefes.
-
-Documentos relacionados: [Wild Ecosystem 1.0](wild_ecosystem_1_0.md), [Roadmap Godot](roadmap_godot.md).
+Leituras: [Wild Ecosystem 1.0](wild_ecosystem_1_0.md) e [Roadmap Godot](roadmap_godot.md).
