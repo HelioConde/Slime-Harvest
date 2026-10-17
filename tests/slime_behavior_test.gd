@@ -111,6 +111,48 @@ func _run() -> void:
     aggressive.queue_free()
     await get_tree().process_frame
 
+    # Fugir de um golpe avisado deve impedir dano.
+    _player.set("_wild_invulnerable", 0.0)
+    var dodged := _spawn_species("guardito", Vector2.ZERO)
+    dodged.call("_tick_wild_social", 0.4)
+    dodged.call("_tick_wild_social", 0.1)
+    _player.position = Vector2(170, 0)
+    dodged.call("_tick_wild_social", 0.9)
+    if not _check(_player.get("wild_health") == 4, "stepping out during windup prevents damage"):
+        return
+    dodged.queue_free()
+    await get_tree().process_frame
+
+    # Reservas criticas tem prioridade sobre hostilidade.
+    _player.position = Vector2(21, 0)
+    var hungry := _spawn_species("guardito", Vector2.ZERO)
+    hungry.set("need_level", 20.0)
+    hungry.call("_tick_wild_social", 0.4)
+    if not _check(hungry.get("_social_mode") == "none", "critical hunger overrides aggressive chase"):
+        return
+    hungry.queue_free()
+    await get_tree().process_frame
+
+    # Um obstaculo da layer World impede percepcao/ataque atraves de parede.
+    var wall := StaticBody2D.new()
+    wall.collision_layer = 1
+    wall.collision_mask = 0
+    wall.position = Vector2(10, 0)
+    var shape := CollisionShape2D.new()
+    var rect := RectangleShape2D.new()
+    rect.size = Vector2(5, 80)
+    shape.shape = rect
+    wall.add_child(shape)
+    _guard.add_child(wall)
+    await get_tree().physics_frame
+    var blocked := _spawn_species("guardito", Vector2.ZERO)
+    blocked.call("_tick_wild_social", 0.4)
+    if not _check(blocked.get("_social_mode") == "none", "solid wall blocks hostile detection"):
+        return
+    blocked.queue_free()
+    wall.queue_free()
+    await get_tree().physics_frame
+
     _player.position = Vector2(45, 0)
     _player.set("_wild_invulnerable", 0.0)
     var water := _spawn_species("gota", Vector2.ZERO)
