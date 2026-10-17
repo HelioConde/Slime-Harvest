@@ -34,6 +34,19 @@
 - [ ] Dia/noite, clima e evolução da fazenda.
 - [ ] Ajuste de controles, interface e performance.
 
+## Marco tecnico antes de historia e mapa definitivo
+
+- [x] Corrigir o teste de agua oculta, validando a fisica apenas da agua efetivamente exposta.
+- [x] Atualizar a navegacao dos slimes quando novos obstaculos surgirem ou forem removidos.
+- [x] Impedir absorcao de recursos indisponiveis.
+- [ ] Completar reacoes entre os proprios slimes e territorialidade real.
+- [ ] Testar projeteis e colisao de combate fisico, alem de efeitos visuais.
+- [ ] Persistir estados individuais dos slimes nos saves.
+- [ ] Concluir simulacao ecologica e limite de populacao por bioma.
+- [ ] Aprovar sprites, animacoes, FPS e testes prolongados.
+
+Checklist e criterios de conclusao: [Wild Ecosystem 1.0](wild_ecosystem_1_0.md).
+
 ## Organização e escopo
 
 Esta trilha é **Godot 2D**, não a implementação 3D/Roblox existente em outro repositório. Compartilhamos conceito e identidade, mas não portamos recursos entre motores sem adequação.
