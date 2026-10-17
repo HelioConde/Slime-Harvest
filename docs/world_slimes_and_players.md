@@ -40,3 +40,27 @@
 - 9 FPS para caminhar, 12 FPS para correr; velocidade acompanha parcialmente a velocidade fisica. Ao trocar entre caminhar/correr preserva a fase do passo.
 - Golpes mantem os eventos de impacto no mesmo quadro, mas agora usam duracoes variaveis: preparacao mais lenta, contato rapido e retorno mais suave.
 - Falta criar sprites extras (idle masculino com piscadas reais e eventualmente locomocao com diagonais) para acabamento definitivo. Inspecione no F5 e teste todas as direcoes.
+
+
+## IA selvagem: temperamentos e reacoes (17/10/2026)
+
+`SlimePopulation` continua colocando 32 especies de forma selvagem, sem captura nem rotina de cuidados do jogador. Os scripts foram divididos por responsabilidade:
+
+- `scripts/slimes/slime_needs.gd`: necessidade ecologica, regeneracao de reserva e risco de dissipar.
+- `scripts/slimes/slime_temperaments.gd`: temperamento especifico das 32 especies, distancia de alerta, alcance e animacoes.
+- `scripts/slimes/slime_wander.gd`: maquina de estados com roaming, busca de habitat e interacao social.
+- `scripts/slimes/world_population.gd`: margens de agua, pontos de recursos e rotas caminhaveis.
+
+Temperamentos:
+- **Medroso**: foge quando o jogador aproxima; tenta desviar de obstaculos.
+- **Amigavel**: se aproxima e exibe afeicao (animacao de felicidade/coracao); nao pode ser domesticado nesta etapa.
+- **Curioso**: observa o jogador, sem partir para combate.
+- **Territorial**: protege uma area ao redor de seu ponto inicial; persegue apenas invasoes proximo ao lar.
+- **Agressivo**: persegue o jogador enquanto estiver no alcance de percepcao. Ataque tem aviso, golpe e tempo de recarga.
+
+Gota possui postura territorial e a animacao `disparar_jato` com trilha visual azul; o jogador recebe dano apenas se continuar dentro do alcance e sem obstaculos no momento do golpe. Uma perseguição nao tem alcance infinito. Ataques tem recarga e o jogador possui invulnerabilidade breve, HP de teste e retorno seguro ao spawn quando HP chega a zero. Nao ha perda de itens, save sobrescrito, captura, domesticacao ou trabalhos no campo.
+
+**Prioridade ecologica**: a IA nao procura o jogador se a reserva essencial estiver criticamente baixa; medrosos ainda podem fugir de perigo. Criaturas nao atravessam agua nem paredes para reagir. As interacoes sociais nao persistem entre aberturas do World; mais tarde podemos persistir memoria de encontros.
+
+Testes: `tests/SlimeBehaviorTest.tscn` (fuga, curiosidade, afeicao, aviso de ataque, dano, recarga, defesa do Gota e respawn); `tests/SlimeSurvivalTest.tscn` (habitat, absorcao e fome). Testes visuais locais no Godot ainda sao recomendados.
+
