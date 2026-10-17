@@ -50,10 +50,13 @@ Checklist e criterios de conclusao: [Wild Ecosystem 1.0](wild_ecosystem_1_0.md).
 ## Progressao regional futura: chefes e amizade
 
 - [ ] Criar definicoes de territorios com **uma especie nativa de slime por territorio**.
-- [ ] Criar gatilhos ambientais configuraveis (ex.: derrotar monstros hostis ou oferecer lava no vulcao).
-- [ ] Fazer o chefe regional surgir somente depois das condicoes, sem duplicatas.
-- [ ] Persistir derrota do chefe e pacificacao individual de cada territorio.
-- [ ] Tornar os slimes da regiao mais amigaveis e a futura amizade mais facil apos a derrota.
+- [ ] Criar **varias rotas alternativas por territorio**: combate opcional, culinaria, missoes de NPCs, restauracao ambiental e progresso misto.
+- [ ] Criar receitas, oferendas e eventos de NPC testaveis sem depender de historia ou mapa definitivo.
+- [ ] Fazer o chefe regional ficar acessivel quando **qualquer rota valida** cumprir seus requisitos; evitar aparicoes duplicadas.
+- [ ] Permitir resolver o encontro por combate OU de modo pacifico (alimentar, convencer ou ajudar o chefe).
+- [ ] Persistir progresso das rotas, estado do encontro, metodo de resolucao e pacificacao por territorio.
+- [ ] Tornar os slimes nativos mais receptivos e facilitar futuras amizades depois da **pacificacao**, independentemente da rota.
+- [ ] Garantir um percurso 100% nao violento com recompensas funcionalmente equivalentes.
 - [ ] Validar esse motor em cenario artificial antes de desenhar mapa definitivo e historia.
 
 **Regra:** slimes nunca lutam entre si; monstros de objetivos sao inimigos hostis separados. Captura/domesticacao continuam fora do escopo atual.
