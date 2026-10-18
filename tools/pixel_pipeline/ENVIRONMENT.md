@@ -44,4 +44,4 @@ Os relatórios finais e imagens do ensaio ficam nos outputs da conversa. O proce
 
 Ensaio completo finalizado: 36 gerações img2img, 12 passos, denoise 0,25, seed 1234, 256×256, exportadas em 64×64. Tempo total das chamadas ~462,23 s (7min42s), média ~12,84 s/quadro. Paleta final comum às cinco sequências, extraída das referências aprovadas; máscara de cada referência preservada. Sem OOM observado. Cinco importações Godot concluídas: idle_down4, walk_down8, walk_up8, walk_left8, walk_right8.
 
-Teste adicional txt2img com `randn_source=CPU` por override temporário e 16 passos também produziu padrões sem personagem utilizável. A opção original GPU foi restaurada pelo WebUI. Isso não isolou a causa do problema; não foi adotado como correção.
+Teste adicional txt2img com `randn_source=CPU` por override temporário e 16 passos também produziu padrões sem personagem utilizável. A restauração automática não se confirmou na consulta final; a opção original GPU foi restaurada explicitamente pela API e verificada. Isso não isolou a causa do problema; não foi adotado como correção.
