@@ -48,6 +48,15 @@ def decode(s):
         raise ValueError('Imagem excede 4096 pixels.')
     return im.convert('RGBA')
 
+def fit_canvas(im, resolution):
+    """Letterbox with a uniform scale; never stretch a rectangular character."""
+    im=im.convert('RGBA')
+    scale=min(resolution/im.width,resolution/im.height)
+    resized=im.resize((max(1,round(im.width*scale)),max(1,round(im.height*scale))),Image.Resampling.NEAREST)
+    canvas=Image.new('RGBA',(resolution,resolution))
+    canvas.paste(resized,((resolution-resized.width)//2,(resolution-resized.height)//2))
+    return canvas
+
 def remove_background(im, color=(255,255,255), tolerance=24):
     """Remove only matching background connected to the border, not white clothing."""
     im = im.convert('RGBA').copy()
@@ -65,6 +74,26 @@ def remove_background(im, color=(255,255,255), tolerance=24):
             px[x,y] = (0,0,0,0)
             todo.extend(((x-1,y),(x+1,y),(x,y-1),(x,y+1)))
     return im
+
+def constrain_mask(im, reference):
+    """Intersect masks; never turn generated white background into opaque skin."""
+    im=remove_background(im)
+    ref=fit_canvas(reference,im.width)
+    if im.size != ref.size: raise ValueError('A saída do modelo deve ter canvas quadrado.')
+    im.putalpha(ImageChops.darker(im.getchannel('A'),ref.getchannel('A')))
+    return im
+
+def protect_contour(im, reference):
+    """Restore the reference's 1px outline and holes lost by background removal."""
+    if im.size!=reference.size: raise ValueError('Contorno exige canvases iguais.')
+    out=im.convert('RGBA').copy();ref=reference.convert('RGBA');w,h=ref.size
+    rp=ref.load();op=out.load()
+    for y in range(h):
+        for x in range(w):
+            if not rp[x,y][3]: op[x,y]=(0,0,0,0);continue
+            edge=any(not (0<=x+dx<w and 0<=y+dy<h) or rp[x+dx,y+dy][3]==0 for dx,dy in ((-1,0),(1,0),(0,-1),(0,1),(-1,-1),(1,-1),(-1,1),(1,1)))
+            if edge or op[x,y][3]==0: op[x,y]=rp[x,y]
+    return out
 
 def process(im, size=64, colors=24, palette=None, background=False, tolerance=24, dither=False, cleanup=False):
     if size not in SIZES or not 2 <= colors <= 256:
@@ -240,8 +269,8 @@ class SDClient:
     def interrupt(self): return self.request('/sdapi/v1/interrupt',{})
 
     def generate(self, prompt, seed=1234, reference=None, denoise=.3, steps=16, resolution=256, model=None):
-        if resolution not in (256,384) or not .25<=denoise<=.40 or not 1<=steps<=40:
-            raise ValueError('Use 256/384 px, denoise 0.25–0.40 e 1–40 passos.')
+        if resolution not in (256,384,512) or not .1<=denoise<=.40 or not 1<=steps<=40:
+            raise ValueError('Use 256/384/512 px, denoise 0.10–0.40 e 1–40 passos.')
         if not 0<=seed<2**32: raise ValueError('Seed deve estar entre 0 e 2^32-1.')
         payload=dict(prompt=prompt+', '+STYLE,negative_prompt=NEGATIVE,seed=seed,steps=steps,width=resolution,height=resolution,
                      sampler_name='Euler',cfg_scale=6,batch_size=1,n_iter=1,save_images=False,send_images=True)
@@ -249,7 +278,7 @@ class SDClient:
         endpoint='txt2img'
         if reference is not None:
             # Composite transparency on white before diffusion, do not expose RGB under alpha.
-            ref=reference.convert('RGBA').resize((resolution,resolution),Image.Resampling.NEAREST)
+            ref=fit_canvas(reference,resolution)
             bg=Image.new('RGBA',ref.size,'white'); bg.alpha_composite(ref)
             payload.update(init_images=[encode(bg.convert('RGB'))],denoising_strength=denoise,resize_mode=0)
             endpoint='img2img'
@@ -266,5 +295,13 @@ def extract_godot_frames(project, resource, animation, count):
         m=re.search(r'\[sub_resource type="AtlasTexture" id="f_'+re.escape(animation)+f'_{i}"'+r'\]\s*atlas = ExtResource\("([^"]+)"\)\s*region = Rect2\(([^)]+)\)',text)
         if not m: raise ValueError(f'Região não encontrada: {animation}/{i}')
         x,y,w,h=map(lambda v:round(float(v)),m[2].split(','))
-        with Image.open(project/textures[m[1]]) as im: result.append(im.convert('RGBA').crop((x,y,x+w,y+h)))
+        # AtlasTexture.margin.size expands the logical canvas; margin.position
+        # locates the region on that canvas. Omitting it changes scale and pivot.
+        tail=text[m.end():].split('[',1)[0]
+        margin=re.search(r'margin = Rect2\(([^)]+)\)',tail)
+        with Image.open(project/textures[m[1]]) as im: cropped=im.convert('RGBA').crop((x,y,x+w,y+h))
+        if margin:
+            mx,my,mw,mh=map(lambda v:round(float(v)),margin[1].split(','))
+            canvas=Image.new('RGBA',(w+mw,h+mh));canvas.paste(cropped,(mx,my));cropped=canvas
+        result.append(cropped)
     return result

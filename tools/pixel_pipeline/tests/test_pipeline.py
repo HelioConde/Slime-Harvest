@@ -13,6 +13,29 @@ def fixture(i=0):
     return im
 
 class PipelineTests(unittest.TestCase):
+    def test_reference_contour_replaces_generated_halo(self):
+        ref=fixture();generated=ref.copy();generated.putpixel((24,12),(255,255,255,255));generated.putpixel((30,30),(90,90,90,255))
+        out=protect_contour(generated,ref)
+        self.assertEqual(out.getpixel((24,12)),ref.getpixel((24,12)))
+        self.assertEqual(out.getpixel((30,30)),(90,90,90,255))
+    def test_mask_does_not_make_white_fringe_opaque(self):
+        ref=Image.new('RGBA',(32,32));ImageDraw.Draw(ref).rectangle((4,4,27,27),fill='red')
+        generated=Image.new('RGBA',(32,32),'white');ImageDraw.Draw(generated).rectangle((7,7,24,24),fill='red')
+        out=constrain_mask(generated,ref)
+        self.assertEqual(out.getpixel((5,5))[3],0)
+        self.assertEqual(out.getpixel((10,10)),(255,0,0,255))
+    def test_reference_aspect_ratio(self):
+        im=Image.new('RGBA',(20,40),(200,50,50,255))
+        fitted=fit_canvas(im,256)
+        self.assertEqual(fitted.size,(256,256))
+        self.assertEqual(fitted.getchannel('A').getbbox(),(64,0,192,256))
+    def test_godot_margin_reconstruction(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);save_png(Image.new('RGBA',(32,32),'red'),root/'sheet.png')
+            (root/'frames.tres').write_text('[ext_resource type="Texture2D" path="res://sheet.png" id="1"]\n[sub_resource type="AtlasTexture" id="f_idle_down_0"]\natlas = ExtResource("1")\nregion = Rect2(0, 0, 10, 20)\nmargin = Rect2(4, 5, 22, 12)\n',encoding='utf-8')
+            im=extract_godot_frames(root,'frames.tres','idle_down',1)[0]
+            self.assertEqual(im.size,(32,32))
+            self.assertEqual(im.getchannel('A').getbbox(),(4,5,14,25))
     def test_transparency_and_dimensions(self):
         for size in SIZES:
             im=process(fixture(),size)

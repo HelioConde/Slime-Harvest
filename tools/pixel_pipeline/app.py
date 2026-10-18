@@ -10,7 +10,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from PIL import Image
-from pipeline import SDClient, decode, process, shared_palette, align_frames, export, save_png, atomic_json, pose_manifest, ANIMATIONS, DIRECTIONS
+from pipeline import SDClient, decode, process, shared_palette, align_frames, export, save_png, atomic_json, pose_manifest, ANIMATIONS, DIRECTIONS, constrain_mask, protect_contour
 
 ROOT=Path(__file__).resolve().parent
 
@@ -39,7 +39,7 @@ class Jobs:
         if size not in (32,48,64,96,128) or not 1<=fps<=60 or not 1<=count<=32: raise ValueError('Resolução, FPS ou quantidade inválidos.')
         if p.get('animation','idle') not in ANIMATIONS or p.get('direction','down') not in DIRECTIONS: raise ValueError('Animação/direção inválida.')
         if not 2<=int(p.get('colors',24))<=256 or not 0<=int(p.get('tolerance',24))<=255: raise ValueError('Cores/tolerância inválidas.')
-        if mode!='process' and (int(p.get('resolution',256)) not in (256,384) or not .25<=float(p.get('denoise',.3))<=.4 or not 1<=int(p.get('steps',16))<=40 or not 0<=int(p.get('seed',1234))<2**32): raise ValueError('Parâmetros de geração inválidos.')
+        if mode!='process' and (int(p.get('resolution',256)) not in (256,384,512) or not .1<=float(p.get('denoise',.3))<=.4 or not 1<=int(p.get('steps',16))<=40 or not 0<=int(p.get('seed',1234))<2**32): raise ValueError('Parâmetros de geração inválidos.')
         refs=p.pop('images',[])
         if len(refs)>32: raise ValueError('Máximo de 32 imagens.')
         images=[decode(s) for s in refs]
@@ -98,7 +98,7 @@ class Jobs:
                         reference=Image.open(ref).convert('RGBA') if ref.exists() else None
                         args=dict(prompt=p.get('prompt',''),seed=int(p.get('seed',1234)),denoise=float(p.get('denoise',.3)),steps=int(p.get('steps',16)),resolution=int(p.get('resolution',256)),model=model)
                         # Cache exact input bytes, settings and loaded-model identity.
-                        key=hashlib.sha256(json.dumps({'args':args,'webui_options':options},sort_keys=True).encode()+(ref.read_bytes() if ref.exists() else b'')).hexdigest()
+                        key=hashlib.sha256(json.dumps({'preprocessing_version':2,'args':args,'webui_options':options},sort_keys=True).encode()+(ref.read_bytes() if ref.exists() else b'')).hexdigest()
                         cache=self.root/'cache'/key
                         if (cache.with_suffix('.png')).exists() and cache.with_suffix('.json').exists():
                             im=Image.open(cache.with_suffix('.png')).convert('RGBA'); info=json.loads(cache.with_suffix('.json').read_text(encoding='utf-8')); info['cache_hit']=True
@@ -110,20 +110,24 @@ class Jobs:
                     atomic_json(folder/'history.json',history); self.update(j,done=i+1)
                 if j['cancel']: self.update(j,status='cancelled'); continue
                 opts=dict(size=int(p.get('size',64)),colors=int(p.get('colors',24)),background=bool(p.get('background',False)),tolerance=int(p.get('tolerance',24)),dither=bool(p.get('dither',False)),cleanup=bool(p.get('cleanup',False)))
-                first=[process(im,**opts) for im in raw]
-                palette=p.get('palette') or shared_palette(first,opts['colors'])
-                # Apply shared palette to originals, avoiding accumulated quantization.
-                frames=[process(im,palette=palette,**opts) for im in raw]
+                prepared=raw
                 if p.get('preserve_mask') and p['mode']=='img2img':
-                    for i,im in enumerate(frames):
-                        mask=process(Image.open(folder/f'input/{i:03}.png'),size=opts['size']).getchannel('A')
-                        im.putalpha(mask)
+                    prepared=[constrain_mask(im,Image.open(folder/f'input/{i:03}.png')) for i,im in enumerate(raw)]
+                    palette_sources=[process(Image.open(folder/f'input/{i:03}.png'),**opts) for i in range(len(raw))]
+                else:
+                    palette_sources=[process(im,**opts) for im in raw]
+                palette=p.get('palette') or shared_palette(palette_sources,opts['colors'])
+                # Apply shared palette to originals, avoiding accumulated quantization.
+                frames=[process(im,palette=palette,**opts) for im in prepared]
+                if p.get('preserve_mask') and p['mode']=='img2img':
+                    frames=[protect_contour(im,process(Image.open(folder/f'input/{i:03}.png'),size=opts['size'],palette=palette)) for i,im in enumerate(frames)]
                 frames=align_frames(frames,p.get('anchors'))
                 direction=p.get('direction','down'); animation=p.get('animation','idle')
                 metadata=export(frames,folder/'export',p.get('name','personagem'),animation,direction,int(p.get('fps',8)),
                     pose_manifest(direction) if animation=='walk' and len(frames)==8 else None,
                     {'mode':p['mode'],'history':'../history.json','reference_policy':'one_posed_reference_per_frame','palette':palette,
-                     'base_approved':bool(p.get('base_approved',False)),'preserve_mask':bool(p.get('preserve_mask',False))})
+                     'base_approved':bool(p.get('base_approved',False)),'preserve_mask':bool(p.get('preserve_mask',False)),
+                     'contour_from_reference':bool(p.get('preserve_mask') and p['mode']=='img2img')})
                 self.update(j,status='review',validation=metadata['validation'])
             except Exception as e:
                 # Never automatically retry OOM or timeout with another heavy request.

@@ -1,5 +1,7 @@
 # Oficina de sprites — Slimekeepers: Lost Valley
 
+> Revisão de qualidade: o primeiro ensaio foi rejeitado. Leia `QUALITY_V2.md`. O importador agora respeita margens Godot, não estica referências e não torna bordas brancas opacas. A interface sugere512px/20passos/denoise0,12; resultados continuam sujeitos à revisão visual.
+
 MVP local em Python 3.10+, Pillow e API AUTOMATIC1111. Não usa OpenAI, CUDA, ROCm, serviços pagos nem dependências do WebUI para o processamento. Os originais do jogo e a instalação de Stable Diffusion são preservados.
 
 ## Instalação e execução no Windows
@@ -21,8 +23,8 @@ O dispositivo 0 foi identificado como RX 580 nesta máquina. Em outro computador
 1. Criar uma base por txt2img ou selecionar a imagem existente. A categoria organiza o histórico; descreva a espécie/aparência no prompt.
 2. Aprovar a identidade visual da base. Isso não aprova a animação.
 3. Para caminhada, preparar oito imagens da **mesma personagem já posada**, em ordem. Usar referências distintas para cima/baixo. `cli.py templates` cria guias coloridos e JSON das fases, não um rig automático.
-4. Enviar as referências, selecionar img2img, mesma seed, 256 px e denoise 0,25–0,40. Batch e n_iter são sempre 1. Nunca encadear saída do quadro anterior como referência do próximo.
-5. Opcionalmente preservar a máscara alpha das referências. Isso mantém a silhueta externa; não assegura rosto, membros ou detalhes internos. Referências com fragmentos continuarão tendo fragmentos.
+4. Enviar as referências, selecionar img2img e mesma seed. No ensaio revisado desta RX580, usar512px, 20passos e denoise0,12 como ponto inicial conservador. Batch e n_iter são sempre1. Nunca encadear saída do quadro anterior como referência do próximo.
+5. Opcionalmente limitar o alpha à máscara das referências. O pipeline remove o fundo branco conectado à borda, intersecta as máscaras e restaura o contorno de1pixel/lacunas com cores da referência na resolução final. Isso não assegura rosto ou membros corretos; referências com fragmentos precisam de correção.
 6. Aplicar paleta compartilhada, Nearest Neighbor, alpha binário, remoção de fundo branco por conectividade e limpeza opcional de pixels isolados. Fundo não uniforme exige máscara manual; o pipeline não inclui segmentador neural.
 7. Informar os pontos de origem por quadro em pixels da resolução final, se houver deslocamento. Exemplo: `[[32,62],[33,61],...]`. O alvo é `(largura/2, altura-2)`. O alinhador rejeita cortes de silhueta. Sem pontos explícitos, preserva o canvas; não infere automaticamente o quadril ou o pé de apoio.
 8. Conferir todos os quadros e a APNG, corrigir imagens problemáticas e reprocessar. Para um quadro isolado, quantidade 1; depois reenviar a sequência completa corrigida.
@@ -69,7 +71,7 @@ Testes GPU opt-in:
 Para reproduzir o ensaio completo de 36 quadros (usa GPU por vários minutos), pare o servidor da oficina para evitar duas filas e execute:
 
 ```powershell
-.\.venv\Scripts\python.exe experiment.py --project C:\FarmSlime --output data/experiment --steps 12 --denoise 0.25
+.\.venv\Scripts\python.exe experiment.py --project C:\FarmSlime --output data/experiment --resolution 512 --steps 20 --denoise 0.12
 ```
 
 O script utiliza uma paleta de referência comum às cinco sequências. Acrescente `--base-approved` somente após aprovação humana da referência. Não aprova animações automaticamente.
@@ -86,7 +88,7 @@ Os testes sem GPU usam fixtures sintéticas criadas localmente; validam payloads
 
 ## Escopo e limitações
 
-- Resoluções finais: 32, 48, 64, 96 e 128; geração 256 ou 384.
+- Resoluções finais: 32, 48, 64, 96 e 128; geração256,384 ou512.
 - Walk: templates de oito fases nas quatro direções. Idle e demais ações têm transporte/exportação genéricos; run/attack/hurt/death/interact/tool_use/watering/planting/harvesting/jump/water_jet precisam de referências próprias.
 - Não há rig humano automático, ControlNet instalado, editor de pintura pixel a pixel, remoção de fundo semântico, LoRA convertido nem modelo especializado baixado.
 - A validação de fragmentos pode marcar efeitos intencionais (água, partículas) para revisão. Atualmente ela bloqueia aprovação; corrija/separe efeitos antes de aprovar o corpo da personagem.

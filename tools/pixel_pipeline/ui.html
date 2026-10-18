@@ -1,7 +1,7 @@
 <!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Slimekeepers · Oficina de sprites</title>
 <style>body{font:16px system-ui;background:#15221e;color:#e4eadf;max-width:1100px;margin:32px auto;padding:0 20px}h1{color:#d4e9a0}fieldset,.card{border:1px solid #49604f;border-radius:12px;padding:20px;margin:16px 0;background:#1e3027}label{display:inline-block;margin:8px;vertical-align:top}input,select,textarea,button{font:inherit;background:#102219;color:#edf4e7;border:1px solid #718369;border-radius:6px;padding:8px;max-width:95%}textarea{display:block;width:95%;height:70px}button{cursor:pointer;background:#405e36}img{image-rendering:pixelated;max-width:100%;background:repeating-conic-gradient(#bbb 0 25%,#ddd 0 50%) 0/16px 16px}a{color:#cbe3a0}.error{color:#ffb59c}.previews{display:flex;gap:24px;align-items:start;flex-wrap:wrap}.preview{width:192px;height:192px;object-fit:contain}small{color:#b5c8b1}pre{white-space:pre-wrap}.grid img{background-size:4px 4px}</style>
 <h1>Oficina de sprites</h1><p>Slimekeepers: Lost Valley · produção experimental · SD 1.5 / DirectML</p>
-<p id="health">Verificando WebUI…</p><button onclick="health()">Verificar conexão / modelos</button>
+<p><small>Revisão de qualidade: 512 px e denoise 0,12 para refinar a referência. Os testes locais de 256/384 px produziram distorções. Comece com um único quadro; não há aprovação automática.</small></p><p id="health">Verificando WebUI…</p><button onclick="health()">Verificar conexão / modelos</button>
 <form id="form"><fieldset><legend>Gerador de Sprites / Editor</legend>
 <label>Modo <select id="mode"><option value="process">Processar imagens locais</option><option value="txt2img">Criar personagem-base</option><option value="img2img">Refinar referências / animar</option></select></label>
 <label>Nome <input id="name" value="aventureira"></label><label>Modelo <select id="model"><option value="">Modelo carregado</option></select></label>
@@ -9,16 +9,16 @@
 <label style="display:block">Prompt <textarea id="prompt">female adventurer, curly brown hair, green vest, cream shirt, brown boots, turquoise pendant</textarea></label>
 <label>Referências PNG, na ordem dos quadros <input type="file" id="files" accept="image/png" multiple></label>
 <p><small>Para animação, envie uma imagem do personagem já posado por quadro. Um esqueleto isolado não preserva sua identidade. Cima e baixo precisam de referências próprias. Para corrigir um quadro, processe uma referência e reenvie a sequência corrigida.</small></p>
-<label>Seed <input id="seed" type="number" value="1234" min="0"></label><label>Passos <input id="steps" type="number" min="1" max="40" value="16"></label>
-<label>Denoising <input id="denoise" type="number" min="0.25" max="0.40" step="0.01" value="0.30"></label>
-<label>Geração <select id="resolution"><option>256</option><option>384</option></select></label>
+<label>Seed <input id="seed" type="number" value="1234" min="0"></label><label>Passos <input id="steps" type="number" min="1" max="40" value="20"></label>
+<label>Denoising <input id="denoise" type="number" min="0.10" max="0.40" step="0.01" value="0.12"></label>
+<label>Geração <select id="resolution"><option>256</option><option>384</option><option selected>512</option></select></label>
 </fieldset><fieldset><legend>Animações / Exportação</legend>
 <label>Animação <select id="animation"></select></label><label>Direção <select id="direction"><option value="down">Baixo</option><option value="up">Cima</option><option value="left">Esquerda</option><option value="right">Direita</option></select></label>
 <label>Quadros <input id="count" type="number" min="1" max="32" value="1"></label><label>FPS <input id="fps" type="number" value="8" min="1" max="60"></label>
 <label>Resolução final <select id="size"><option>32</option><option>48</option><option selected>64</option><option>96</option><option>128</option></select></label>
 <label>Cores <input id="colors" type="number" value="24" min="2" max="256"></label>
 <label><input id="background" type="checkbox"> Remover fundo branco conectado à borda</label><label>Tolerância <input id="tolerance" type="number" value="24" min="0" max="255"></label>
-<label><input id="preserve_mask" type="checkbox"> Preservar máscara da referência no img2img</label><label><input id="base_approved" type="checkbox"> Base aprovada por mim</label><label><input id="dither" type="checkbox"> Dithering</label><label><input id="cleanup" type="checkbox"> Limpar pixels isolados (pode remover detalhes)</label>
+<label><input id="preserve_mask" type="checkbox"> Limitar à máscara da referência e remover fundo branco no img2img</label><label><input id="base_approved" type="checkbox"> Base aprovada por mim</label><label><input id="dither" type="checkbox"> Dithering</label><label><input id="cleanup" type="checkbox"> Limpar pixels isolados (pode remover detalhes)</label>
 <label style="display:block">Paleta RGB opcional (JSON) <input id="palette" placeholder="[[40,35,40],[230,210,170]]" style="width:90%"></label>
 <label style="display:block">Pontos de origem opcionais por quadro, na resolução final <input id="anchors" placeholder="[[32,62],[32,62],...]" style="width:90%"></label>
 <button>Adicionar à fila</button><span id="message"></span></fieldset></form>
