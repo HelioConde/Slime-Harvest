@@ -96,3 +96,7 @@ Os testes sem GPU usam fixtures sintéticas criadas localmente; validam payloads
 - A consistência de identidade ainda depende de referências de qualidade e ajustes manuais. Ver `ENVIRONMENT.md` e `MODEL_RESEARCH.md` para resultados e decisões reais.
 
 O objetivo de animações prontas para produção ainda depende de superar as falhas visuais observadas no backend/modelo local. A ferramenta pode processar e exportar arte corrigida manualmente sem usar a IA.
+
+## Revisão das caminhadas da aventureira
+
+`revise_walks.py` reproduz o ensaio específico da personagem existente. Recupera os corpos completos de frente/costas do atlas original, cujo recorte regular cortava os pés; mantém as referências laterais existentes. Usa escala fixa e registro pelo centro da cabeça, sem modificar o recurso ativo do jogo. Exige `--output` e `--palette-job` (job.json do idle V2 para compartilhar a paleta). Comece com `--phase samples`; após inspeção, use `--phase full` no mesmo diretório para aproveitar o cache. Consulte `QUALITY_WALKS_V2.md` para limites e resultados.
