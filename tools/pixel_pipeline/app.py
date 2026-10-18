@@ -101,7 +101,7 @@ class Jobs:
                         key=hashlib.sha256(json.dumps({'args':args,'webui_options':options},sort_keys=True).encode()+(ref.read_bytes() if ref.exists() else b'')).hexdigest()
                         cache=self.root/'cache'/key
                         if (cache.with_suffix('.png')).exists() and cache.with_suffix('.json').exists():
-                            im=Image.open(cache.with_suffix('.png')).convert('RGBA'); info=json.loads(cache.with_suffix('.json').read_text()); info['cache_hit']=True
+                            im=Image.open(cache.with_suffix('.png')).convert('RGBA'); info=json.loads(cache.with_suffix('.json').read_text(encoding='utf-8')); info['cache_hit']=True
                         else:
                             im,info=self.client.generate(reference=reference,**args)
                             if j['cancel']: break

@@ -169,7 +169,10 @@ def validate_frames(images, expected=None, poses=None):
         if im.size!=size: issues.append(f'Quadro {i}: dimensões diferentes.')
         a=im.getchannel('A'); box=a.getbbox(); boxes.append(box)
         if not box: issues.append(f'Quadro {i}: vazio.')
-        else: bottoms.append(box[3])
+        else:
+            bottoms.append(box[3])
+            if box[0]==0 or box[1]==0 or box[2]==im.width or box[3]==im.height:
+                issues.append(f'Quadro {i}: silhueta toca a borda; revisar corte/margem.')
         if a.getextrema()[0]!=0: issues.append(f'Quadro {i}: sem transparência.')
         if any(v not in (0,255) for v in set(a.getdata())): issues.append(f'Quadro {i}: alpha intermediário.')
         if len(components(im))>1: issues.append(f'Quadro {i}: componentes desconectados; revisar fragmentos/efeitos.')
