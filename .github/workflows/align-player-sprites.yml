@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "tools/align_player_sprites.py"
+      - "tools/test_player_idle_import.py"
       - "assets/Characters/new/player_*_idle_suave.png"
       - ".github/workflows/align-player-sprites.yml"
   workflow_dispatch:
@@ -34,7 +35,10 @@ jobs:
       - name: Instalar dependencias do corretor
         run: python -m pip install --disable-pip-version-check pillow numpy scipy
 
-      - name: Recriar os 13 atlas alinhados e os SpriteFrames
+      - name: Verificar importacao das animacoes idle suave
+        run: python tools/test_player_idle_import.py
+
+      - name: Recriar os atlas alinhados e os SpriteFrames
         run: python -u tools/align_player_sprites.py
 
       - name: Verificar dimensoes, conteudo e referencias
