@@ -1,6 +1,6 @@
 [gd_resource type="SpriteFrames" load_steps=232 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/Characters/aligned/exec-3436f4e7-4b70-4556-bd52-8ba00adae31c.png" id="tex_1"]
+[ext_resource type="Texture2D" path="res://assets/Characters/aligned/player_feminino_idle_suave.png" id="tex_1"]
 [ext_resource type="Texture2D" path="res://assets/Characters/aligned/exec-af55c5be-081c-44df-8fe1-617ca0bc67e8.png" id="tex_2"]
 [ext_resource type="Texture2D" path="res://assets/Characters/aligned/exec-64bcc504-e427-4d69-a3d6-625271ed496f.png" id="tex_3"]
 [ext_resource type="Texture2D" path="res://assets/Characters/aligned/exec-98e6b770-ea96-4040-a85e-078447aa6e4b.png" id="tex_4"]
