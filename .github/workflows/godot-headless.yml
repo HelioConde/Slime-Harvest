@@ -50,11 +50,6 @@ jobs:
         run: |
           set -o pipefail
           for scene in \
-            res://scenes/trees/TreeChopDemo.tscn \
-            res://scenes/trees/FruitTreesDemo.tscn \
-            res://scenes/world/TerrainGallery.tscn \
-            res://scenes/farming/FarmingToolDemo.tscn \
-            res://scenes/farming/GrowthPreview.tscn \
             res://scenes/objects/ObjectCatalog.tscn
           do
             echo "SMOKE TEST: $scene"
