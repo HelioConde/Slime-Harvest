@@ -22,26 +22,39 @@ func _run() -> void:
 	if not _check(tiles != null and tiles.get_terrain_sets_count() >= 18, "original TileSet has all terrain configurations"):
 		get_tree().quit(1)
 		return
-	var gallery := load("res://scenes/world/TerrainGallery.tscn").instantiate() as Node2D
+	# Criar seis superficies temporarias na memoria; nenhuma cena World/Demo e necessaria.
+	var gallery := Node2D.new()
+	gallery.name = "Patches"
 	add_child(gallery)
+	var patch_script: Script = load("res://scripts/world/terrain_patch.gd") as Script
+	var terrain_sets: Array[int] = [9, 3, 11, 5, 13, 17]
+	var patches: Array[TileMapLayer] = []
+	for chosen_set in terrain_sets:
+		var patch := TileMapLayer.new()
+		patch.set_script(patch_script)
+		patch.tile_set = tiles
+		patch.set("terrain_set_index", chosen_set)
+		gallery.add_child(patch)
+		patches.append(patch)
 	await get_tree().process_frame
-	var patches: Array[Node] = gallery.get_node("Patches").get_children()
-	if not _check(patches.size() == 6, "six example surfaces available"):
+	if not _check(patches.size() == 6, "six temporary surfaces available"):
 		get_tree().quit(1)
 		return
 	for patch in patches:
-		var layer := patch as TileMapLayer
-		if not _check(layer.tile_set == tiles and layer.get_used_cells().size() >= 40,
-			"%s builds cells using the shared original tileset" % patch.name):
+		if not _check(patch.tile_set == tiles and patch.get_used_cells().size() >= 40,
+			"%s builds cells using shared original tileset" % patch.name):
 			get_tree().quit(1)
 			return
-		var chosen: int = int(layer.get("terrain_set_index"))
+		var chosen: int = int(patch.get("terrain_set_index"))
 		if not _check(tiles.get_terrains_count(chosen) > 0, "terrain set %d has configured transitions" % chosen):
 			get_tree().quit(1)
 			return
 
-	# Se a pessoa pintar manualmente uma celula no editor, o script nao deve apagar a edicao.
-	var manual: TileMapLayer = load("res://scenes/world/TerrainPatch.tscn").instantiate()
+	# Pintura manual deve permanecer apos _ready da TileMapLayer.
+	var manual := TileMapLayer.new()
+	manual.set_script(patch_script)
+	manual.tile_set = tiles
+	manual.set("terrain_set_index", 9)
 	manual.set_cell(Vector2i(0, 0), 30, Vector2i(1, 1))
 	add_child(manual)
 	if not _check(manual.get_used_cells().size() == 1, "manual tile painting is preserved"):

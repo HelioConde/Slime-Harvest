@@ -18,7 +18,7 @@ func _check(value: bool, description: String) -> bool:
 
 
 func _run() -> void:
-	var demo: Node2D = load("res://scenes/trees/TreeChopDemo.tscn").instantiate() as Node2D
+	var demo: Node2D = preload("res://tests/helpers/resource_fixture.gd").create_test_world()
 	add_child(demo)
 	await get_tree().process_frame
 
