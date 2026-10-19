@@ -1,0 +1,84 @@
+name: Alinhar sprites dos jogadores
+
+on:
+  push:
+    paths:
+      - "tools/align_player_sprites.py"
+      - "tools/test_player_idle_import.py"
+      - "assets/Characters/new/player_*_idle_suave.png"
+      - ".github/workflows/align-player-sprites.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: player-sprite-alignment
+  cancel-in-progress: false
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obter o projeto Godot
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias do corretor
+        run: python -m pip install --disable-pip-version-check pillow numpy scipy
+
+      - name: Verificar importacao das animacoes idle suave
+        run: python tools/test_player_idle_import.py
+
+      - name: Recriar os atlas alinhados e os SpriteFrames
+        run: python -u tools/align_player_sprites.py
+
+      - name: Verificar dimensoes, conteudo e referencias
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re
+          base = Path('assets/Characters/aligned')
+          sheets = list(base.glob('*.png'))
+          imported = sum((Path('assets/Characters/new') / f'player_{sex}_idle_suave.png').is_file()
+                         for sex in ('masculino', 'feminino'))
+          expected = 13 + imported
+          assert len(sheets) == expected, f'Esperadas {expected} spritesheets; obtidas {len(sheets)}'
+          for sheet in sheets:
+              im = Image.open(sheet)
+              assert im.size == (2560, 1280), (sheet, im.size)
+              assert im.getbbox() is not None, sheet
+          for name in ('masculino', 'feminino'):
+              tres = Path('assets/Characters/animation') / f'player_{name}_frames.tres'
+              data = tres.read_text(encoding='utf-8')
+              assert 'res://assets/Characters/new/' not in data
+              assert len(re.findall(r'region = Rect2\(', data)) >= 224
+              if (Path('assets/Characters/new') / f'player_{name}_idle_suave.png').is_file():
+                  assert f'assets/Characters/aligned/player_{name}_idle_suave.png' in data
+          assert Path('assets/Characters/aligned/alignment_report.json').is_file()
+          print(f'OK: {len(sheets)} folhas / {len(sheets) * 32} quadros / grade 320px / resources atualizados')
+          PY
+
+      - name: Criar commit das artes corrigidas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/Characters/aligned/ \
+            assets/Characters/animation/player_masculino_frames.tres \
+            assets/Characters/animation/player_feminino_frames.tres \
+            scripts/player/player_motion_alignment.gd
+          if git diff --cached --quiet; then
+            echo "Sem mudancas na exportacao."
+          else
+            git commit -m "fix(player): isolate and foot-anchor all animation atlas frames"
+            git push origin HEAD:main
+          fi

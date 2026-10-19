@@ -49,6 +49,8 @@ func _ready() -> void:
 	_build_background()
 	_build_panel()
 	_build_popup()
+	get_viewport().size_changed.connect(_update_popup_scale)
+	UISettings.ui_scale_changed.connect(_update_popup_scale)
 	_update_save_buttons()
 	if not _slots_ok:
 		_show_message(str(_slots.get("error_message")))
@@ -476,6 +478,21 @@ func _build_popup() -> void:
 	_popup_close_button.custom_minimum_size = Vector2(0, 24)
 	_popup_close_button.pressed.connect(_dismiss_popup)
 	content.add_child(_popup_close_button)
+	_overlay_card.resized.connect(_update_popup_scale)
+
+
+func _update_popup_scale() -> void:
+	if not is_instance_valid(_overlay_card):
+		return
+	var dialog_size: Vector2 = _overlay_card.size
+	if dialog_size.x <= 0.0 or dialog_size.y <= 0.0:
+		return
+	var available: Vector2 = get_viewport_rect().size - Vector2(24.0, 24.0)
+	var factor: float = minf(UISettings.hud_scale,
+		minf(available.x / dialog_size.x, available.y / dialog_size.y))
+	# Escalar em torno do centro evita deslocar a janela do menu.
+	_overlay_card.pivot_offset = dialog_size * 0.5
+	_overlay_card.scale = Vector2.ONE * clampf(factor, 0.25, UISettings.MAX_SCALE)
 
 
 func _show_message(message: String) -> void:
@@ -490,6 +507,8 @@ func _show_actions(_title: String, message: String, actions: Array[Dictionary]) 
 		_choices.remove_child(child)
 		child.queue_free()
 	for child in _popup_fields.get_children():
+		if child.has_method("cancel_changes"):
+			child.call("cancel_changes")
 		_popup_fields.remove_child(child)
 		child.queue_free()
 	_popup_fields.visible = false
@@ -508,10 +527,14 @@ func _show_actions(_title: String, message: String, actions: Array[Dictionary]) 
 		if next_focus == _popup_close_button and not item.disabled:
 			next_focus = item
 	_overlay.visible = true
+	_update_popup_scale.call_deferred()
 	next_focus.grab_focus()
 
 
 func _dismiss_popup() -> void:
+	for child in _popup_fields.get_children():
+		if child.has_method("cancel_changes"):
+			child.call("cancel_changes")
 	_overlay.visible = false
 	if is_instance_valid(_dialog_return_focus):
 		_dialog_return_focus.grab_focus()

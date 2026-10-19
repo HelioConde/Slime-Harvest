@@ -61,6 +61,18 @@ func _run() -> void:
 	for kind in ["tree", "flower", "wood", "rock", "mushroom"]:
 		if not _check(int(kinds.get(kind, 0)) > 0, "category spawned: " + kind):
 			return
+	# A geracao deve abranger diferentes regioes do gramado, sem concentrar no centro.
+	var zones: Dictionary = {}
+	var used_rect: Rect2i = grass.get_used_rect()
+	var span_x: float = maxf(1.0, float(used_rect.size.x))
+	var span_y: float = maxf(1.0, float(used_rect.size.y))
+	for entry in records:
+		var cell: Vector2i = grass.local_to_map(grass.to_local(Vector2(float(entry["x"]), float(entry["y"]))))
+		var col: int = clampi(int(float(cell.x - used_rect.position.x) * 4.0 / span_x), 0, 3)
+		var row: int = clampi(int(float(cell.y - used_rect.position.y) * 3.0 / span_y), 0, 2)
+		zones[Vector2i(col, row)] = true
+	if not _check(zones.size() >= 4, "random resources cover at least four map sectors"):
+		return
 	var initial_count := population.get_child_count()
 	if not _check(initial_count >= 20, "procedural scenes instantiated"):
 		return

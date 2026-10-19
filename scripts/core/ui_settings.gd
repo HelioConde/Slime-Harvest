@@ -36,10 +36,23 @@ func set_hud_scale(value: float) -> void:
 
 
 func restore_defaults() -> void:
-	hotbar_scale = DEFAULT_HOTBAR_SCALE
-	hud_scale = DEFAULT_HUD_SCALE
+	preview_scales(DEFAULT_HOTBAR_SCALE, DEFAULT_HUD_SCALE)
 	_save()
+
+
+## Atualiza apenas a pre-visualizacao. O arquivo so e gravado ao confirmar.
+func preview_scales(next_hotbar: float, next_hud: float) -> void:
+	var sanitized_bar: float = _sanitize(next_hotbar, DEFAULT_HOTBAR_SCALE)
+	var sanitized_hud: float = _sanitize(next_hud, DEFAULT_HUD_SCALE)
+	if is_equal_approx(hotbar_scale, sanitized_bar) and is_equal_approx(hud_scale, sanitized_hud):
+		return
+	hotbar_scale = sanitized_bar
+	hud_scale = sanitized_hud
 	ui_scale_changed.emit()
+
+
+func commit_preview() -> void:
+	_save()
 
 
 func _sanitize(value: float, fallback: float) -> float:
