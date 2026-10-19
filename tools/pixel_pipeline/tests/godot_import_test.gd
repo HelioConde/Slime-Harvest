@@ -17,6 +17,11 @@ func _initialize() -> void:
 	for i in count:
 		var texture := resource.get_frame_texture(name, i)
 		assert(texture.get_width() == 64 and texture.get_height() == 64)
+		if metadata.has("padding"):
+			var padding := int(metadata.padding)
+			assert(texture is AtlasTexture)
+			assert(texture.region == Rect2(padding + i * (64 + padding), padding, 64, 64))
+			assert(texture.filter_clip)
 		if metadata.has("durations"):
 			assert(is_equal_approx(resource.get_frame_duration(name, i), float(metadata.durations[i])))
 	var scene := load("res://Preview.tscn") as PackedScene

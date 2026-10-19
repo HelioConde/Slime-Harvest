@@ -254,10 +254,11 @@ def validate_frames(images, expected=None, poses=None):
                 note='Metadados de poses não comprovam anatomia dos pixels. Aprovação humana necessária.')
 
 def export(images, directory, name='personagem', animation='walk', direction='down', fps=8, poses=None, provenance=None,
-           durations=None, loop=None, origin=None, allow_repeated_frames=False):
+           durations=None, loop=None, origin=None, allow_repeated_frames=False, padding=0):
     if not images or not 1<=fps<=60: raise ValueError('Quadros/FPS inválidos.')
     if not re.fullmatch(r'[a-z][a-z0-9_]{0,63}',animation) or direction not in DIRECTIONS: raise ValueError('Animação/direção inválida.')
     if any(im.size!=images[0].size for im in images): raise ValueError('Dimensões inconsistentes.')
+    if not isinstance(padding,int) or not 0<=padding<=64: raise ValueError('Espaçamento inválido.')
     root=Path(directory); root.mkdir(parents=True,exist_ok=True)
     w,h=images[0].size; n=len(images); cols=min(4,n); rows=math.ceil(n/cols)
     durations=list(durations) if durations is not None else [1.0]*n
@@ -265,9 +266,10 @@ def export(images, directory, name='personagem', animation='walk', direction='do
     loop=animation in ('idle','walk','run','hold_slime','sleep') if loop is None else bool(loop)
     origin=list(origin) if origin is not None else [w//2,h-2]
     if len(origin)!=2 or any(not math.isfinite(v) for v in origin): raise ValueError('Origem inválida.')
-    horizontal=Image.new('RGBA',(w*n,h)); grid=Image.new('RGBA',(w*cols,h*rows))
+    sx,sy=w+padding,h+padding
+    horizontal=Image.new('RGBA',(w*n+padding*(n+1),h+padding*2)); grid=Image.new('RGBA',(w*cols+padding*(cols+1),h*rows+padding*(rows+1)))
     for i,im in enumerate(images):
-        save_png(im,root/f'frames/{i:03}.png'); horizontal.paste(im,(w*i,0)); grid.paste(im,(w*(i%cols),h*(i//cols)))
+        save_png(im,root/f'frames/{i:03}.png'); horizontal.paste(im,(padding+sx*i,padding)); grid.paste(im,(padding+sx*(i%cols),padding+sy*(i//cols)))
     save_png(horizontal,root/'sheet.png'); save_png(grid,root/'grid.png')
     # APNG preserves alpha without GIF palette limitations.
     images[0].save(root/'preview.png',save_all=True,append_images=images[1:],duration=[round(1000*v/fps) for v in durations],loop=0 if loop else 1,disposal=0,blend=0)
@@ -278,13 +280,13 @@ def export(images, directory, name='personagem', animation='walk', direction='do
         validation['issues']=[v for v in validation['issues'] if not v.startswith('Descontinuidade provável')]
     validation['structural_ok']=not validation['issues']
     metadata=dict(character=name,animation=animation,direction=direction,resolution=[w,h],frame_count=n,fps=fps,
-                  origin=origin,durations=durations,loop=loop,grid={'columns':cols,'rows':rows},horizontal={'columns':n,'rows':1},
+                  origin=origin,durations=durations,loop=loop,padding=padding,grid={'columns':cols,'rows':rows,'offset':[padding,padding],'stride':[sx,sy]},horizontal={'columns':n,'rows':1,'offset':[padding,padding],'stride':[sx,sy]},
                   validation=validation,provenance=provenance or {},poses=poses)
     atomic_json(root/'metadata.json',metadata)
     # Standalone Godot preview, never changes the game project.
     (root/'project.godot').write_text('config_version=5\n[application]\nconfig/name="Sprite experimental"\nrun/main_scene="res://Preview.tscn"\n[rendering]\nrenderer/rendering_method="gl_compatibility"\ntextures/default_filters/use_nearest_mipmap_filter=false\n',encoding='utf-8')
     lines=['[gd_resource type="SpriteFrames" load_steps=%d format=3]'%(n+2),'[ext_resource type="Texture2D" path="res://sheet.png" id="1"]']
-    for i in range(n): lines += [f'[sub_resource type="AtlasTexture" id="f{i}"]','atlas = ExtResource("1")',f'region = Rect2({i*w}, 0, {w}, {h})']
+    for i in range(n): lines += [f'[sub_resource type="AtlasTexture" id="f{i}"]','atlas = ExtResource("1")',f'region = Rect2({padding+i*sx}, {padding}, {w}, {h})','filter_clip = true']
     frames=', '.join('{"duration": %s, "texture": SubResource("f%d")}'%(durations[i],i) for i in range(n))
     lines += ['[resource]',f'animations = [{{"name": &"{animation}_{direction}", "speed": {float(fps)}, "loop": {str(loop).lower()}, "frames": [{frames}]}}]']
     (root/'frames.tres').write_text('\n\n'.join(lines),encoding='utf-8')

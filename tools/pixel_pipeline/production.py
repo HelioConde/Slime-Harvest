@@ -86,7 +86,7 @@ def run(project, root, character, actions, limit=2, sd=False, pose_review=None, 
                     state.pop('error',None);state.update(generation_status='partial');atomic_json(statefile,state)
                 if len(state['done'])==len(sequence['frames']):
                     frames=[Image.open(folder/f'frames/{i:03}.png').convert('RGBA') for i in range(len(sequence['frames']))]
-                    meta=export(frames,folder/'export',character,action,direction,sequence['fps'],provenance=dict(mode='img2img' if sd else 'existing_reference_cleanup',source_resource=snap[character]['resource'],source_hashes=snap[character]['source_hashes'],motion_preserved=True,palette=palette,base_approved=character=='feminino',events_validated=False),durations=[f['duration'] for f in sequence['frames']],loop=sequence['loop'],allow_repeated_frames=action=='idle',origin=definition['origin'])
+                    meta=export(frames,folder/'export',character,action,direction,sequence['fps'],provenance=dict(mode='img2img' if sd else 'existing_reference_cleanup',source_resource=snap[character]['resource'],source_hashes=snap[character]['source_hashes'],motion_preserved=True,palette=palette,base_approved=character=='feminino',events_validated=False),durations=[f['duration'] for f in sequence['frames']],loop=sequence['loop'],allow_repeated_frames=action=='idle',origin=definition['origin'],padding=8)
                     source_frames=[process(load_frame(project,f),palette=palette) for f in sequence['frames']]
                     original_alpha_preserved=all(im.getchannel('A').tobytes()==source.getchannel('A').tobytes() for im,source in zip(frames,source_frames))
                     for source,stats in zip(source_frames,state['cleaner']):

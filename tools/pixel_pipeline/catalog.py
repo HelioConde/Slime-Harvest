@@ -4,6 +4,7 @@ import json
 import re
 from pathlib import Path
 from PIL import Image
+from collections import Counter
 
 DIRECTIONS = ['down', 'up', 'left', 'right']
 PRIMARY = ['idle', 'walk', 'run', 'axe', 'pick', 'hoe', 'watering']
@@ -46,6 +47,44 @@ def load_frame(project, frame):
         crop=im.convert('RGBA').crop((x,y,x+w,y+h))
     canvas=Image.new('RGBA',(w+mw,h+mh));canvas.paste(crop,(mx,my))
     return canvas
+
+class AtlasIsolation:
+    """Remove only small intrusions belonging to a different, complete atlas body.
+
+    Small detached objects/particles are retained. Ambiguous large overlaps are
+    reported, never resolved by erasing a limb or inventing a new pose.
+    """
+    def __init__(self, project):
+        self.project=Path(project);self.cache={}
+
+    def isolate(self, frame):
+        from pipeline import connected_regions
+        path=frame['texture']
+        if path not in self.cache:
+            with Image.open(self.project/path) as source:image=source.convert('RGBA')
+            labels=Image.new('I',image.size);pixels=labels.load();sizes={}
+            for ident,group in enumerate(connected_regions(image),1):
+                sizes[ident]=len(group)
+                for xy in group:pixels[xy]=ident
+            self.cache[path]=(image,labels,sizes)
+        image,labels,sizes=self.cache[path]
+        x,y,w,h=frame['region'];mx,my,mw,mh=frame['margin']
+        local=labels.crop((x,y,x+w,y+h));counts=Counter(local.getdata());counts.pop(0,None)
+        foreign=[];ambiguous=[]
+        if counts:
+            primary=max(counts,key=counts.get)
+            for ident,inside in counts.items():
+                if ident==primary or sizes[ident]<sizes[primary]*.4:continue
+                if inside/sizes[ident]<.25:foreign.append(ident)
+                else:ambiguous.append(dict(component=ident,pixels_inside=inside,total_pixels=sizes[ident]))
+        crop=image.crop((x,y,x+w,y+h));mask=Image.new('RGBA',(w,h));removed=0
+        for yy in range(h):
+            for xx in range(w):
+                if local.getpixel((xx,yy)) in foreign:
+                    crop.putpixel((xx,yy),(0,0,0,0));mask.putpixel((xx,yy),(255,255,255,255));removed+=1
+        canvas=Image.new('RGBA',(w+mw,h+mh));canvas.paste(crop,(mx,my))
+        foreign_mask=Image.new('RGBA',canvas.size);foreign_mask.paste(mask,(mx,my))
+        return canvas,foreign_mask,dict(removed_source_pixels=removed,foreign_components=foreign,ambiguous_components=ambiguous,region=frame['region'],margin=frame['margin'],body_repositioned=False)
 
 def inventory(project):
     result={}

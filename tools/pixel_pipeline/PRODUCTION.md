@@ -81,3 +81,9 @@ A configuração editável central está em animation_catalog.json. Cada produç
 A limpeza P0 retirou 537 pixels de fragmentos femininos e 11 masculinos, registrados em provenance.fragment_removals. A máscara corporal restante foi comparada com a fonte; ordem, duração e FPS permaneceram iguais. As referências anteriores à remoção estão no histórico da saída.
 
 Antes de integrar um sprite 64×64, a escala visual e a origem devem ser comparadas com o desenho original e a escala atual do AnimatedSprite2D (o jogo usa referências maiores). A entrega não aplica uma troca cega de textura que diminuiria o personagem.
+
+## Separação de quadros
+
+production.py exporta com 8 pixels transparentes entre quadros e nas bordas. Cada AtlasTexture continua em 64×64, com filter_clip e regiões que consideram as margens. FPS, ordem e durações não mudam. O exportador genérico mantém padding=0 por compatibilidade; use padding=8 em novas chamadas.
+
+Para reparar candidatos existentes: `python repair_spacing.py --output DIRETORIO --project FONTES_CONGELADAS --padding 8`. O comando confere hashes, guarda a versão anterior em history_spacing e remove somente fragmentos de componentes grandes cuja maior parte está fora do recorte. Partículas pequenas e sobreposições ambíguas ficam preservadas. A repetição parte do backup, sem remoção acumulativa. Não execute produção e reparo simultaneamente. A remoção não recupera ferramentas ou membros já cortados na referência; esses casos continuam exigindo revisão artística. Após reparar, execute review_catalog.py e test_godot.ps1 em cada exportação.
