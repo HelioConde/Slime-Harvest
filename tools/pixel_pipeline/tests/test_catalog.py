@@ -18,6 +18,21 @@ def make_project(root):
     for c in ('feminino','masculino'):(folder/f'player_{c}_frames.tres').write_text(text)
 
 class CatalogTests(unittest.TestCase):
+    def test_review_uses_current_image_version_and_labels_original(self):
+        from review_catalog import build
+        with tempfile.TemporaryDirectory() as temp:
+            project=Path(temp)/'project';project.mkdir();make_project(project);out=Path(temp)/'output'
+            run(project,out,'feminino',['idle'],limit=3)
+            first=build(out,project)[0]['after'][0]
+            path=out/first.split('?')[0]
+            image=Image.open(path).convert('RGBA');image.putpixel((20,20),(1,2,3,255));image.save(path)
+            second=build(out,project)[0]['after'][0]
+            self.assertNotEqual(first,second)
+            self.assertEqual(first.split('?')[0],second.split('?')[0])
+            html=(out/'REVISAR_CATALOGO.html').read_text(encoding='utf8')
+            self.assertIn('id="original" hidden',html)
+            self.assertIn('ORIGINAL SEM CORREÇÃO',html)
+
     def test_sd_partial_failure_resumes_without_regenerating_completed_frame(self):
         import hashlib
         class Client:

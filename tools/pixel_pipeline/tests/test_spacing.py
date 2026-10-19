@@ -8,6 +8,20 @@ from pipeline import export
 from repair_spacing import repair
 
 class SpacingTests(unittest.TestCase):
+    def test_droplets_from_previous_row_removed_own_particles_retained(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            atlas=Image.new('RGBA',(100,120));draw=ImageDraw.Draw(atlas)
+            draw.rectangle((20,5,45,35),fill='red')
+            draw.rectangle((20,65,45,95),fill='blue')
+            draw.rectangle((46,42,47,43),fill='cyan')
+            draw.rectangle((46,100,47,101),fill='cyan')
+            atlas.save(Path(tmp)/'atlas.png')
+            frame=dict(texture='atlas.png',region=[0,40,100,80],margin=[0,0,0,0])
+            clean,_,audit=AtlasIsolation(tmp).isolate(frame)
+            self.assertEqual(clean.getpixel((46,2))[3],0)
+            self.assertEqual(clean.getpixel((46,60)),(0,255,255,255))
+            self.assertEqual(audit['removed_source_pixels'],4)
+
     def test_repair_respects_production_lock(self):
         with tempfile.TemporaryDirectory() as tmp:
             lock=Path(tmp)/'production.lock';lock.write_text('running')

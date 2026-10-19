@@ -51,7 +51,8 @@ def load_frame(project, frame):
 class AtlasIsolation:
     """Remove only small intrusions belonging to a different, complete atlas body.
 
-    Small detached objects/particles are retained. Ambiguous large overlaps are
+    Detached particles are retained unless outside this body's vertical extent
+    and unambiguously closer to a different body. Ambiguous large overlaps are
     reported, never resolved by erasing a limb or inventing a new pose.
     """
     def __init__(self, project):
@@ -62,19 +63,33 @@ class AtlasIsolation:
         path=frame['texture']
         if path not in self.cache:
             with Image.open(self.project/path) as source:image=source.convert('RGBA')
-            labels=Image.new('I',image.size);pixels=labels.load();sizes={}
+            labels=Image.new('I',image.size);pixels=labels.load();sizes={};boxes={}
             for ident,group in enumerate(connected_regions(image),1):
                 sizes[ident]=len(group)
+                boxes[ident]=(min(p[0] for p in group),min(p[1] for p in group),max(p[0] for p in group),max(p[1] for p in group))
                 for xy in group:pixels[xy]=ident
-            self.cache[path]=(image,labels,sizes)
-        image,labels,sizes=self.cache[path]
+            self.cache[path]=(image,labels,sizes,boxes)
+        image,labels,sizes,boxes=self.cache[path]
         x,y,w,h=frame['region'];mx,my,mw,mh=frame['margin']
         local=labels.crop((x,y,x+w,y+h));counts=Counter(local.getdata());counts.pop(0,None)
         foreign=[];ambiguous=[]
         if counts:
             primary=max(counts,key=counts.get)
             for ident,inside in counts.items():
-                if ident==primary or sizes[ident]<sizes[primary]*.4:continue
+                if ident==primary:continue
+                if sizes[ident]<sizes[primary]*.4:
+                    # Detached droplets may belong to the preceding row. Only
+                    # remove when another body is unambiguously closer and the
+                    # entire fragment lies beyond this body's vertical extent.
+                    box=boxes[ident];body=boxes[primary]
+                    if box[3]>=body[1] and box[1]<=body[3]:continue
+                    def gap(other):
+                        return max(other[0]-box[2],box[0]-other[2],0)**2+max(other[1]-box[3],box[1]-other[3],0)**2
+                    own=gap(body)
+                    neighbors=[other for key,other in boxes.items() if key!=primary and sizes[key]>=sizes[primary]*.4]
+                    if neighbors and min(gap(other) for other in neighbors)+16<own:
+                        foreign.append(ident)
+                    continue
                 if inside/sizes[ident]<.25:foreign.append(ident)
                 else:ambiguous.append(dict(component=ident,pixels_inside=inside,total_pixels=sizes[ident]))
         crop=image.crop((x,y,x+w,y+h));mask=Image.new('RGBA',(w,h));removed=0
