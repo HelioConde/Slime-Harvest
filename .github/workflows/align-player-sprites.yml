@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "tools/align_player_sprites.py"
+      - "assets/Characters/new/player_*_idle_suave.png"
       - ".github/workflows/align-player-sprites.yml"
   workflow_dispatch:
 
@@ -44,7 +45,10 @@ jobs:
           import re
           base = Path('assets/Characters/aligned')
           sheets = list(base.glob('*.png'))
-          assert len(sheets) == 13, f'Esperadas 13 spritesheets; obtidas {len(sheets)}'
+          imported = sum((Path('assets/Characters/new') / f'player_{sex}_idle_suave.png').is_file()
+                         for sex in ('masculino', 'feminino'))
+          expected = 13 + imported
+          assert len(sheets) == expected, f'Esperadas {expected} spritesheets; obtidas {len(sheets)}'
           for sheet in sheets:
               im = Image.open(sheet)
               assert im.size == (2560, 1280), (sheet, im.size)
@@ -54,8 +58,10 @@ jobs:
               data = tres.read_text(encoding='utf-8')
               assert 'res://assets/Characters/new/' not in data
               assert len(re.findall(r'region = Rect2\(', data)) >= 224
+              if (Path('assets/Characters/new') / f'player_{name}_idle_suave.png').is_file():
+                  assert f'assets/Characters/aligned/player_{name}_idle_suave.png' in data
           assert Path('assets/Characters/aligned/alignment_report.json').is_file()
-          print('OK: 13 folhas / 416 quadros / grade 320px / resources atualizados')
+          print(f'OK: {len(sheets)} folhas / {len(sheets) * 32} quadros / grade 320px / resources atualizados')
           PY
 
       - name: Criar commit das artes corrigidas
