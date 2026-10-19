@@ -121,189 +121,67 @@ def align_sheet(source: Path, destination: Path) -> list[dict]:
 
 
 def prefer_smooth_idle(text: str, gender: str) -> str:
-    """Wire uploaded *idle_suave* PNGs; never synthesize them from older sprites.
-
-    Masculino: tex_1 is WALK and must remain so; install idle as tex_7.
-    Feminino: tex_1 is only IDLE and can be replaced in-place.
-    """
+    """Use newly supplied idle atlases without replacing male walk frames."""
     image_name = f"player_{gender}_idle_suave.png"
     candidate = SOURCE / image_name
     if not candidate.is_file():
-        print(f"INFO: {image_name} ausente: mantendo idle anterior", flush=True)
+        print(f"INFO: {image_name} ainda nao adicionado ao repositorio", flush=True)
         return text
 
-    sprite_path = f"res://assets/Characters/new/{image_name}"
+    new_line = f'[ext_resource type="Texture2D" path="res://assets/Characters/new/{image_name}" id="tex_7"]'
+    lines = text.splitlines()
     if gender == "feminino":
-        pat = r'(\[ext_resource type="Texture2D" path="res://)[^"]+(" id="tex_1"\])'
-        text, changed = re.subn(
-            pat, lambda m: m.group(1) + sprite_path.removeprefix("res://") + m.group(2),
-            text, count=1,
-        )
-        if changed != 1:
-            raise ValueError("Female idle tex_1 not found")
+        # Female tex_1 is exclusively idle.
+        for index, line in enumerate(lines):
+            if line.startswith('[ext_resource type="Texture2D"') and line.endswith('id="tex_1"]'):
+                lines[index] = new_line.replace('tex_7', 'tex_1')
+                break
+        else:
+            raise ValueError("Feminino: ext_resource tex_1 not found")
+        text = "\n".join(lines) + "\n"
     elif gender == "masculino":
-        new_line = f'[ext_resource type="Texture2D" path="{sprite_path}" id="tex_7"]'
-        tex7 = re.search(r'^\[ext_resource type="Texture2D" path="[^"]+" id="tex_7"\]
-    pngs = {}
-
-    def fix_texture(match: re.Match[str]) -> str:
-        original = Path(match.group(1))
-        if original.parent == Path("assets/Characters/aligned"):
-            source = SOURCE / original.name
-        elif original.parent == Path("assets/Characters/new"):
-            source = ROOT / original
+        # Male tex_1 is also used for walk: keep it intact and add a new tex_7.
+        for index, line in enumerate(lines):
+            if line.startswith('[ext_resource type="Texture2D"') and line.endswith('id="tex_7"]'):
+                lines[index] = new_line
+                break
         else:
-            raise ValueError(f"Unknown sprite source: {original}")
-        if not source.is_file():
-            raise FileNotFoundError(source)
-        pngs[match.group(2)] = source
-        return match.group(0).replace(
-            str(original), f"assets/Characters/aligned/{original.name}")
-
-    text, ext_count = TEXTURE_RE.subn(fix_texture, text)
-    if ext_count not in (6, 7):
-        raise ValueError(f"Unexpected source sheet count: {ext_count}")
-
-    def fix_frame(match: re.Match[str]) -> str:
-        direction, col, texture = match.group(3), int(match.group(4)), match.group(5)
-        if texture not in pngs or col not in range(8):
-            raise ValueError("Unexpected SpriteFrames reference")
-        row = ROWS.index(direction)
-        return match.group(1) + f"Rect2({col * CELL}, {row * CELL}, {CELL}, {CELL})"
-
-    text, frame_count = FRAME_RE.subn(fix_frame, text)
-    if frame_count < 6 * 32:
-        raise ValueError(f"Incomplete AtlasTexture frames: {frame_count}")
-    return text, pngs
-
-
-def main() -> None:
-    changes = {}
-    for gender in ("masculino", "feminino"):
-        config = ANIMATION / f"player_{gender}_frames.tres"
-        content = config.read_text(encoding="utf-8")
-        content = prefer_smooth_idle(content, gender)
-        fixed, source_map = update_spriteframes(content)
-        for source in sorted(set(source_map.values())):
-            destination = TARGET / source.name
-            changes[source.name] = align_sheet(source, destination)
-            print(f"OK {source.name}: 8x4 at {CELL}x{CELL}", flush=True)
-        if fixed != content:
-            config.write_text(fixed, encoding="utf-8")
-        print(f"OK {config.relative_to(ROOT)}", flush=True)
-
-    offsets = ROOT / "scripts/player/player_motion_alignment.gd"
-    offsets.write_text("""extends RefCounted
-## Correcoes de deslocamento foram incorporadas nos PNGs.
-## Nao aplicar compensacoes antigas nos quadros ja corrigidos.
-static func frame_offset(_appearance: String, _name: StringName, _frame: int) -> Vector2:
-\treturn Vector2.ZERO
-""", encoding="utf-8")
-    report = TARGET / "alignment_report.json"
-    report.write_text(json.dumps({
-        "cell": CELL, "anchor": [ANCHOR_X, ANCHOR_Y],
-        "sheets": changes,
-    }, indent=2, ensure_ascii=False), encoding="utf-8")
-    print("OK alignment_report.json")
-
-
-if __name__ == "__main__":
-    main()
-, text, re.M)
-        if tex7:
-            text = text[:tex7.start()] + new_line + text[tex7.end():]
-        else:
-            # The seventh asset exists only if the new male idle is uploaded.
-            last_tex = re.search(
-                r'^\[ext_resource type="Texture2D" path="[^"]+" id="tex_6"\]
-    pngs = {}
-
-    def fix_texture(match: re.Match[str]) -> str:
-        original = Path(match.group(1))
-        if original.parent == Path("assets/Characters/aligned"):
-            source = SOURCE / original.name
-        elif original.parent == Path("assets/Characters/new"):
-            source = ROOT / original
-        else:
-            raise ValueError(f"Unknown sprite source: {original}")
-        if not source.is_file():
-            raise FileNotFoundError(source)
-        pngs[match.group(2)] = source
-        return match.group(0).replace(
-            str(original), f"assets/Characters/aligned/{original.name}")
-
-    text, ext_count = TEXTURE_RE.subn(fix_texture, text)
-    if ext_count not in (6, 7):
-        raise ValueError(f"Unexpected source sheet count: {ext_count}")
-
-    def fix_frame(match: re.Match[str]) -> str:
-        direction, col, texture = match.group(3), int(match.group(4)), match.group(5)
-        if texture not in pngs or col not in range(8):
-            raise ValueError("Unexpected SpriteFrames reference")
-        row = ROWS.index(direction)
-        return match.group(1) + f"Rect2({col * CELL}, {row * CELL}, {CELL}, {CELL})"
-
-    text, frame_count = FRAME_RE.subn(fix_frame, text)
-    if frame_count < 6 * 32:
-        raise ValueError(f"Incomplete AtlasTexture frames: {frame_count}")
-    return text, pngs
-
-
-def main() -> None:
-    changes = {}
-    for gender in ("masculino", "feminino"):
-        config = ANIMATION / f"player_{gender}_frames.tres"
-        content = config.read_text(encoding="utf-8")
-        fixed, source_map = update_spriteframes(content)
-        for source in sorted(set(source_map.values())):
-            destination = TARGET / source.name
-            changes[source.name] = align_sheet(source, destination)
-            print(f"OK {source.name}: 8x4 at {CELL}x{CELL}", flush=True)
-        if fixed != content:
-            config.write_text(fixed, encoding="utf-8")
-        print(f"OK {config.relative_to(ROOT)}", flush=True)
-
-    offsets = ROOT / "scripts/player/player_motion_alignment.gd"
-    offsets.write_text("""extends RefCounted
-## Correcoes de deslocamento foram incorporadas nos PNGs.
-## Nao aplicar compensacoes antigas nos quadros ja corrigidos.
-static func frame_offset(_appearance: String, _name: StringName, _frame: int) -> Vector2:
-\treturn Vector2.ZERO
-""", encoding="utf-8")
-    report = TARGET / "alignment_report.json"
-    report.write_text(json.dumps({
-        "cell": CELL, "anchor": [ANCHOR_X, ANCHOR_Y],
-        "sheets": changes,
-    }, indent=2, ensure_ascii=False), encoding="utf-8")
-    print("OK alignment_report.json")
-
-
-if __name__ == "__main__":
-    main()
-,
-                text, re.M,
-            )
-            if last_tex is None:
-                raise ValueError("Male tex_6 missing")
-            text = text[:last_tex.end()] + "\n" + new_line + text[last_tex.end():]
-            text = re.sub(
-                r'^(\[gd_resource type="SpriteFrames" load_steps=)(\d+)',
-                lambda m: m.group(1) + str(int(m.group(2)) + 1),
-                text,
-                count=1,
-            )
-        # Never overwrite the walk frames (they share tex_1 in the legacy file).
-        idle_ref = re.compile(
-            r'(\[sub_resource type="AtlasTexture" id="f_idle_'
-            r'(?:down|up|right|left)_\d+"\]\s*atlas = ExtResource\(")'
-            r'tex_\d+("\))'
-        )
-        text, replaced = idle_ref.subn(r'\g<1>tex_7\g<2>', text)
-        if replaced != 32:
-            raise ValueError(f"Expected 32 male idle regions, found {replaced}")
+            for index, line in enumerate(lines):
+                if line.startswith('[ext_resource type="Texture2D"') and line.endswith('id="tex_6"]'):
+                    lines.insert(index + 1, new_line)
+                    break
+            else:
+                raise ValueError("Masculino: ext_resource tex_6 not found")
+            load_steps = re.search(r'(?m)^\[gd_resource type="SpriteFrames" load_steps=(\d+)', text)
+            if not load_steps:
+                raise ValueError("Masculino: load_steps not found")
+            text = text[:load_steps.start(1)] + str(int(load_steps.group(1)) + 1) + text[load_steps.end(1):]
+            lines = text.splitlines()
+            # Re-insert the new resource after editing load_steps.
+            for index, line in enumerate(lines):
+                if line.startswith('[ext_resource type="Texture2D"') and line.endswith('id="tex_6"]'):
+                    lines.insert(index + 1, new_line)
+                    break
+        text = "\n".join(lines) + "\n"
+        changed = 0
+        for direction in ROWS:
+            for frame in range(COLUMNS):
+                marker = f'[sub_resource type="AtlasTexture" id="f_idle_{direction}_{frame}"]'
+                start = text.find(marker)
+                if start < 0:
+                    raise ValueError(f"Missing male idle resource: {marker}")
+                atlas_start = text.find('atlas = ExtResource("', start + len(marker))
+                region_start = text.find("region = Rect2(", start + len(marker))
+                if atlas_start < 0 or region_start < 0 or atlas_start > region_start:
+                    raise ValueError(f"Bad male idle resource: {marker}")
+                old = text[atlas_start: text.find("\n", atlas_start)]
+                text = text[:atlas_start] + 'atlas = ExtResource("tex_7")' + text[atlas_start + len(old):]
+                changed += 1
+        assert changed == 32
     else:
-        raise ValueError(f"Unknown gender: {gender}")
-    print(f"OK new idle asset: {image_name}", flush=True)
+        raise ValueError(f"Unsupported gender: {gender}")
+
+    print(f"OK new idle source: {image_name}", flush=True)
     return text
 
 
@@ -346,6 +224,7 @@ def main() -> None:
     for gender in ("masculino", "feminino"):
         config = ANIMATION / f"player_{gender}_frames.tres"
         content = config.read_text(encoding="utf-8")
+        content = prefer_smooth_idle(content, gender)
         fixed, source_map = update_spriteframes(content)
         for source in sorted(set(source_map.values())):
             destination = TARGET / source.name
