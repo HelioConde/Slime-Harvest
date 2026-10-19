@@ -1,0 +1,75 @@
+ assets/Characters/Basic Charakter Actions.png      |  Bin [31m8002[m -> [32m0[m bytes
+ .../Characters/Basic Charakter Actions.png.import  |   40 [31m-[m
+ assets/Characters/Basic Charakter Spritesheet.png  |  Bin [31m2091[m -> [32m0[m bytes
+ .../Basic Charakter Spritesheet.png.import         |   40 [31m-[m
+ .../Charakter Spritesheet and animations.aseprite  |  Bin [31m54442[m -> [32m0[m bytes
+ .../Charakter Spritesheet and animations.gif       |  Bin [31m863033[m -> [32m0[m bytes
+ assets/Characters/Tools.png                        |  Bin [31m2409[m -> [32m0[m bytes
+ assets/Characters/Tools.png.import                 |   40 [31m-[m
+ assets/Characters/aligned/alignment_report.json    | 9445 [31m--------------------[m
+ .../exec-0eea2ccf-743f-492f-b773-5f51e8478aa3.png  |  Bin [31m1512520[m -> [32m0[m bytes
+ .../exec-17e6c232-eef2-4436-bcb9-5927d8ab4d3e.png  |  Bin [31m1609798[m -> [32m0[m bytes
+ .../exec-2a7a11de-02e2-4058-a955-a55e6cb74d39.png  |  Bin [31m1680537[m -> [32m0[m bytes
+ .../exec-3436f4e7-4b70-4556-bd52-8ba00adae31c.png  |  Bin [31m1504138[m -> [32m0[m bytes
+ .../exec-42584540-eb7f-40f5-90c3-6f5e7e87afb4.png  |  Bin [31m1531491[m -> [32m0[m bytes
+ .../exec-486b5e99-6122-4cf1-bf8e-af6e99caa514.png  |  Bin [31m1558028[m -> [32m0[m bytes
+ .../exec-48bd9d22-2b51-4ae2-8147-97caba2e3cb3.png  |  Bin [31m1688039[m -> [32m0[m bytes
+ .../exec-64bcc504-e427-4d69-a3d6-625271ed496f.png  |  Bin [31m1631411[m -> [32m0[m bytes
+ .../exec-9749d5d0-c0d0-4042-8181-d35286cf460a.png  |  Bin [31m1707711[m -> [32m0[m bytes
+ .../exec-98e6b770-ea96-4040-a85e-078447aa6e4b.png  |  Bin [31m1339203[m -> [32m0[m bytes
+ .../exec-9e81e999-3511-4520-adeb-7f2c2744fef0.png  |  Bin [31m1274936[m -> [32m0[m bytes
+ .../exec-af55c5be-081c-44df-8fe1-617ca0bc67e8.png  |  Bin [31m1594606[m -> [32m0[m bytes
+ .../exec-fd8ae2cc-8791-4f79-a2d1-7815068bd828.png  |  Bin [31m1560557[m -> [32m0[m bytes
+ .../aligned/player_feminino_idle_suave.png         |  Bin [31m567637[m -> [32m0[m bytes
+ .../aligned/player_masculino_idle_suave.png        |  Bin [31m624439[m -> [32m0[m bytes
+ .../animation/player_feminino_frames.tres          | 1792 [31m----[m
+ .../animation/player_masculino_frames.tres         | 1636 [31m----[m
+ .../exec-0eea2ccf-743f-492f-b773-5f51e8478aa3.png  |  Bin [31m1834217[m -> [32m0[m bytes
+ ...0eea2ccf-743f-492f-b773-5f51e8478aa3.png.import |   40 [31m-[m
+ .../exec-17e6c232-eef2-4436-bcb9-5927d8ab4d3e.png  |  Bin [31m1779047[m -> [32m0[m bytes
+ ...17e6c232-eef2-4436-bcb9-5927d8ab4d3e.png.import |   40 [31m-[m
+ .../exec-1e6c49ee-6bd9-40cb-bd1a-eba6758fb9c9.png  |  Bin [31m1835893[m -> [32m0[m bytes
+ ...1e6c49ee-6bd9-40cb-bd1a-eba6758fb9c9.png.import |   40 [31m-[m
+ .../exec-1ec4a3f7-0f7c-4cf5-847c-f81bf22b8b2b.png  |  Bin [31m1720049[m -> [32m0[m bytes
+ ...1ec4a3f7-0f7c-4cf5-847c-f81bf22b8b2b.png.import |   40 [31m-[m
+ .../exec-2a7a11de-02e2-4058-a955-a55e6cb74d39.png  |  Bin [31m1993379[m -> [32m0[m bytes
+ ...2a7a11de-02e2-4058-a955-a55e6cb74d39.png.import |   40 [31m-[m
+ .../exec-3436f4e7-4b70-4556-bd52-8ba00adae31c.png  |  Bin [31m1694891[m -> [32m0[m bytes
+ ...3436f4e7-4b70-4556-bd52-8ba00adae31c.png.import |   40 [31m-[m
+ .../exec-42584540-eb7f-40f5-90c3-6f5e7e87afb4.png  |  Bin [31m1737496[m -> [32m0[m bytes
+ ...42584540-eb7f-40f5-90c3-6f5e7e87afb4.png.import |   40 [31m-[m
+ .../exec-486b5e99-6122-4cf1-bf8e-af6e99caa514.png  |  Bin [31m1804951[m -> [32m0[m bytes
+ ...486b5e99-6122-4cf1-bf8e-af6e99caa514.png.import |   40 [31m-[m
+ .../exec-48bd9d22-2b51-4ae2-8147-97caba2e3cb3.png  |  Bin [31m1918798[m -> [32m0[m bytes
+ ...48bd9d22-2b51-4ae2-8147-97caba2e3cb3.png.import |   40 [31m-[m
+ .../exec-64bcc504-e427-4d69-a3d6-625271ed496f.png  |  Bin [31m1817795[m -> [32m0[m bytes
+ ...64bcc504-e427-4d69-a3d6-625271ed496f.png.import |   40 [31m-[m
+ .../exec-9749d5d0-c0d0-4042-8181-d35286cf460a.png  |  Bin [31m1904919[m -> [32m0[m bytes
+ ...9749d5d0-c0d0-4042-8181-d35286cf460a.png.import |   40 [31m-[m
+ .../exec-98e6b770-ea96-4040-a85e-078447aa6e4b.png  |  Bin [31m1642939[m -> [32m0[m bytes
+ ...98e6b770-ea96-4040-a85e-078447aa6e4b.png.import |   40 [31m-[m
+ .../exec-9e81e999-3511-4520-adeb-7f2c2744fef0.png  |  Bin [31m1625861[m -> [32m0[m bytes
+ ...9e81e999-3511-4520-adeb-7f2c2744fef0.png.import |   40 [31m-[m
+ .../exec-af55c5be-081c-44df-8fe1-617ca0bc67e8.png  |  Bin [31m1766359[m -> [32m0[m bytes
+ ...af55c5be-081c-44df-8fe1-617ca0bc67e8.png.import |   40 [31m-[m
+ .../exec-fd8ae2cc-8791-4f79-a2d1-7815068bd828.png  |  Bin [31m1701778[m -> [32m0[m bytes
+ ...fd8ae2cc-8791-4f79-a2d1-7815068bd828.png.import |   40 [31m-[m
+ .../Characters/new/player_feminino_idle_suave.png  |  Bin [31m668261[m -> [32m0[m bytes
+ .../Characters/new/player_masculino_idle_suave.png |  Bin [31m735902[m -> [32m0[m bytes
+ assets/Characters/palette_protagonista_28.gpl      |   40 [31m-[m
+ assets/Characters/palette_protagonista_28.json     |  153 [31m-[m
+ ...r from water can frames and animations.aseprite |  Bin [31m3697[m -> [32m0[m bytes
+ .../Characters/water from wateringcan frames.png   |  Bin [31m972[m -> [32m0[m bytes
+ .../water from wateringcan frames.png.import       |   40 [31m-[m
+ scenes/farming/FarmingToolDemo.tscn                |   20 [31m-[m
+ scenes/farming/GrowthPreview.tscn                  |   40 [31m-[m
+ scenes/player/FemaleSpritePreview.tscn             |   12 [31m-[m
+ scenes/slimes/BlueSlimePreview.tscn                |   11 [31m-[m
+ scenes/slimes/bestiary/BestiaryPreview.tscn        |    6 [31m-[m
+ scenes/trees/FruitTreesDemo.tscn                   |   45 [31m-[m
+ scenes/trees/TreeChopDemo.tscn                     |  167 [31m-[m
+ scenes/world/.gitkeep                              |    0
+ scenes/world/TerrainGallery.tscn                   |   97 [31m-[m
+ scenes/world/TerrainPatch.tscn                     |   11 [31m-[m
+ tools/validate_godot_project.py                    |    2 [31m-[m
+ 74 files changed, 14237 deletions(-)
