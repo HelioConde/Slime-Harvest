@@ -34,6 +34,36 @@
 - [ ] Dia/noite, clima e evolução da fazenda.
 - [ ] Ajuste de controles, interface e performance.
 
+## Marco tecnico antes de historia e mapa definitivo
+
+- [x] Corrigir o teste de agua oculta, validando a fisica apenas da agua efetivamente exposta.
+- [x] Atualizar a navegacao dos slimes quando novos obstaculos surgirem ou forem removidos.
+- [x] Impedir absorcao de recursos indisponiveis.
+- [x] Implementar encontros selvagens sem jogador: aproximacao, brincadeira, curiosidade e afastamento pacifico, testados automaticamente.
+- [ ] Completar relacoes duradouras entre slimes: afinidades persistentes, ajuda, convivencia em grupos e afastamento sem confronto.
+- [ ] Testar projeteis e colisao de combate fisico, alem de efeitos visuais.
+- [ ] Persistir estados individuais dos slimes nos saves.
+- [ ] Concluir simulacao ecologica e limite de populacao por bioma.
+- [ ] Aprovar sprites, animacoes, FPS e testes prolongados.
+
+Checklist e criterios de conclusao: [Wild Ecosystem 1.0](wild_ecosystem_1_0.md).
+
+## Progressao regional futura: chefes e amizade
+
+- [ ] Criar definicoes de territorios com **uma especie nativa de slime por territorio**.
+- [ ] Criar **varias rotas alternativas por territorio**: combate opcional, culinaria, missoes de NPCs, restauracao ambiental e progresso misto.
+- [ ] Criar receitas, oferendas e eventos de NPC testaveis sem depender de historia ou mapa definitivo.
+- [ ] Fazer o chefe regional ficar acessivel quando **qualquer rota valida** cumprir seus requisitos; evitar aparicoes duplicadas.
+- [ ] Permitir resolver o encontro por combate OU de modo pacifico (alimentar, convencer ou ajudar o chefe).
+- [ ] Persistir progresso das rotas, estado do encontro, metodo de resolucao e pacificacao por territorio.
+- [ ] Tornar os slimes nativos mais receptivos e facilitar futuras amizades depois da **pacificacao**, independentemente da rota.
+- [ ] Garantir um percurso 100% nao violento com recompensas funcionalmente equivalentes.
+- [ ] Validar esse motor em cenario artificial antes de desenhar mapa definitivo e historia.
+
+**Regra:** slimes nunca lutam entre si; monstros de objetivos sao inimigos hostis separados. Captura/domesticacao continuam fora do escopo atual.
+
+Especificacao detalhada: [Territorios, bosses e amizade](territorios_bosses_afinidade.md).
+
 ## Organização e escopo
 
 Esta trilha é **Godot 2D**, não a implementação 3D/Roblox existente em outro repositório. Compartilhamos conceito e identidade, mas não portamos recursos entre motores sem adequação.

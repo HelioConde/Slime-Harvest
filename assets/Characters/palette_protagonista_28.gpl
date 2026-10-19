@@ -1,0 +1,40 @@
+GIMP Palette
+Name: Slimekeepers - Protagonista 28
+Columns: 5
+# Paleta v1: selecao de 28 cores existentes na referencia do cenario
+# Contornos
+ 63  59  74	Contornos - Contorno base
+ 81  74  88	Contornos - Borda media
+101  86  99	Contornos - Borda iluminada
+# Cabelo castanho
+ 94  70  70	Cabelo castanho - Sombra profunda
+115  85  87	Cabelo castanho - Sombra
+144  98  93	Cabelo castanho - Meio-tom
+165 118  98	Cabelo castanho - Luz
+196 154 108	Cabelo castanho - Brilho pontual
+# Pele
+183 123 108	Pele - Sombra quente
+233 186 154	Pele - Meio-tom
+244 209 175	Pele - Base
+247 222 192	Pele - Luz
+# Couro, botas e luvas
+129  83  79	Couro, botas e luvas - Sombra
+163 104  88	Couro, botas e luvas - Base escura
+186 125 101	Couro, botas e luvas - Base clara
+213 152 119	Couro, botas e luvas - Luz nas bordas
+# Camisa creme
+156 146 126	Camisa creme - Sombra
+220 208 175	Camisa creme - Base
+238 226 197	Camisa creme - Luz
+# Colete verde
+ 62  85  83	Colete verde - Sombra
+ 94 125 104	Colete verde - Meio-tom
+110 150 124	Colete verde - Base
+151 187 142	Colete verde - Luz
+# Lenco agua-petroleo
+ 66  91 113	Lenco agua-petroleo - Sombra
+ 91 135 147	Lenco agua-petroleo - Base
+155 212 195	Lenco agua-petroleo - Luz
+# Metais e fivela
+157 133  83	Metais e fivela - Ouro sombra
+210 190 130	Metais e fivela - Ouro luz

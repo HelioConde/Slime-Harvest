@@ -4,7 +4,7 @@
 
 - `World.tscn` instancia `SlimePopulation`, que carrega as 32 especies do manifesto do bestiario (`assets/slimes/bestiary/bestiario.json`). Usa uma unidade de cada especie, em pontos livres do gramado, sem sobrescrever casas, terreno ou saves.
 - Cada unidade tem `CharacterBody2D`, collider circular e `slime_wander.gd`, com deslocamento e pausas aleatorias, desvio de bloqueios fisicos da layer World e limite de distancia da origem. Nao anda sobre agua ou fora do gramado; outras especies nao precisam de cenas reeditadas.
-- **Por enquanto a IA e somente ambiental**: nao planta, nao rega, nao ataca e nao salva posicoes. Os slimes reaparecem redistribuidos ao abrir o World. O bestiario continua independente.
+- **IA selvagem**: as 32 especies possuem necessidades, temperamento, fuga, curiosidade, afeicao e ataques territoriais/agressivos somente contra o jogador; slimes nunca atacam outros slimes. Nao executam trabalhos de fazenda nem salvam posicoes. Os slimes reaparecem distribuidos ao abrir o World. O bestiario continua independente.
 - O jogador usa os PNGs novos de `assets/Characters/new` com nomes de animacao iguais aos antigos (`idle_*, walk_*, run_*, axe_*, pick_*, hoe_*, watering_*`). Os PNGs nao foram alterados ou regravados.
 - Ao iniciar uma nova fazenda, escolha Masculino/Feminino junto ao nome. A escolha e salva no metadado do slot. Saves antigos continuam disponiveis e usam masculino por padrao.
 - O PNG masculino especifico de idle nao estava entre as 15 folhas de 8x4 importadas; ate esse material chegar, a postura idle usa o primeiro frame de caminhada do mesmo visual. A transicao nao usa recortes do atlas antigo. O idle feminino usa a folha dedicada.
@@ -20,7 +20,7 @@
 ## Limitacoes conhecidas
 
 - Os quadros gerados por IA tem espacamento 1774x887 dividido em 8 colunas e 4 linhas; recortes podem necessitar ajustes visuais (alinhar pes e armas). O runtime usa as texturas originais e escala para aproximar 48px da arte anterior.
-- Os slimes nao contam com interacoes, tarefas, combate, domar, salvamento de posicao ou reproducao. Isso exige nova fase de gameplay.
+- Ja existem reacoes selvagens ao jogador e visitas pacificas entre especies (observar, aproximar, brincar e se afastar). Ainda faltam combate profundo, interacoes duradouras entre especies, tarefas, domesticacao, salvamento de posicao e reproducao.
 - Teste visual local no Godot e validacao do desempenho com 32 entidades sao necessarios.
 
 ## Correcao de visibilidade (16/10/2026)
@@ -40,3 +40,37 @@
 - 9 FPS para caminhar, 12 FPS para correr; velocidade acompanha parcialmente a velocidade fisica. Ao trocar entre caminhar/correr preserva a fase do passo.
 - Golpes mantem os eventos de impacto no mesmo quadro, mas agora usam duracoes variaveis: preparacao mais lenta, contato rapido e retorno mais suave.
 - Falta criar sprites extras (idle masculino com piscadas reais e eventualmente locomocao com diagonais) para acabamento definitivo. Inspecione no F5 e teste todas as direcoes.
+
+
+## IA selvagem: temperamentos e reacoes (17/10/2026)
+
+`SlimePopulation` continua colocando 32 especies de forma selvagem, sem captura nem rotina de cuidados do jogador. Os scripts foram divididos por responsabilidade:
+
+- `scripts/slimes/slime_needs.gd`: necessidade ecologica, regeneracao de reserva e risco de dissipar.
+- `scripts/slimes/slime_temperaments.gd`: temperamento especifico das 32 especies, distancia de alerta, alcance e animacoes.
+- `scripts/slimes/slime_wander.gd`: maquina de estados com roaming, busca de habitat e interacao social.
+- `scripts/slimes/world_population.gd`: margens de agua, pontos de recursos e rotas caminhaveis.
+
+Temperamentos:
+- **Medroso**: foge quando o jogador aproxima; tenta desviar de obstaculos.
+- **Amigavel**: se aproxima e exibe afeicao (animacao de felicidade/coracao); nao pode ser domesticado nesta etapa.
+- **Curioso**: observa o jogador, sem partir para combate.
+- **Territorial**: protege uma area ao redor de seu ponto inicial; persegue apenas invasoes proximo ao lar.
+- **Agressivo**: persegue o jogador enquanto estiver no alcance de percepcao. Ataque tem aviso, golpe e tempo de recarga.
+
+Gota possui postura territorial e a animacao `disparar_jato` com trilha visual azul; o jogador recebe dano apenas se continuar dentro do alcance e sem obstaculos no momento do golpe. Uma perseguição nao tem alcance infinito. Ataques tem recarga e o jogador possui invulnerabilidade breve, HP de teste e retorno seguro ao spawn quando HP chega a zero. Nao ha perda de itens, save sobrescrito, captura, domesticacao ou trabalhos no campo.
+
+**Prioridade ecologica**: a IA nao procura o jogador se a reserva essencial estiver criticamente baixa; medrosos ainda podem fugir de perigo. Criaturas nao atravessam agua nem paredes para reagir. As interacoes sociais nao persistem entre aberturas do World; mais tarde podemos persistir memoria de encontros.
+
+Testes: `tests/SlimeBehaviorTest.tscn` (fuga, curiosidade, afeicao, aviso de ataque, dano, recarga, defesa do Gota e respawn); `tests/SlimeSurvivalTest.tscn` (habitat, absorcao e fome). Testes visuais locais no Godot ainda sao recomendados.
+
+
+## Regra de convivencia selvagem
+
+**Slimes nao lutam entre si.** Independentemente de agressividade ou territorialidade, os slimes so podem interagir uns com os outros pacificamente: observar, brincar, mostrar afeicao, compartilhar recursos, ajudar ou se afastar. Slimes hostis podem atacar o **jogador**, mas nao outros slimes. Proibidos combate intraespecies, predacao, dano ou morte causada por outro slime. Nao implementar captura/domesticacao nesta fase.
+
+## Convivo selvagem sem combate (17/10/2026)
+
+`SlimePopulation` agora oferece `find_nearby_wild_slime()`, que encontra individuos selvagens vivos e saudaveis proximos, de maneira local e esparsa. `slime_wander.gd` alterna encontros de curta duracao e com cooldown: curiosos observam; amigaveis aproximam-se, brincam e mostram um coracao; medrosos e territoriais respeitam o espaco; agressivos **somente observam outros slimes**. Nao ha dano, predacao, captura, pontos de amizade persistentes ou ataques entre especies.
+
+As necessidades de agua, comida e habitat tem prioridade; o encontro acaba se faltar energia, se o parceiro for removido ou se o jogador trouxer perigo. A IA funciona mesmo sem o jogador na cena. O teste dedicado `tests/SlimePeerTest.tscn` valida estas regras, incluindo o encerramento seguro de encontros. Ficam pendentes afinidades persistentes, ajuda, convivencia em grupos, testes visuais e a criacao dos territorios definitivos.

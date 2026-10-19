@@ -5,12 +5,6 @@
 [ext_resource type="PackedScene" uid="uid://e41u5bfsawlk" path="res://scenes/player/Player.tscn" id="3_v5dby"]
 [ext_resource type="Script" uid="uid://ckh0g2fwff8lu" path="res://scripts/world/world_hoeing.gd" id="4_hoe"]
 [ext_resource type="Script" uid="uid://defifava5el4x" path="res://scripts/world/terrain_edge_collision.gd" id="5_collision"]
-[ext_resource type="PackedScene" uid="uid://dtxkin281u2sa" path="res://scenes/objects/flowers/flower_blue.tscn" id="5_lplgh"]
-[ext_resource type="PackedScene" uid="uid://b0eknar52iwoe" path="res://scenes/objects/flowers/flower_light_blue.tscn" id="6_d6tky"]
-[ext_resource type="PackedScene" uid="uid://det6skf4eyyec" path="res://scenes/objects/flowers/flower_light_yellow.tscn" id="7_6mhxi"]
-[ext_resource type="PackedScene" uid="uid://crbe8iaa6ro7q" path="res://scenes/objects/flowers/flower_pink.tscn" id="8_xclow"]
-[ext_resource type="PackedScene" uid="uid://dyeb616iwcv7h" path="res://scenes/objects/flowers/flower_purple.tscn" id="9_hon07"]
-[ext_resource type="PackedScene" uid="uid://blmsev07orpf2" path="res://scenes/objects/flowers/flower_yellow.tscn" id="10_dobjl"]
 [ext_resource type="PackedScene" uid="uid://4l6nmav7sm53" path="res://scenes/objects/bushes/grass.tscn" id="11_iehkj"]
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/apple.tscn" id="12_iqxvy"]
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/apple_leaf.tscn" id="13_pi2y4"]
@@ -26,15 +20,10 @@
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry.tscn" id="23_0qn2w"]
 [ext_resource type="PackedScene" path="res://scenes/objects/fruit/red_berry_leaf.tscn" id="24_l5iln"]
 
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_small.tscn" id="27_tree_small"]
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree.tscn" id="28_tree"]
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_apple.tscn" id="29_tree_apple"]
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_orange.tscn" id="30_tree_orange"]
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_pear.tscn" id="31_tree_pear"]
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_peach.tscn" id="32_tree_peach"]
-[ext_resource type="PackedScene" path="res://scenes/objects/trees/tree_large.tscn" id="33_tree_large"]
 
 [ext_resource type="Script" path="res://scripts/slimes/world_population.gd" id="26_population"]
+[ext_resource type="Script" path="res://scripts/world/world_population.gd" id="35_world_population"]
+[ext_resource type="Script" path="res://scripts/ui/world_settings_menu.gd" id="34_world_settings"]
 
 [node name="World2" type="Node2D" unique_id=2045392138]
 
@@ -81,23 +70,11 @@ soil_water_path = NodePath("../soil_water")
 house_path = NodePath("../HouseBuilder")
 player_path = NodePath("../../Player")
 
-[node name="flower_blue" parent="Actors/Map" unique_id=209981286 instance=ExtResource("5_lplgh")]
-position = Vector2(-142, -2)
 
-[node name="flower_light_blue" parent="Actors/Map" unique_id=1952284404 instance=ExtResource("6_d6tky")]
-position = Vector2(246, 58)
 
-[node name="flower_light_yellow" parent="Actors/Map" unique_id=1453015353 instance=ExtResource("7_6mhxi")]
-position = Vector2(222, -3)
 
-[node name="flower_pink" parent="Actors/Map" unique_id=2103528471 instance=ExtResource("8_xclow")]
-position = Vector2(209, -71)
 
-[node name="flower_purple" parent="Actors/Map" unique_id=64943752 instance=ExtResource("9_hon07")]
-position = Vector2(-163, 50)
 
-[node name="flower_yellow" parent="Actors/Map" unique_id=427656246 instance=ExtResource("10_dobjl")]
-position = Vector2(-119, -46)
 
 [node name="grass" parent="Actors/Map" unique_id=1952023146 instance=ExtResource("11_iehkj")]
 position = Vector2(-119, -46)
@@ -147,51 +124,29 @@ position = Vector2(237, 178)
 [node name="red_berry_leaf" parent="Actors/Map" unique_id=1403635951 instance=ExtResource("24_l5iln")]
 position = Vector2(169, 224)
 
-[node name="tree_small_west" parent="Actors/Map" instance=ExtResource("27_tree_small")]
-position = Vector2(-252, -176)
-persistent_id = "world2_forest_v1_tree_small_west"
 
-[node name="tree_large_east" parent="Actors/Map" instance=ExtResource("33_tree_large")]
-position = Vector2(258, -171)
-persistent_id = "world2_forest_v1_tree_large_east"
 
-[node name="tree_apple_west" parent="Actors/Map" instance=ExtResource("29_tree_apple")]
-position = Vector2(-250, -76)
-persistent_id = "world2_forest_v1_tree_apple_west"
 
-[node name="tree_orange_east" parent="Actors/Map" instance=ExtResource("30_tree_orange")]
-position = Vector2(252, -68)
-persistent_id = "world2_forest_v1_tree_orange_east"
 
-[node name="tree_pear_west" parent="Actors/Map" instance=ExtResource("31_tree_pear")]
-position = Vector2(-265, 72)
-persistent_id = "world2_forest_v1_tree_pear_west"
 
-[node name="tree_peach_east" parent="Actors/Map" instance=ExtResource("32_tree_peach")]
-position = Vector2(285, 135)
-persistent_id = "world2_forest_v1_tree_peach_east"
 
-[node name="tree_common_west" parent="Actors/Map" instance=ExtResource("28_tree")]
-position = Vector2(-245, 181)
-persistent_id = "world2_forest_v1_tree_common_west"
 
-[node name="tree_large_southeast" parent="Actors/Map" instance=ExtResource("33_tree_large")]
-position = Vector2(260, 261)
-persistent_id = "world2_forest_v1_tree_large_southeast"
 
-[node name="tree_small_southwest" parent="Actors/Map" instance=ExtResource("27_tree_small")]
-position = Vector2(-95, 285)
-persistent_id = "world2_forest_v1_tree_small_southwest"
 
-[node name="tree_common_south" parent="Actors/Map" instance=ExtResource("28_tree")]
-position = Vector2(105, 280)
-persistent_id = "world2_forest_v1_tree_common_south"
 
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("3_v5dby")]
 z_index = 10
 position = Vector2(2, -157)
 
+[node name="WorldPopulation" type="Node2D" parent="Actors/Map"]
+y_sort_enabled = true
+script = ExtResource("35_world_population")
+
 [node name="SlimePopulation" type="Node2D" parent="Actors"]
 z_index = 3
 y_sort_enabled = true
 script = ExtResource("26_population")
+
+[node name="WorldSettings" type="CanvasLayer" parent="."]
+layer = 40
+script = ExtResource("34_world_settings")

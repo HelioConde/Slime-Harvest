@@ -35,6 +35,16 @@ jobs:
             exit 1
           fi
 
+      - name: Test interface scale and settings (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/InterfaceScaleTest.tscn --quit-after 500 2>&1 | tee interface-scale.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL interface" interface-scale.log; then
+            exit 1
+          fi
+          grep -F "PASS interface: hotbar, HUD, options and persistence" interface-scale.log
+
       - name: Smoke test constructed scenes
         shell: bash
         run: |
@@ -82,6 +92,46 @@ jobs:
             exit 1
           fi
           grep -F "PASS fruit-terrain: all four fruit trees and six terrain patches validated" fruit-terrain.log
+
+      - name: Test wild slime reaction and attacks (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SlimeBehaviorTest.tscn --quit-after 600 2>&1 | tee wild-behavior.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL wild-behavior" wild-behavior.log; then
+            exit 1
+          fi
+          grep -F "PASS wild-behavior: flee, observe, affection, charged hits, cooldown and safe respawn" wild-behavior.log
+
+      - name: Test wild slime peaceful peer interactions (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SlimePeerTest.tscn --quit-after 700 2>&1 | tee slime-peer.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL slime-peer" slime-peer.log; then
+            exit 1
+          fi
+          grep -F "PASS slime-peer: play, curiosity, spacing, survival priority and nonviolence" slime-peer.log
+
+      - name: Test wild slime ecology and water need (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SlimeSurvivalTest.tscn --quit-after 1200 2>&1 | tee slime-survival.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL slime-survival" slime-survival.log; then
+            exit 1
+          fi
+          grep -F "PASS slime-survival: species habitats, Gota hydration and wild exhaustion" slime-survival.log
+
+      - name: Test generated world resources and persistence (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/WorldPopulationTest.tscn --quit-after 1500 2>&1 | tee population.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL population" population.log; then
+            exit 1
+          fi
+          grep -F "PASS population: seeded layout, safe grass2 bounds and persistence" population.log
 
       - name: Test main world hoe restrictions (headless)
         shell: bash

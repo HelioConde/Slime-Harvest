@@ -4,6 +4,8 @@ extends CharacterBody2D
 signal interaction_requested(target: Node)
 signal tool_use_requested(origin: Vector2, direction: Vector2)
 signal tool_action_requested(tool_id: StringName, world_position: Vector2)
+signal wild_health_changed(current: int, maximum: int)
+signal wild_player_respawned()
 
 const PLAYER_SKINS = preload("res://scripts/player/player_skins.gd")
 const MOTION_ALIGNMENT = preload("res://scripts/player/player_motion_alignment.gd")
@@ -20,6 +22,12 @@ const HOTBAR_SCENE: PackedScene = preload("res://scenes/ui/ToolHotbar.tscn")
 @export_range(16.0, 96.0, 1.0) var tool_reach: float = 60.0
 @export_range(0.5, 3.0, 0.05) var tool_animation_speed: float = 1.65
 
+@export_range(1, 20, 1) var wild_max_health: int = 5
+var wild_health: int = 5
+var _wild_invulnerable: float = 0.0
+var _wild_impulse := Vector2.ZERO
+var _wild_spawn := Vector2.ZERO
+var _wild_health_display: Label
 var facing: Vector2 = Vector2.DOWN
 var _tool_remaining: float = 0.0
 var _action_animating: bool = false
@@ -45,6 +53,8 @@ var _was_moving: bool = false
 
 
 func _ready() -> void:
+	_wild_spawn = global_position
+	wild_health = wild_max_health
 	if animation == null:
 		push_error("Player: mantenha AnimatedSprite2D como filho direto.")
 		set_physics_process(false)
@@ -67,6 +77,7 @@ func _ready() -> void:
 	hud_layer.add_child(_hotbar)
 	_hotbar.connect("tool_selected", Callable(self, "_on_hotbar_selection"))
 	_hotbar.call("set_selected_tool", _current_tool())
+	_build_wild_health_hud(hud_layer)
 
 
 func _current_tool() -> StringName:
@@ -181,6 +192,7 @@ func _try_collect_click(cursor: Vector2) -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	_wild_invulnerable = maxf(0.0, _wild_invulnerable - delta)
 	_tool_remaining = maxf(0.0, _tool_remaining - delta)
 	var direction := Vector2.ZERO
 	if controls_enabled and not _action_animating:
@@ -197,6 +209,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		var rate: float = move_acceleration if direction != Vector2.ZERO else move_deceleration
 		velocity = velocity.move_toward(desired, rate * delta)
+	velocity += _wild_impulse
+	_wild_impulse = _wild_impulse.move_toward(Vector2.ZERO, 500.0 * delta)
 	move_and_slide()
 	interaction_ray.target_position = facing * 24.0
 	tool_origin.position = facing * 16.0
@@ -497,3 +511,56 @@ func _update_visual_anchor(delta: float) -> void:
 	_anchor_current = _anchor_current.lerp(_anchor_target, 1.0 - exp(-maxf(delta, 0.0) * 19.0))
 	# Quadros ~222px em escala .25: quantizar para um pixel inteiro no mapa.
 	animation.offset = Vector2(roundf(_anchor_current.x * 0.25) * 4.0, roundf(_anchor_current.y * 0.25) * 4.0)
+
+
+## Combate selvagem provisório: protege o jogador sem alterar inventario/saves.
+## O ciclo de cuidado/domesticacao fica fora deste escopo.
+func receive_wild_attack(amount: int, source: Vector2) -> bool:
+	if amount <= 0 or _wild_invulnerable > 0.0 or not is_inside_tree():
+		return false
+	wild_health = maxi(0, wild_health - amount)
+	_wild_invulnerable = 1.2
+	var away: Vector2 = global_position - source
+	_wild_impulse = away.normalized() * 100.0 if away.length() > 0.1 else Vector2.DOWN * 100.0
+	_refresh_wild_health_hud()
+	wild_health_changed.emit(wild_health, wild_max_health)
+	if animation != null:
+		animation.modulate = Color(1.0, 0.45, 0.45)
+		var flash := create_tween()
+		flash.tween_property(animation, "modulate", Color.WHITE, 0.25)
+	if wild_health <= 0:
+		_wild_respawn()
+	return true
+
+
+func _wild_respawn() -> void:
+	global_position = _wild_spawn
+	velocity = Vector2.ZERO
+	_wild_impulse = Vector2.ZERO
+	wild_health = wild_max_health
+	_wild_invulnerable = 4.0
+	_refresh_wild_health_hud()
+	wild_health_changed.emit(wild_health, wild_max_health)
+	wild_player_respawned.emit()
+
+
+func _build_wild_health_hud(layer: CanvasLayer) -> void:
+	_wild_health_display = Label.new()
+	_wild_health_display.name = "WildHealth"
+	_wild_health_display.anchor_left = 1.0
+	_wild_health_display.anchor_right = 1.0
+	_wild_health_display.offset_left = -130.0
+	_wild_health_display.offset_right = -42.0
+	_wild_health_display.offset_top = 8.0
+	_wild_health_display.offset_bottom = 34.0
+	_wild_health_display.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_wild_health_display.add_theme_font_size_override("font_size", 13)
+	_wild_health_display.add_theme_color_override("font_color", Color(1.0, 0.83, 0.77))
+	_wild_health_display.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(_wild_health_display)
+	_refresh_wild_health_hud()
+
+
+func _refresh_wild_health_hud() -> void:
+	if is_instance_valid(_wild_health_display):
+		_wild_health_display.text = "HP %d/%d" % [wild_health, wild_max_health]

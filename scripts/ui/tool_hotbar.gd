@@ -46,6 +46,7 @@ func _ready() -> void:
 	_build_panel()
 	_build_toast()
 	_build_selection_label()
+	UISettings.ui_scale_changed.connect(_layout_bar)
 	_layout_bar()
 	_refresh_selection()
 	_update_selection_label()
@@ -176,12 +177,18 @@ func _layout_bar() -> void:
 		if image != null:
 			image.custom_minimum_size.y = 23.0 if compact else 29.0
 	var real_width: float = PANEL_PADDING * 2.0 + slot_width * 10.0 + SLOT_GAP * 9.0
+	var ui_scale: float = UISettings.hotbar_scale
 	_panel.custom_minimum_size = Vector2(real_width, bar_height)
 	_panel.size = Vector2(real_width, bar_height)
-	_panel.position = Vector2(roundf((size.x - real_width) * 0.5), roundf(size.y - bar_height - BAR_BOTTOM_MARGIN))
+	_panel.scale = Vector2.ONE * ui_scale
+	# Centralize pela largura ja reduzida, sem mover a camera ou as hitboxes.
+	_panel.position = Vector2(roundf((size.x - real_width * ui_scale) * 0.5), roundf(size.y - bar_height * ui_scale - BAR_BOTTOM_MARGIN))
 	if _selection_label != null:
-		_selection_label.position = Vector2(_panel.position.x, _panel.position.y - 22.0)
+		_selection_label.scale = Vector2.ONE * ui_scale
+		_selection_label.position = Vector2(_panel.position.x, _panel.position.y - 22.0 * ui_scale)
 		_selection_label.size = Vector2(real_width, 18.0)
+	if _toast != null:
+		_toast.scale = Vector2.ONE * UISettings.hud_scale
 
 
 func get_slot_item(index: int) -> StringName:

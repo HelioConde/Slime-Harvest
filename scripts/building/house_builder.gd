@@ -165,6 +165,8 @@ func _build_ui() -> void:
 	tooltip.name = "ConstructionCursor"
 	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(tooltip)
+	UISettings.ui_scale_changed.connect(_apply_construction_hud_scale.bind(tooltip))
+	_apply_construction_hud_scale(tooltip)
 	balance = Label.new()
 	balance.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip.add_child(balance)
@@ -179,6 +181,11 @@ func _build_ui() -> void:
 		label.add_theme_color_override("font_outline_color", Color.BLACK)
 	tooltip.hide()
 	_refresh_balance()
+
+func _apply_construction_hud_scale(tooltip: Control) -> void:
+	if is_instance_valid(tooltip):
+		tooltip.scale = Vector2.ONE * UISettings.hud_scale
+
 
 func _update_cursor_ui() -> void:
 	var tooltip := balance.get_parent() as Control

@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+UISettings="*res://scripts/core/ui_settings.gd"
 GameCalendar="*res://scripts/core/game_calendar.gd"
 TreePersistence="*res://scripts/trees/tree_persistence.gd"
 ResourceBag="*res://scripts/items/resource_bag.gd"
