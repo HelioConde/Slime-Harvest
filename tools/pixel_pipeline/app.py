@@ -148,6 +148,9 @@ def serve(root, port=8877):
                 if path=='/api/jobs':
                     with jobs.lock: return self.reply({'jobs':list(jobs.jobs.values()),'paused':jobs.paused.is_set()})
                 if path=='/api/models': return self.reply(jobs.client.models())
+                if path=='/api/catalog':
+                    from catalog import configured_definitions
+                    return self.reply(configured_definitions())
                 if path=='/api/health':
                     opts=jobs.client.health(); return self.reply({'ok':True,'model':opts.get('sd_model_checkpoint')})
                 if path.startswith('/files/'):

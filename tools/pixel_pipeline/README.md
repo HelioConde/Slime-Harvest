@@ -100,3 +100,7 @@ O objetivo de animações prontas para produção ainda depende de superar as fa
 ## Revisão das caminhadas da aventureira
 
 `revise_walks.py` reproduz o ensaio específico da personagem existente. Recupera os corpos completos de frente/costas do atlas original, cujo recorte regular cortava os pés; mantém as referências laterais existentes. Usa escala fixa e registro pelo centro da cabeça, sem modificar o recurso ativo do jogo. Exige `--output` e `--palette-job` (job.json do idle V2 para compartilhar a paleta). Comece com `--phase samples`; após inspeção, use `--phase full` no mesmo diretório para aproveitar o cache. Consulte `QUALITY_WALKS_V2.md` para limites e resultados.
+
+## Catálogo completo e preservação do player
+
+Use production.py para a produção atual; leia PRODUCTION.md. O catálogo reúne 44 ações e mantém os tempos reais de idle/walk. O ensaio legado de 36 quadros não é o fluxo de preservação aprovado. As novas exportações ficam separadas e exigem revisão antes de integração.

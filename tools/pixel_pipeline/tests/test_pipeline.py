@@ -32,7 +32,7 @@ class PipelineTests(unittest.TestCase):
     def test_godot_margin_reconstruction(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);save_png(Image.new('RGBA',(32,32),'red'),root/'sheet.png')
-            (root/'frames.tres').write_text('[ext_resource type="Texture2D" path="res://sheet.png" id="1"]\n[sub_resource type="AtlasTexture" id="f_idle_down_0"]\natlas = ExtResource("1")\nregion = Rect2(0, 0, 10, 20)\nmargin = Rect2(4, 5, 22, 12)\n',encoding='utf-8')
+            (root/'frames.tres').write_text('[ext_resource type="Texture2D" path="res://sheet.png" id="1"]\n[sub_resource type="AtlasTexture" id="f_idle_down_0"]\natlas = ExtResource("1")\nregion = Rect2(0, 0, 10, 20)\nmargin = Rect2(4, 5, 22, 12)\n[resource]\nanimations = [{"frames": [{"duration": 1.0, "texture": SubResource("f_idle_down_0")}], "loop": true, "name": &"idle_down", "speed": 6.0}]\n',encoding='utf-8')
             im=extract_godot_frames(root,'frames.tres','idle_down',1)[0]
             self.assertEqual(im.size,(32,32))
             self.assertEqual(im.getchannel('A').getbbox(),(4,5,14,25))

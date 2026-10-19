@@ -1,0 +1,1806 @@
+{
+  "schema_version": 1,
+  "aliases": {
+    "pickaxe": "pick",
+    "watering_can": "watering",
+    "planting": "plant",
+    "harvesting": "harvest"
+  },
+  "actions": [
+    {
+      "id": "idle",
+      "name": "idle",
+      "priority": 0,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": true,
+      "pose_family": "idle",
+      "pose_plan": [
+        "cycle"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, idle, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [],
+      "interruptible": true,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "walk",
+      "name": "walk",
+      "priority": 0,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": true,
+      "pose_family": "walk",
+      "pose_plan": [
+        "cycle"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, walk, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [],
+      "interruptible": true,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "run",
+      "name": "run",
+      "priority": 1,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": true,
+      "pose_family": "run",
+      "pose_plan": [
+        "cycle"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, run, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [],
+      "interruptible": true,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "axe",
+      "name": "axe",
+      "priority": 1,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": false,
+      "pose_family": "axe",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, axe, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "impact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "pick",
+      "name": "pick",
+      "priority": 1,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": false,
+      "pose_family": "pick",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, pick, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "impact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "hoe",
+      "name": "hoe",
+      "priority": 1,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": false,
+      "pose_family": "hoe",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, hoe, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "impact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "watering",
+      "name": "watering",
+      "priority": 1,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": 8,
+      "fps": null,
+      "loop": false,
+      "pose_family": "watering",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, watering, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "water_start",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "plant",
+      "name": "plant",
+      "priority": 2,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "plant",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, plant, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "seed_release",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "harvest",
+      "name": "harvest",
+      "priority": 2,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "harvest",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, harvest, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "crop_collect",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "fertilize",
+      "name": "fertilize",
+      "priority": 2,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "fertilize",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, fertilize, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "fertilizer_release",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "weed",
+      "name": "weed",
+      "priority": 2,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "weed",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, weed, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "weed_remove",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "sickle",
+      "name": "sickle",
+      "priority": 2,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "sickle",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, sickle, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "impact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "refill_watering_can",
+      "name": "refill watering can",
+      "priority": 2,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "refill_watering_can",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, refill watering can, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "water_refill",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "fish",
+      "name": "fish",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "fish",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, fish, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "cast",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "cook",
+      "name": "cook",
+      "priority": 3,
+      "directions": [
+        "down"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "cook",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, cook, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "ingredient_add",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "build",
+      "name": "build",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "build",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, build, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "impact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "sleep",
+      "name": "sleep",
+      "priority": 3,
+      "directions": [
+        "down"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": true,
+      "pose_family": "sleep",
+      "pose_plan": [
+        "cycle"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, sleep, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [],
+      "interruptible": true,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "attack",
+      "name": "attack",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "attack",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, attack, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "hit",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "hurt",
+      "name": "hurt",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "hurt",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, hurt, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "hit_reaction",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "death",
+      "name": "death",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "death",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, death, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "collapse",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "interact",
+      "name": "interact",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "interact",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, interact, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "activate",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "tool_use",
+      "name": "tool use",
+      "priority": 3,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "tool_use",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, tool use, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "impact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "pet_slime",
+      "name": "pet slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "pet_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, pet slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "pet_contact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "pickup_slime",
+      "name": "pickup slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "carry",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, pickup slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "attach_slime",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "hold_slime",
+      "name": "hold slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": true,
+      "pose_family": "carry",
+      "pose_plan": [
+        "cycle"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, hold slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "hold_anchor",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": true,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "putdown_slime",
+      "name": "putdown slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "carry",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, putdown slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "detach_slime",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "feed_slime",
+      "name": "feed slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "feed_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, feed slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "food_transfer",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "play_slime",
+      "name": "play slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "play_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, play slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "play_cue",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "hug_slime",
+      "name": "hug slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "hug_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, hug slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "hug_contact",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "call_slime",
+      "name": "call slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "call_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, call slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "command",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "command_follow",
+      "name": "command follow",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "command",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, command follow, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "command",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "command_stay",
+      "name": "command stay",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "command",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, command stay, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "command",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "command_work",
+      "name": "command work",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "command",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, command work, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "command",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "command_attack",
+      "name": "command attack",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "command",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, command attack, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "command",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "give_item",
+      "name": "give item",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "give_item",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, give item, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "item_transfer",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "receive_item",
+      "name": "receive item",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "receive_item",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, receive item, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "item_receive",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "heal_slime",
+      "name": "heal slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "heal_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, heal slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "heal",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "train_slime",
+      "name": "train slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "train_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, train slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "training_cue",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "celebrate_slime",
+      "name": "celebrate slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "celebrate_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, celebrate slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "celebrate",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "protect_slime",
+      "name": "protect slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "protect_slime",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, protect slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "shield",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "combo_attack",
+      "name": "combo attack",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "combo_attack",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, combo attack, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "combo_hit",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "rescue_slime",
+      "name": "rescue slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "carry",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, rescue slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "rescue_attach",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "place_slime_home",
+      "name": "place slime home",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "carry",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, place slime home, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "home_release",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    },
+    {
+      "id": "rest_slime",
+      "name": "rest slime",
+      "priority": 4,
+      "directions": [
+        "down",
+        "up",
+        "left",
+        "right"
+      ],
+      "planned_frames": null,
+      "fps": null,
+      "loop": false,
+      "pose_family": "carry",
+      "pose_plan": [
+        "preparation",
+        "execution",
+        "contact",
+        "recovery"
+      ],
+      "pose_validation": "pending",
+      "prompt": "same character, rest slime, readable full body pose, correct tool or interaction object, top-down 3/4 pixel art",
+      "reference_image": null,
+      "palette": null,
+      "origin": [
+        32,
+        62
+      ],
+      "events": [
+        {
+          "id": "rest_release",
+          "phase": "contact",
+          "frame": null,
+          "socket": "hands",
+          "validated": false
+        }
+      ],
+      "interruptible": false,
+      "generation_status": "pending_reference",
+      "validation_status": "pending",
+      "export_path": null
+    }
+  ]
+}

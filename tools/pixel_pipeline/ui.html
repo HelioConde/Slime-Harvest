@@ -27,6 +27,7 @@
 <script>
 const $=id=>document.getElementById(id), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 ['idle','walk','run','attack','hurt','death','interact','tool_use','watering','planting','harvesting','jump','water_jet'].forEach(a=>$('animation').add(new Option(a,a)));
+fetch('/api/catalog').then(r=>r.json()).then(c=>{const selected=$('animation').value;$('animation').replaceChildren();[...c.actions.map(a=>a.id),'planting','harvesting','jump','water_jet'].forEach(a=>$('animation').add(new Option(a,a)));$('animation').value=selected}).catch(()=>{});
 async function api(path,opts){let r=await fetch(path,opts),d=await r.json();if(!r.ok)throw Error(d.error||r.status);return d}
 const post=(path,data)=>api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
 async function health(){try{let h=await api('/api/health');$('health').textContent='WebUI conectado · '+h.model;let models=await api('/api/models');$('model').innerHTML='<option value="">Modelo carregado</option>';models.forEach(m=>$('model').add(new Option(m.title,m.title)))}catch(e){$('health').textContent=e.message}}

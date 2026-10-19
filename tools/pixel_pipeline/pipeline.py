@@ -17,7 +17,8 @@ from PIL import Image, ImageChops
 
 SIZES = (32, 48, 64, 96, 128)
 DIRECTIONS = ('down', 'up', 'left', 'right')
-ANIMATIONS = ('idle','walk','run','attack','hurt','death','interact','tool_use','watering','planting','harvesting','jump','water_jet')
+from catalog import configured_definitions
+ANIMATIONS = tuple(a['id'] for a in configured_definitions()['actions']) + ('planting','harvesting','jump','water_jet')
 STYLE = 'cozy fantasy game sprite, full body, single character, 3/4 top-down, pixel art, harmonious colors, plain white background'
 NEGATIVE = 'photo, text, watermark, multiple characters, cropped, blurry, extra limbs'
 PHASES = ['left_contact','left_weight','right_passing','right_advance','right_contact','right_weight','left_passing','left_advance']
@@ -133,19 +134,49 @@ def process(im, size=64, colors=24, palette=None, background=False, tolerance=24
     out.putdata([p if p[3] else (0,0,0,0) for p in out.getdata()])
     return out
 
-def components(im):
+def clean_frame(image, palette, remove_top_fragments=False):
+    base=process(image,size=64,palette=palette,background=False,dither=False,cleanup=False)
+    result=base.copy(); changed=0
+    # Only low-contrast single-pixel colour noise in a fully opaque neighbourhood.
+    # Keep silhouettes, gaps, eyes and high-contrast material details intact.
+    for y in range(1,63):
+        for x in range(1,63):
+            p=base.getpixel((x,y))
+            neighbors=[base.getpixel((x+dx,y+dy)) for dy in (-1,0,1) for dx in (-1,0,1) if (dx,dy)!=(0,0)]
+            if not p[3] or any(q[3]!=255 for q in neighbors): continue
+            candidate=max(set(neighbors),key=neighbors.count)
+            if candidate!=p and neighbors.count(candidate)>=7 and sum((p[k]-candidate[k])**2 for k in range(3))<=28**2:
+                result.putpixel((x,y),candidate);changed+=1
+    assert result.getchannel('A').tobytes()==base.getchannel('A').tobytes()
+    removed=[]
+    if remove_top_fragments:
+        groups=connected_regions(base)
+        if groups:
+            main=max(groups,key=len);top=min(y for x,y in main)
+            for group in groups:
+                if group is main:continue
+                if len(group)==1 or (len(group)<=max(4,len(main)*.06) and max(y for x,y in group)<top):
+                    for xy in group:result.putpixel(xy,(0,0,0,0))
+                    removed.extend(sorted(group))
+    return result,dict(recolored_pixels=changed,alpha_preserved=not removed,body_mask_preserved=True,pose_transforms=False,removed_fragment_pixels=[list(xy) for xy in removed])
+
+
+def connected_regions(im):
     a=im.getchannel('A'); w,h=im.size
     remaining={(x,y) for y in range(h) for x in range(w) if a.getpixel((x,y))>=128}
-    sizes=[]
+    groups=[]
     while remaining:
-        todo=[remaining.pop()]; size=0
+        todo=[remaining.pop()]; group=set(todo)
         while todo:
-            x,y=todo.pop(); size+=1
+            x,y=todo.pop()
             for dx,dy in ((-1,0),(1,0),(0,-1),(0,1),(-1,-1),(1,-1),(-1,1),(1,1)):
                 n=(x+dx,y+dy)
-                if n in remaining: remaining.remove(n); todo.append(n)
-        sizes.append(size)
-    return sorted(sizes,reverse=True)
+                if n in remaining: remaining.remove(n); todo.append(n); group.add(n)
+        groups.append(group)
+    return groups
+
+def components(im):
+    return sorted((len(group) for group in connected_regions(im)),reverse=True)
 
 def shared_palette(images, colors=24):
     pixels = [p[:3] for im in images for p in im.convert('RGBA').getdata() if p[3]>=128]
@@ -153,7 +184,9 @@ def shared_palette(images, colors=24):
         raise ValueError('Todos os quadros estão vazios.')
     strip = Image.new('RGB',(len(pixels),1)); strip.putdata(pixels)
     p = strip.quantize(colors=colors).getpalette()[:colors*3]
-    return [p[i:i+3] for i in range(0,len(p),3)]
+    result=[p[i:i+3] for i in range(0,len(p),3)]
+    if len(result)==1: result.append(result[0][:])
+    return result
 
 def align_frames(images, anchors=None, target=None):
     """Explicit per-frame ground/root anchors preserve intentional limb motion."""
@@ -220,31 +253,42 @@ def validate_frames(images, expected=None, poses=None):
                 visual_review_required=['identidade','alternância real dos membros','braços opostos','contato e deslizamento','escala','continuidade'],
                 note='Metadados de poses não comprovam anatomia dos pixels. Aprovação humana necessária.')
 
-def export(images, directory, name='personagem', animation='walk', direction='down', fps=8, poses=None, provenance=None):
+def export(images, directory, name='personagem', animation='walk', direction='down', fps=8, poses=None, provenance=None,
+           durations=None, loop=None, origin=None, allow_repeated_frames=False):
     if not images or not 1<=fps<=60: raise ValueError('Quadros/FPS inválidos.')
-    if animation not in ANIMATIONS or direction not in DIRECTIONS: raise ValueError('Animação/direção inválida.')
+    if not re.fullmatch(r'[a-z][a-z0-9_]{0,63}',animation) or direction not in DIRECTIONS: raise ValueError('Animação/direção inválida.')
     if any(im.size!=images[0].size for im in images): raise ValueError('Dimensões inconsistentes.')
     root=Path(directory); root.mkdir(parents=True,exist_ok=True)
     w,h=images[0].size; n=len(images); cols=min(4,n); rows=math.ceil(n/cols)
+    durations=list(durations) if durations is not None else [1.0]*n
+    if len(durations)!=n or any(not math.isfinite(v) or v<=0 for v in durations): raise ValueError('Durações inválidas.')
+    loop=animation in ('idle','walk','run','hold_slime','sleep') if loop is None else bool(loop)
+    origin=list(origin) if origin is not None else [w//2,h-2]
+    if len(origin)!=2 or any(not math.isfinite(v) for v in origin): raise ValueError('Origem inválida.')
     horizontal=Image.new('RGBA',(w*n,h)); grid=Image.new('RGBA',(w*cols,h*rows))
     for i,im in enumerate(images):
         save_png(im,root/f'frames/{i:03}.png'); horizontal.paste(im,(w*i,0)); grid.paste(im,(w*(i%cols),h*(i//cols)))
     save_png(horizontal,root/'sheet.png'); save_png(grid,root/'grid.png')
     # APNG preserves alpha without GIF palette limitations.
-    images[0].save(root/'preview.png',save_all=True,append_images=images[1:],duration=round(1000/fps),loop=0,disposal=0,blend=0)
-    validation=validate_frames(images,4 if animation=='idle' else 8 if animation=='walk' else n,poses)
+    images[0].save(root/'preview.png',save_all=True,append_images=images[1:],duration=[round(1000*v/fps) for v in durations],loop=0 if loop else 1,disposal=0,blend=0)
+    validation=validate_frames(images,n,poses)
+    if allow_repeated_frames:
+        validation['issues']=[v for v in validation['issues'] if not v.startswith('Quadros duplicados:')]
+    if not loop:
+        validation['issues']=[v for v in validation['issues'] if not v.startswith('Descontinuidade provável')]
+    validation['structural_ok']=not validation['issues']
     metadata=dict(character=name,animation=animation,direction=direction,resolution=[w,h],frame_count=n,fps=fps,
-                  origin=[w//2,h-2],grid={'columns':cols,'rows':rows},horizontal={'columns':n,'rows':1},
+                  origin=origin,durations=durations,loop=loop,grid={'columns':cols,'rows':rows},horizontal={'columns':n,'rows':1},
                   validation=validation,provenance=provenance or {},poses=poses)
     atomic_json(root/'metadata.json',metadata)
     # Standalone Godot preview, never changes the game project.
     (root/'project.godot').write_text('config_version=5\n[application]\nconfig/name="Sprite experimental"\nrun/main_scene="res://Preview.tscn"\n[rendering]\nrenderer/rendering_method="gl_compatibility"\ntextures/default_filters/use_nearest_mipmap_filter=false\n',encoding='utf-8')
     lines=['[gd_resource type="SpriteFrames" load_steps=%d format=3]'%(n+2),'[ext_resource type="Texture2D" path="res://sheet.png" id="1"]']
     for i in range(n): lines += [f'[sub_resource type="AtlasTexture" id="f{i}"]','atlas = ExtResource("1")',f'region = Rect2({i*w}, 0, {w}, {h})']
-    frames=', '.join('{"duration": 1.0, "texture": SubResource("f%d")}'%i for i in range(n))
-    lines += ['[resource]',f'animations = [{{"name": &"{animation}_{direction}", "speed": {float(fps)}, "loop": true, "frames": [{frames}]}}]']
+    frames=', '.join('{"duration": %s, "texture": SubResource("f%d")}'%(durations[i],i) for i in range(n))
+    lines += ['[resource]',f'animations = [{{"name": &"{animation}_{direction}", "speed": {float(fps)}, "loop": {str(loop).lower()}, "frames": [{frames}]}}]']
     (root/'frames.tres').write_text('\n\n'.join(lines),encoding='utf-8')
-    (root/'Preview.tscn').write_text(f'[gd_scene load_steps=2 format=3]\n[ext_resource type="SpriteFrames" path="res://frames.tres" id="1"]\n[node name="Preview" type="AnimatedSprite2D"]\ntexture_filter = 1\nposition = Vector2(320, 280)\nscale = Vector2(4, 4)\ncentered = false\noffset = Vector2({-w//2}, {-h+2})\nsprite_frames = ExtResource("1")\nanimation = &"{animation}_{direction}"\nautoplay = "{animation}_{direction}"\n',encoding='utf-8')
+    (root/'Preview.tscn').write_text(f'[gd_scene load_steps=2 format=3]\n[ext_resource type="SpriteFrames" path="res://frames.tres" id="1"]\n[node name="Preview" type="AnimatedSprite2D"]\ntexture_filter = 1\nposition = Vector2(320, 280)\nscale = Vector2(4, 4)\ncentered = false\noffset = Vector2({-origin[0]}, {-origin[1]})\nsprite_frames = ExtResource("1")\nanimation = &"{animation}_{direction}"\nautoplay = "{animation}_{direction}"\n',encoding='utf-8')
     return metadata
 
 class SDClient:
@@ -287,21 +331,9 @@ class SDClient:
         return decode(data['images'][0]),dict(seconds=time.monotonic()-start,parameters={k:v for k,v in payload.items() if k!='init_images'},info=data.get('info'),endpoint=endpoint)
 
 def extract_godot_frames(project, resource, animation, count):
-    """Read-only extraction of existing AtlasTexture regions; never label them AI output."""
-    project=Path(project); text=(project/resource).read_text(encoding='utf-8')
-    textures={m[1]:m[0] for m in re.findall(r'\[ext_resource[^\]]*path="res://([^"]+)" id="([^"]+)"\]',text)}
-    result=[]
-    for i in range(count):
-        m=re.search(r'\[sub_resource type="AtlasTexture" id="f_'+re.escape(animation)+f'_{i}"'+r'\]\s*atlas = ExtResource\("([^"]+)"\)\s*region = Rect2\(([^)]+)\)',text)
-        if not m: raise ValueError(f'Região não encontrada: {animation}/{i}')
-        x,y,w,h=map(lambda v:round(float(v)),m[2].split(','))
-        # AtlasTexture.margin.size expands the logical canvas; margin.position
-        # locates the region on that canvas. Omitting it changes scale and pivot.
-        tail=text[m.end():].split('[',1)[0]
-        margin=re.search(r'margin = Rect2\(([^)]+)\)',tail)
-        with Image.open(project/textures[m[1]]) as im: cropped=im.convert('RGBA').crop((x,y,x+w,y+h))
-        if margin:
-            mx,my,mw,mh=map(lambda v:round(float(v)),margin[1].split(','))
-            canvas=Image.new('RGBA',(w+mw,h+mh));canvas.paste(cropped,(mx,my));cropped=canvas
-        result.append(cropped)
-    return result
+    """Read existing timeline order (including repeated poses) without modifying sources."""
+    from catalog import read_resource, load_frame
+    sequence=read_resource(project,resource).get(animation)
+    if sequence is None or not 1<=count<=len(sequence['frames']):
+        raise ValueError(f'Animação/quantidade não encontrada: {animation}/{count}')
+    return [load_frame(project,f) for f in sequence['frames'][:count]]
