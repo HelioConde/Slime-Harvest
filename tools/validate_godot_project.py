@@ -31,8 +31,6 @@ CORE_SCRIPTS = (
 REQUIRED_SCENES = (
     "scenes/world/World.tscn",
     "scenes/objects/ObjectCatalog.tscn",
-    "scenes/trees/TreeChopDemo.tscn",
-    "scenes/farming/FarmingToolDemo.tscn",
     "scenes/ui/ToolHotbar.tscn",
 )
 
