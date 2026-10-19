@@ -7,6 +7,8 @@ extends Node2D
 
 const SAVE_VERSION := 1
 const SAVE_PREFIX := "world_random_v1_"
+const ZONE_COLUMNS := 5
+const ZONE_ROWS := 4
 const DEFINITIONS: Array[Dictionary] = [
 	{"kind": "tree", "count": 10, "space": 34.0, "margin": 3, "paths": [
 		"res://scenes/objects/trees/tree.tscn",
@@ -50,6 +52,7 @@ var _rng := RandomNumberGenerator.new()
 var _reserved: Array[Dictionary] = []
 var _records: Array[Dictionary] = []
 var _valid_cells: Array[Vector2i] = []
+var _spawn_zones: Array[Dictionary] = []
 var _allowed_paths: Dictionary = {}
 var _initialized: bool = false
 
@@ -116,12 +119,39 @@ func _initialize() -> void:
 
 func _build_ground_cells() -> void:
 	_valid_cells.clear()
-	var max_margin: int = border_margin_tiles
-	for definition in DEFINITIONS:
-		max_margin = maxi(max_margin, int(definition["margin"]))
 	for cell in grass.get_used_cells():
-		if _ground_is_safe(cell, max_margin):
+		if _ground_is_safe(cell, border_margin_tiles):
 			_valid_cells.append(cell)
+	_build_spawn_zones()
+
+
+## Divide somente o gramado seguro em regioes, incluindo as areas perifericas.
+## Cada setor recebe prioridade por quantidade ja gerada, nao pelo centro do mapa.
+func _build_spawn_zones() -> void:
+	_spawn_zones.clear()
+	if _valid_cells.is_empty():
+		return
+	var min_cell: Vector2i = _valid_cells[0]
+	var max_cell: Vector2i = _valid_cells[0]
+	for cell in _valid_cells:
+		min_cell.x = mini(min_cell.x, cell.x)
+		min_cell.y = mini(min_cell.y, cell.y)
+		max_cell.x = maxi(max_cell.x, cell.x)
+		max_cell.y = maxi(max_cell.y, cell.y)
+	var span_x: float = float(max_cell.x - min_cell.x + 1)
+	var span_y: float = float(max_cell.y - min_cell.y + 1)
+	var buckets: Dictionary = {}
+	for cell in _valid_cells:
+		var col: int = clampi(int(float(cell.x - min_cell.x) * ZONE_COLUMNS / span_x), 0, ZONE_COLUMNS - 1)
+		var row: int = clampi(int(float(cell.y - min_cell.y) * ZONE_ROWS / span_y), 0, ZONE_ROWS - 1)
+		var key: int = row * ZONE_COLUMNS + col
+		if not buckets.has(key):
+			buckets[key] = []
+		(buckets[key] as Array).append(cell)
+	var keys: Array = buckets.keys()
+	keys.sort()
+	for key in keys:
+		_spawn_zones.append({"cells": buckets[key], "used": 0})
 
 
 func _green_cell(cell: Vector2i) -> bool:
@@ -184,6 +214,8 @@ func is_safe_spawn(point: Vector2, distance: float, margin: int = 2) -> bool:
 func _generate_records() -> void:
 	_records.clear()
 	_reserved.clear()
+	for zone in _spawn_zones:
+		zone["used"] = 0
 	for definition in DEFINITIONS:
 		var kind: String = str(definition["kind"])
 		var count: int = int(definition["count"])
@@ -191,23 +223,39 @@ func _generate_records() -> void:
 		var space: float = float(definition["space"])
 		var margin: int = int(definition["margin"])
 		var placed := 0
-		var attempts := 0
-		while placed < count and attempts < count * 250:
-			attempts += 1
-			var cell: Vector2i = _valid_cells[_rng.randi_range(0, _valid_cells.size() - 1)]
-			var world_point: Vector2 = grass.to_global(grass.map_to_local(cell))
-			world_point += Vector2(_rng.randf_range(-3.0, 3.0), _rng.randf_range(-3.0, 3.0))
-			if not is_safe_spawn(world_point, space, margin):
-				continue
-			var resource: String = str(paths[_rng.randi_range(0, paths.size() - 1)])
-			var entry: Dictionary = {
-				"id": "%s_%03d" % [kind, placed],
-				"kind": kind, "path": resource, "x": world_point.x, "y": world_point.y,
-				"space": space, "margin": margin
-			}
-			_records.append(entry)
-			_reserved.append({"point": world_point, "space": space})
-			placed += 1
+		for index in range(count):
+			var zone_order: Array[int] = []
+			for zone_id in range(_spawn_zones.size()):
+				zone_order.append(zone_id)
+			zone_order.shuffle()
+			zone_order.sort_custom(func(a: int, b: int) -> bool:
+				return int(_spawn_zones[a]["used"]) < int(_spawn_zones[b]["used"])
+			)
+			var found := false
+			for zone_id in zone_order:
+				var cells: Array = _spawn_zones[zone_id]["cells"]
+				for attempt in range(mini(48, cells.size() * 2)):
+					var cell: Vector2i = cells[_rng.randi_range(0, cells.size() - 1)]
+					var world_point: Vector2 = grass.to_global(grass.map_to_local(cell))
+					world_point += Vector2(_rng.randf_range(-3.0, 3.0), _rng.randf_range(-3.0, 3.0))
+					if not is_safe_spawn(world_point, space, margin):
+						continue
+					var resource: String = str(paths[_rng.randi_range(0, paths.size() - 1)])
+					var entry: Dictionary = {
+						"id": "%s_%03d" % [kind, placed],
+						"kind": kind, "path": resource, "x": world_point.x, "y": world_point.y,
+						"space": space, "margin": margin
+					}
+					_records.append(entry)
+					_reserved.append({"point": world_point, "space": space})
+					_spawn_zones[zone_id]["used"] = int(_spawn_zones[zone_id]["used"]) + 1
+					placed += 1
+					found = true
+					break
+				if found:
+					break
+			if not found:
+				break
 		if placed < count:
 			push_warning("WorldPopulation: %s: apenas %d/%d lugares livres." % [kind, placed, count])
 
