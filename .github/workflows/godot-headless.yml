@@ -178,6 +178,16 @@ jobs:
           fi
           grep -F "PASS menu: functional safe entry point, future multiplayer and fourth-slot pickaxe" main-menu.log
 
+      - name: Test Sprout Sorry protagonist animation mapping (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/SproutSorryPlayerTest.tscn --quit-after 500 2>&1 | tee sprout-sorry-player.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL Sprout Sorry" sprout-sorry-player.log; then
+            exit 1
+          fi
+          grep -F "PASS Sprout Sorry: fim" sprout-sorry-player.log
+
       - name: Test isolated save slots (headless)
         shell: bash
         run: |
