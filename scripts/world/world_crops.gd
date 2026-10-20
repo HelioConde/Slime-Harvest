@@ -6,6 +6,8 @@ signal farm_changed
 const SAVE_PATH := "user://slimekeepers_world_crops_v1.json"
 const DAYS_PER_STAGE := 3
 const START_SEEDS := 12
+const SEED_PRICE := 3
+const FLOWER_NAMES := ["Azul", "Rosa", "Amarela"]
 const FLOWER_SCENES := [
 	preload("res://scenes/objects/flowers/flower_blue.tscn"),
 	preload("res://scenes/objects/flowers/flower_pink.tscn"),
@@ -21,6 +23,7 @@ var _crops: Dictionary = {}
 var _visuals: Dictionary = {}
 var seeds: int = START_SEEDS
 var harvests: int = 0
+var selected_variety: int = 0
 
 
 func _ready() -> void:
@@ -34,6 +37,48 @@ func _ready() -> void:
 
 func get_seed_count() -> int:
 	return seeds
+
+
+func get_selected_variety() -> int:
+	return selected_variety
+
+
+func get_selected_seed_name() -> String:
+	return FLOWER_NAMES[selected_variety]
+
+
+func select_variety(variety: int) -> bool:
+	if variety < 0 or variety >= FLOWER_SCENES.size():
+		return false
+	if selected_variety == variety:
+		return true
+	selected_variety = variety
+	_save()
+	farm_changed.emit()
+	return true
+
+
+func buy_seeds(amount: int = 1) -> bool:
+	# Valida antes de debitar: nenhuma compra parcial ou credito gratuito.
+	if amount <= 0 or amount > 99 or seeds > 99999 - amount:
+		return false
+	if not ResourceBag.spend_coins(SEED_PRICE * amount):
+		return false
+	seeds += amount
+	_save()
+	farm_changed.emit()
+	return true
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key == null or not key.pressed or key.echo or key.keycode != KEY_Q:
+		return
+	var player: Node = get_node_or_null("../../Player")
+	if player != null and not bool(player.get("controls_enabled")):
+		return
+	select_variety((selected_variety + 1) % FLOWER_SCENES.size())
+	get_viewport().set_input_as_handled()
 
 
 func get_harvest_count() -> int:
@@ -51,7 +96,7 @@ func try_hoe(cell: Vector2i) -> String:
 	if record.is_empty():
 		if seeds <= 0:
 			return "Sem sementes. Colha flores para recuperar sementes."
-		var variety: int = posmod(cell.x + cell.y * 7, FLOWER_SCENES.size())
+		var variety: int = selected_variety
 		record = {
 			"variety": variety, "watered": false, "stage": 0,
 			"growth_days": 0, "last_day": GameCalendar.day,
@@ -153,6 +198,7 @@ func _load() -> void:
 		return
 	seeds = clampi(int(data.get("seeds", START_SEEDS)), 0, 99999)
 	harvests = maxi(0, int(data.get("harvests", 0)))
+	selected_variety = clampi(int(data.get("selected_variety", 0)), 0, FLOWER_SCENES.size() - 1)
 	var entries: Variant = data.get("crops", [])
 	if not entries is Array:
 		return
@@ -198,7 +244,8 @@ func _save() -> void:
 		push_warning("WorldCrops: nao foi possivel salvar os cultivos.")
 		return
 	file.store_string(JSON.stringify({
-		"version": 1, "seeds": seeds, "harvests": harvests, "crops": records,
+		"version": 1, "seeds": seeds, "harvests": harvests,
+		"selected_variety": selected_variety, "crops": records,
 	}))
 
 
