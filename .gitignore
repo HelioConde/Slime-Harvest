@@ -12,3 +12,8 @@
 
 # Os assets licenciados do UI Pack sao instalados apenas na copia local.
 /assets/ui/sprout_lands/
+
+# Packs Sprout Lands e seus addons com arte licenciada: instalados localmente.
+/assets/sprout_lands/
+/addons/sprout_lands_ui/
+/addons/sprout_lands_tilemap/
