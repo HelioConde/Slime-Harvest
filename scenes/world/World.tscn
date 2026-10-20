@@ -23,6 +23,7 @@
 
 [ext_resource type="Script" path="res://scripts/slimes/world_population.gd" id="26_population"]
 [ext_resource type="Script" path="res://scripts/world/world_population.gd" id="35_world_population"]
+[ext_resource type="Script" path="res://scripts/world/world_crops.gd" id="36_world_crops"]
 [ext_resource type="Script" path="res://scripts/ui/world_settings_menu.gd" id="34_world_settings"]
 
 [node name="World2" type="Node2D" unique_id=2045392138]
@@ -75,6 +76,11 @@ player_path = NodePath("../../Player")
 
 
 
+
+[node name="WorldCrops" type="Node2D" parent="Actors/Map"]
+z_index = 0
+script = ExtResource("36_world_crops")
+tilled_soil_path = NodePath("../TilledSoil")
 
 [node name="grass" parent="Actors/Map" unique_id=1952023146 instance=ExtResource("11_iehkj")]
 position = Vector2(-119, -46)
