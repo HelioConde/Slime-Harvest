@@ -8,7 +8,16 @@ const THEME_PATH := "res://assets/ui/sprout_lands/sprout_theme.tres"
 static func get_theme() -> Theme:
 	if not ResourceLoader.exists(THEME_PATH):
 		return null
-	return load(THEME_PATH) as Theme
+	var loaded_theme := load(THEME_PATH) as Theme
+	if loaded_theme != null:
+		# O pack usa madeira clara: o texto padrao branco do Godot
+		# perde contraste em botoes, labels e caixas de texto.
+		loaded_theme.set_color(&"font_color", &"Button", Color("#3c2b21"))
+		loaded_theme.set_color(&"font_hover_color", &"Button", Color("#292018"))
+		loaded_theme.set_color(&"font_pressed_color", &"Button", Color("#292018"))
+		loaded_theme.set_color(&"font_disabled_color", &"Button", Color("#796d60"))
+		loaded_theme.set_color(&"font_color", &"Label", Color("#3c2b21"))
+	return loaded_theme
 
 
 static func get_style(style_name: StringName, type_name: StringName = &"Button") -> StyleBox:
