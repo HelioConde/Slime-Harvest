@@ -455,7 +455,7 @@ func _build_popup() -> void:
 	_overlay_card = PanelContainer.new()
 	_overlay_card.name = "Dialog"
 	_overlay_card.custom_minimum_size = Vector2(326, 0)
-	var sprout_panel: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+	var sprout_panel: StyleBox = SPROUT_UI.settings_panel_style()
 	_overlay_card.add_theme_stylebox_override("panel", sprout_panel if sprout_panel != null else _wood_style("normal"))
 	center.add_child(_overlay_card)
 
