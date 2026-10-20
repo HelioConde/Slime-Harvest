@@ -20,7 +20,7 @@ const ENTRIES: Array[Dictionary] = [
 	{"name": "14 · Breakable Pots", "slug": "breakable_pots", "file": "breakable pots.png", "info": "Vasos quebraveis: exemplo interativo no World."},
 	{"name": "15 · Sprout Lands Sprites", "path": "res://assets/sprout_lands/sprites/Objects/Basic Plants.png", "info": "Plantas, animais, mobiliario, edificios e tiles."},
 	{"name": "16 · Sprout Lands UI Basic", "path": "res://assets/ui/sprout_lands/settings_menu.png", "info": "Paineis e botoes do HUD e menu."},
-	{"name": "17 · Sprout Lands TileMap", "path": "res://addons/sprout_lands_tilemap/base/tilesets/sprout_lands_tile_set.tres", "info": "Plugin de TileMap e cenas base no editor. Opcional."},
+	{"name": "17 · Sprout Lands TileMap", "path": "res://addons/sprout_lands_tilemap/base/scenes/sprout_lands_tile_map.tscn", "info": "Plugin de TileMap e cenas base no editor. Opcional."},
 	{"name": "18 · Sprout Lands UI plugin", "path": "res://addons/sprout_lands_ui/content/assets/Sprite sheet for Basic Pack.png", "info": "Plugin de tema Godot; nao necessita ativacao automatica."},
 	{"name": "19 · Sprout Sorry", "path": "res://assets/Characters/sprout_sorry/free_character_spritesheet_by-cupnooble.png", "info": "Protagonista de 8 direcoes (corrigidas) e efeitos de ferramenta."},
 ]
@@ -115,7 +115,7 @@ func _display(index: int) -> void:
 	_preview.texture = null
 	if resource_path.ends_with(".png") and ResourceLoader.exists(resource_path):
 		_preview.texture = load(resource_path) as Texture2D
-	elif resource_path.ends_with(".tres") and ResourceLoader.exists(resource_path):
+	elif (resource_path.ends_with(".tres") or resource_path.ends_with(".tscn")) and ResourceLoader.exists(resource_path):
 		var tiles: Resource = load(resource_path)
 		_path_hint.text = "Plugin instalado: " + resource_path if tiles != null else "Plugin nao importado."
 		return
