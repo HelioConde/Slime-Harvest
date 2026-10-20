@@ -28,6 +28,7 @@ func _run() -> void:
 		return
 	var cal := test_root + "slimekeepers_calendar_v1.json"
 	var res := test_root + "slimekeepers_resources_v1.json"
+	var crops := test_root + "slimekeepers_world_crops_v1.json"
 	if not _check(_write(cal, "{\"version\":1,\"day\":17}") and _write(res, "{\"version\":1,\"counts\":{\"wood\":42}}"), "legacy progress created in sandbox"):
 		return
 	var mgr: RefCounted = SLOTS.new(test_root)
@@ -37,25 +38,28 @@ func _run() -> void:
 		return
 	if not _check(bool(mgr.call("create_new", "Vale Verde", "Lia")), "new independent farm created"):
 		return
-	if not _check(int(mgr.call("active_slot")) == 2 and not FileAccess.file_exists(cal), "new farm starts fresh"):
+	if not _check(int(mgr.call("active_slot")) == 2 and not FileAccess.file_exists(cal) and not FileAccess.file_exists(crops), "new farm starts fresh"):
 		return
 	if not _check(_write(cal, "{\"version\":1,\"day\":2}") and _write(res, "{\"version\":1,\"counts\":{\"wood\":3}}"), "new farm stores its own progress"):
+		return
+	if not _check(_write(crops, "{\"version\":1,\"selected_variety\":2,\"seeds\":4,\"crops\":[]}"), "second farm saves seed selection"):
 		return
 	if not _check(bool(mgr.call("activate", 1)), "switches back to original farm"):
 		return
 	var old_cal: Variant = JSON.parse_string(FileAccess.get_file_as_string(cal))
 	var old_res: Variant = JSON.parse_string(FileAccess.get_file_as_string(res))
-	if not _check(old_cal is Dictionary and int(old_cal.get("day", 0)) == 17 and old_res is Dictionary and int(old_res.get("counts", {}).get("wood", 0)) == 42, "original progress restored exactly"):
+	if not _check(old_cal is Dictionary and int(old_cal.get("day", 0)) == 17 and old_res is Dictionary and int(old_res.get("counts", {}).get("wood", 0)) == 42 and not FileAccess.file_exists(crops), "original progress restored exactly"):
 		return
 	if not _check(bool(mgr.call("activate", 2)), "switches back to second farm"):
 		return
 	var next_cal: Variant = JSON.parse_string(FileAccess.get_file_as_string(cal))
-	if not _check(next_cal is Dictionary and int(next_cal.get("day", 0)) == 2, "separate farm progress intact"):
+	var next_crops: Variant = JSON.parse_string(FileAccess.get_file_as_string(crops))
+	if not _check(next_cal is Dictionary and int(next_cal.get("day", 0)) == 2 and next_crops is Dictionary and int(next_crops.get("selected_variety", -1)) == 2, "separate crop selection and farm progress intact"):
 		return
 	var first_snapshot: String = str(mgr.call("slot_metadata", 1).get("snapshot", ""))
 	if not _check(bool(mgr.call("create_new", "Vila Nova", "Hélio", 0, true)), "explicit replace resets only active farm"):
 		return
-	if not _check(not FileAccess.file_exists(cal), "replaced farm has no old progress"):
+	if not _check(not FileAccess.file_exists(cal) and not FileAccess.file_exists(crops), "replaced farm has no old crops"):
 		return
 	var backup: String = str(mgr.call("backup_path"))
 	if not _check(not backup.is_empty() and FileAccess.file_exists(backup.path_join("slimekeepers_calendar_v1.json")), "backup created before replacement"):

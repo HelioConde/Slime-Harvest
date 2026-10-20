@@ -3,11 +3,15 @@ extends Node
 
 signal amount_changed(item_id: StringName, total: int)
 signal item_collected(item_id: StringName, amount: int)
+signal coins_changed(total: int)
 
 const SAVE_PATH := "user://slimekeepers_resources_v1.json"
 const DROP_SCENE: PackedScene = preload("res://scenes/items/ResourceDrop.tscn")
+## Precos fixos de teste; somente flores podem ser vendidas.
+const SALE_PRICES := {"flower_blue": 5, "flower_pink": 7, "flower_yellow": 9}
 
 var _counts: Dictionary = {}
+var _coins: int = 0
 var _drops: Dictionary = {}
 var _claimed: Dictionary = {}
 var _mining_levels: Dictionary = {}
@@ -45,6 +49,41 @@ func get_count(item_id: StringName) -> int:
 ## Visao somente-leitura para a mochila; sem duplicar o estado persistido.
 func get_all_counts() -> Dictionary:
 	return _counts.duplicate(true)
+
+
+func get_coins() -> int:
+	return _coins
+
+
+func get_sell_price(item_id: StringName) -> int:
+	return int(SALE_PRICES.get(String(item_id), 0))
+
+
+## Venda atomica: remocao de flores e credito das moedas no mesmo save.
+## Retorna valor ganho; zero indica quantidade/preco invalido.
+func sell_item(item_id: StringName, amount: int = 1) -> int:
+	var price: int = get_sell_price(item_id)
+	if price <= 0 or amount <= 0 or amount > get_count(item_id):
+		return 0
+	var payout: int = price * amount
+	if payout > 1000000000 or _coins > 1000000000 - payout:
+		return 0
+	var key: String = String(item_id)
+	_counts[key] = get_count(item_id) - amount
+	_coins += payout
+	_save_state()
+	amount_changed.emit(item_id, get_count(item_id))
+	coins_changed.emit(_coins)
+	return payout
+
+
+func spend_coins(cost: int) -> bool:
+	if cost <= 0 or cost > _coins:
+		return false
+	_coins -= cost
+	_save_state()
+	coins_changed.emit(_coins)
+	return true
 
 
 func add_item(item_id: StringName, amount: int = 1) -> void:
@@ -163,10 +202,12 @@ func reload_session_state() -> void:
 	_claimed.clear()
 	_mining_levels.clear()
 	_picked_plants.clear()
+	_coins = 0
 	_active_scene = null
 	_load_state()
 	for item_id in _counts.keys():
 		amount_changed.emit(StringName(str(item_id)), get_count(StringName(str(item_id))))
+	coins_changed.emit(_coins)
 
 
 func _load_state() -> void:
@@ -176,6 +217,7 @@ func _load_state() -> void:
 	if not data is Dictionary or int(data.get("version", 0)) != 1:
 		push_warning("ResourceBag: save invalido.")
 		return
+	_coins = clampi(int(data.get("coins", 0)), 0, 1000000000)
 	for pair in [["counts", "_counts"], ["drops", "_drops"], ["claimed", "_claimed"], ["mining_levels", "_mining_levels"], ["picked_plants", "_picked_plants"]]:
 		var value = data.get(pair[0], {})
 		if value is Dictionary:
@@ -192,4 +234,4 @@ func _save_state() -> void:
 	if file == null:
 		push_warning("ResourceBag: falha ao salvar recursos.")
 		return
-	file.store_string(JSON.stringify({"version": 1, "counts": _counts, "drops": _drops, "claimed": _claimed, "mining_levels": _mining_levels, "picked_plants": _picked_plants}))
+	file.store_string(JSON.stringify({"version": 1, "coins": _coins, "counts": _counts, "drops": _drops, "claimed": _claimed, "mining_levels": _mining_levels, "picked_plants": _picked_plants}))

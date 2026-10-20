@@ -42,7 +42,7 @@ func _run() -> void:
 		return
 	if not _check(bool(slots.call("create_new", "Testing", "QA")), "second slot created"):
 		return
-	var second_resource := "{\"version\":1,\"counts\":{\"wood\":9,\"stone\":4},\"claimed\":{\"bush\":true},\"drops\":{\"d2\":{\"item\":\"stone\"}},\"mining_levels\":{\"rock\":1},\"picked_plants\":{\"bush\":3}}"
+	var second_resource := "{\"version\":1,\"coins\":77,\"counts\":{\"wood\":9,\"stone\":4},\"claimed\":{\"bush\":true},\"drops\":{\"d2\":{\"item\":\"stone\"}},\"mining_levels\":{\"rock\":1},\"picked_plants\":{\"bush\":3}}"
 	if not _check(_write(res_file, second_resource) and _write(house, "{\"farm\":2}") and _write(hoe, "{\"farm\":2}") and _write(trees, "{\"farm\":2}") and _write(calendar, "{\"day\":12}") and _write(equipment, "{\"equipped\":\"axe\"}"), "second slot has old map state"):
 		return
 	# create_new alterna de fazenda e atualiza o snapshot da original; comparar apos a troca.
@@ -53,7 +53,7 @@ func _run() -> void:
 		if not _check(not FileAccess.file_exists(file_path), "world-only file removed: " + file_path.get_file()):
 			return
 	var result: Variant = JSON.parse_string(FileAccess.get_file_as_string(res_file))
-	if not _check(result is Dictionary and result.get("counts", {}).get("wood", 0) == 9 and result.get("counts", {}).get("stone", 0) == 4, "inventory counts preserved"):
+	if not _check(result is Dictionary and result.get("counts", {}).get("wood", 0) == 9 and result.get("counts", {}).get("stone", 0) == 4 and int(result.get("coins", -1)) == 77, "inventory and wallet preserved"):
 		return
 	for key in ["claimed", "drops", "mining_levels", "picked_plants"]:
 		if not _check(result.get(key, {"bad":true}).is_empty(), "cleared world state: "+key):

@@ -74,3 +74,7 @@ O avatar humano do Sprout Sorry e a opcao padrao para **novas fazendas**, com sp
 ## Cultivo no mapa principal e mochila (I)
 
 A fazenda agora pode preparar terra, plantar, regar, colher flores e recuperar sementes **no World.tscn**, usando as ferramentas ja existentes. A colheita acrescenta flores ao ResourceBag e a tecla I mostra a mochila com ferramentas, materiais e contadores. Salvos por slot, com tema Sprout Lands opcional. Manual: [cultivo e mochila](docs/world_farming_backpack.md).
+
+## Sementes e moedas (banca provisoria)
+
+Na mochila (`I`) agora e possivel escolher sementes azuis, rosas ou amarelas, vender flores colhidas por 5/7/9 moedas e comprar sementes por 3 moedas. `Q` alterna sementes durante a exploracao. As moedas sao salvas em ResourceBag junto com os itens, e o tipo de semente escolhido fica no save da fazenda. O mercado esta provisoriamente dentro da mochila, antes da implementacao de NPCs de loja. Consulte [agricultura e mochila](docs/world_farming_backpack.md).
