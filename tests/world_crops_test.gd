@@ -92,7 +92,7 @@ func _run() -> void:
 	# Construir a grade tambem sem instanciar Player nem tocar nos saves.
 	add_child(bag)
 	_check(bag.get_node_or_null("BackpackOverlay") != null, "backpack interface exists")
-	_check(bag.get_node_or_null("BackpackOverlay/Center/BackpackWindow") == null or bag.get("_coins_label") != null, "wallet UI built")
+	_check(bag.get("_coins_label") != null and bag.get("_seed_picker") != null and bag.get("_buy_button") != null, "wallet and marketplace UI built")
 	bag.queue_free()
 	restored.queue_free()
 	await get_tree().process_frame
