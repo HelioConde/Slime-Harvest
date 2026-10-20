@@ -8,7 +8,8 @@ signal wild_health_changed(current: int, maximum: int)
 signal wild_player_respawned()
 
 const PLAYER_SKINS = preload("res://scripts/player/player_skins.gd")
-const TOOL_ATLAS = preload("res://assets/Objects/Items/tools-n-meterial-items.png")
+const SPROUT_TOOL_FX = preload("res://scripts/player/sprout_tool_fx.gd")
+const SPROUT_SORRY = preload("res://scripts/player/sprout_sorry_skin.gd")
 const MOTION_ALIGNMENT = preload("res://scripts/player/player_motion_alignment.gd")
 const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
@@ -42,7 +43,8 @@ var _impact_frame: int = 1
 var _hotbar_index: int = 1
 var _player_appearance: String = "masculino"
 var _using_sprout_skin: bool = false
-var _tool_visual: Sprite2D
+var _tool_visual: Node2D
+var _last_visual_direction: String = "down"
 ## Suaviza mudancas dos offsets dos sprites sem alterar o CharacterBody2D.
 var _anchor_current := Vector2.ZERO
 var _anchor_target := Vector2.ZERO
@@ -203,6 +205,9 @@ func _physics_process(delta: float) -> void:
 		direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var running := controls_enabled and not _action_animating and Input.is_action_pressed("run")
 	if direction != Vector2.ZERO:
+		if _using_sprout_skin:
+			# Visual 8-way; alcance, RayCast e ferramentas continuam cardinais.
+			_last_visual_direction = SPROUT_SORRY.visual_direction(direction)
 		if absf(direction.x) > absf(direction.y):
 			facing = Vector2.RIGHT if direction.x > 0.0 else Vector2.LEFT
 		else:
@@ -224,6 +229,7 @@ func _physics_process(delta: float) -> void:
 	_was_moving = moving
 	_update_animation(moving, running)
 	_update_visual_anchor(delta)
+	_update_tool_visual()
 	if not controls_enabled or _action_animating:
 		return
 	if Input.is_action_just_pressed("interact"):
@@ -371,56 +377,26 @@ func _face_world_position(target: Vector2) -> void:
 
 
 func _create_tool_visual() -> void:
-	_tool_visual = Sprite2D.new()
-	_tool_visual.name = "ToolVisual"
-	_tool_visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_tool_visual.visible = false
-	_tool_visual.z_index = 1
+	_tool_visual = SPROUT_TOOL_FX.new() as Node2D
 	add_child(_tool_visual)
 
 
 func _show_tool_visual(tool_id: StringName, suffix: String) -> void:
-	if not _using_sprout_skin or _tool_visual == null:
-		return
-	var icon_index: int = -1
-	match tool_id:
-		&"watering_can":
-			icon_index = 0
-		&"axe":
-			icon_index = 1
-		&"hoe":
-			icon_index = 2
-		&"pickaxe":
-			icon_index = 3
-	if icon_index == -1:
-		return
-	var icon := AtlasTexture.new()
-	icon.atlas = TOOL_ATLAS
-	icon.region = Rect2(icon_index * 16, 0, 16, 16)
-	icon.filter_clip = true
-	_tool_visual.texture = icon
-	_tool_visual.flip_h = suffix == "left"
-	_tool_visual.z_index = -1 if suffix == "up" else 1
-	_tool_visual.visible = true
-	_update_tool_visual()
+	if _using_sprout_skin and is_instance_valid(_tool_visual):
+		_tool_visual.call("start_action", tool_id, suffix)
+		_update_tool_visual()
 
 
 func _update_tool_visual() -> void:
-	if not _action_animating or not is_instance_valid(_tool_visual) or not _tool_visual.visible:
+	if not _action_animating or not _using_sprout_skin or not is_instance_valid(_tool_visual):
 		return
-	# Icones originais da hotbar simulam o golpe enquanto nao existe uma
-	# folha oficial de bracos/ferramentas do personagem Sprout Sorry.
-	var pose: int = mini(animation.frame, 3)
-	var angles := [-0.70, -0.18, 0.42, 0.85]
-	_tool_visual.rotation = float(angles[pose]) * (-1.0 if facing == Vector2.LEFT else 1.0)
-	if facing == Vector2.UP:
-		_tool_visual.position = Vector2(-7, -17)
-	elif facing == Vector2.LEFT:
-		_tool_visual.position = Vector2(-9, -7)
-	elif facing == Vector2.RIGHT:
-		_tool_visual.position = Vector2(9, -7)
-	else:
-		_tool_visual.position = Vector2(8, -5)
+	if animation.sprite_frames == null or not animation.sprite_frames.has_animation(animation.animation):
+		return
+	var count: int = animation.sprite_frames.get_frame_count(animation.animation)
+	if count <= 0:
+		return
+	var phase: float = (float(animation.frame) + animation.frame_progress) / float(count)
+	_tool_visual.call("set_action_progress", phase)
 
 
 func _play_tool_animation(tool_id: StringName) -> void:
@@ -436,6 +412,8 @@ func _play_tool_animation(tool_id: StringName) -> void:
 		suffix = "left"
 	elif facing == Vector2.RIGHT:
 		suffix = "right"
+	if _using_sprout_skin:
+		_last_visual_direction = suffix
 	var tool_animation := StringName(prefix + "_" + suffix)
 	if not _has_frames(tool_animation):
 		push_warning("Player: animacao de ferramenta ausente: " + str(tool_animation))
@@ -460,7 +438,7 @@ func _on_action_animation_finished() -> void:
 	_queued_tool = &""
 	_action_animating = false
 	if is_instance_valid(_tool_visual):
-		_tool_visual.hide()
+		_tool_visual.call("stop_action")
 	animation.speed_scale = 1.0
 	_update_animation(false, false)
 
@@ -475,6 +453,9 @@ func _update_animation(moving: bool, running: bool) -> void:
 		suffix = "left"
 	elif facing == Vector2.RIGHT:
 		suffix = "right"
+	if _using_sprout_skin:
+		# Quando para, conserva a ultima orientacao (inclusive diagonais).
+		suffix = _last_visual_direction
 	var state := "walk" if moving else "idle"
 	var name_to_play := StringName(state + "_" + suffix)
 	animation.flip_h = false

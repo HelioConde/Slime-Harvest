@@ -6,8 +6,15 @@ do arquivo original:
 
 Dimensoes verificadas: atlas **128x96**, grade **8 colunas x 3 linhas**,
 celulas **16x32**. As colunas sao as oito orientacoes e cada linha uma
-pose. O motor atual utiliza quatro orientacoes (cima, baixo, esquerda e
-direita) e monta 28 animacoes para compatibilidade com o controlador Player.
+pose. O Sprout Sorry agora utiliza as oito orientacoes para andar, correr e
+ficar parado (56 estados visuais no recurso SpriteFrames); o sistema fisico
+de ferramentas continua nas quatro direcoes cardinais para preservar o
+alcance, os alvos, as colisoes e os saves.
+
+Mapeamento real das colunas: 0 superior esquerda, 1 cima, 2 esquerda,
+3 inferior esquerda, 4 baixo, 5 inferior direita, 6 direita, 7 superior direita.
+O codigo anterior usava incorretamente a coluna 0 para andar para cima;
+essa orientacao foi corrigida.
 
 ## Instalar no seu projeto (sem publicar o PNG)
 
@@ -38,10 +45,14 @@ diferente sem `--replace`, e aceita `--dry-run`. O diretorio esta no
 **Limite conhecido:** este ZIP tem apenas poses simples de caminhada,
 nao sprites completos das ferramentas. Para preservar interacoes e
 momentos de impacto, as animacoes de machado, picareta, enxada e regador
-usam poses temporarias do proprio personagem e exibem o icone original
-da ferramenta sobreposto, em movimento. Sao animacoes de transicao,
-nao movimentos detalhados de bracos desenhados pelo autor.
-As orientacoes diagonais tambem ficam reservadas para movimento futuro.
+usam poses temporarias do proprio personagem, mas o icone original da
+ferramenta agora segue uma curva suave ao longo dos quadros de ataque.
+Machado/picareta mostram um pequeno arco luminoso, a enxada faz um
+arco terroso e o regador inclina com gotas puramente visuais.
+Os efeitos obedecem ao tempo real do SpriteFrames e nao alteram as regras
+de impacto/dano. Ainda nao sao animacoes de bracos desenhados pelo autor.
+As oito orientacoes estao ativas para caminhar e correr; as quatro direcoes
+cardinais permanecem para o uso das ferramentas.
 
 Se o ZIP nao foi instalado, o avatar `sprout_sorry` usa automaticamente
 o antigo personagem masculino, sem erro fatal. A cena `Player.tscn`
@@ -60,3 +71,11 @@ automaticamente os termos deste ZIP.
 
 Nao adicione os sprites originais ao GitHub publico sem conferir o alcance
 da autorizacao. O jogo distribuido deve manter os creditos obrigatorios.
+
+## Validacao de qualidade
+
+O teste `tests/SproutSorryPlayerTest.tscn` confere as 56 animacoes,
+a coluna correta de cada direcao e o efeito de ferramentas sem carregar
+os PNGs licenciados. Em um jogo real, teste **WASD incluindo diagonais**,
+Shift, quatro ferramentas (teclas 1-4 e F), esquiva e persistencia de saves.
+A avaliacao visual com o PNG instalado ainda deve ser realizada no Godot local.
