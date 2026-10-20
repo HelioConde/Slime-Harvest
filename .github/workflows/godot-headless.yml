@@ -138,6 +138,16 @@ jobs:
           fi
           grep -F "PASS world-hoe: green-ground tilling, occupied cells, fixed house, save and load" world-hoe.log
 
+      - name: Test world crop farming and backpack (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/WorldCropsTest.tscn --quit-after 700 2>&1 | tee world-crops.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL world-crops" world-crops.log; then
+            exit 1
+          fi
+          grep -F "PASS world-crops: end" world-crops.log
+
       - name: Test removable world objects (headless)
         shell: bash
         run: |

@@ -108,7 +108,7 @@ func _show_prompt() -> void:
 	if _player != null:
 		_old_controls_enabled = bool(_player.get("controls_enabled"))
 		_player.call("set_controls_enabled", false)
-	_message.text = "Reinicia casa, solo arado, arvores, pedras, flores e objetos do mapa atual.\n\nMantem inventario, dia, equipamento e outras fazendas. Cria backup completo antes."
+	_message.text = "Reinicia casa, solo arado, cultivos, arvores, pedras, flores e objetos do mapa atual.\n\nMantem inventario, dia, equipamento e outras fazendas. Cria backup completo antes."
 	_overlay.visible = true
 	_accept.visible = true
 	_cancel.text = "Cancelar (Esc)"
