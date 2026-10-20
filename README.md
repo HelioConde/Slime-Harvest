@@ -62,3 +62,7 @@ UI Pack e do addon Godot; sem os arquivos, a interface antiga continua funcionan
 O tema estiliza hotbar, calendario, opcoes e dialogs, preservando sprites de
 menu existentes. Instrucoes de instalacao e permissao de uso:
 [Guia Sprout Lands UI](docs/sprout_lands_ui.md).
+
+## Colecao Sprout Lands (sprites + plugins)
+
+Instalacao opcional e segura de **UI Basic**, **Sprites Basic**, **plugin UI** e **plugin TileMap**, usando os quatro ZIPs originais, sem alterar os saves nem o mapa principal. Abra `scenes/world/SproutShowcase.tscn` (F6) para visualizar o exemplo e as folhas de sprites. Guia: [Colecao Sprout Lands](docs/sprout_lands_collection.md). Os arquivos licenciados ficam apenas na instalacao local.
