@@ -70,3 +70,7 @@ Instalacao opcional e segura de **UI Basic**, **Sprites Basic**, **plugin UI** e
 ## Protagonista Sprout Sorry
 
 O avatar humano do Sprout Sorry e a opcao padrao para **novas fazendas**, com sprites 16x32 em oito direcoes e adaptacao para as ferramentas. Os avatares originais permanecem disponiveis e saves antigos nao mudam automaticamente. O PNG licenciado deve ser instalado localmente; veja [guia do protagonista Sprout Sorry](docs/sprout_sorry_player.md).
+
+## Cultivo no mapa principal e mochila (I)
+
+A fazenda agora pode preparar terra, plantar, regar, colher flores e recuperar sementes **no World.tscn**, usando as ferramentas ja existentes. A colheita acrescenta flores ao ResourceBag e a tecla I mostra a mochila com ferramentas, materiais e contadores. Salvos por slot, com tema Sprout Lands opcional. Manual: [cultivo e mochila](docs/world_farming_backpack.md).
