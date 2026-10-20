@@ -67,6 +67,8 @@ func _run() -> void:
 	_check(ResourceBag.sell_item(flower_id, 1) == 7, "pink flower sells for seven coins")
 	_check(ResourceBag.get_count(flower_id) == original, "sold flower removed from same inventory")
 	_check(ResourceBag.get_coins() == old_wallet + 7, "wallet credited once")
+	_check(not ResourceBag.spend_coins(old_wallet + 8), "insufficient wallet cannot pay")
+	_check(ResourceBag.get_coins() == old_wallet + 7, "failed purchase keeps balance")
 	ResourceBag.reload_session_state()
 	_check(ResourceBag.get_coins() == old_wallet + 7 and ResourceBag.get_count(flower_id) == original, "sale survives save reload without duplicate payout")
 	_check(not bool(crops.call("buy_seeds", 0)), "zero-quantity purchase rejected")
