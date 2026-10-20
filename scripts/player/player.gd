@@ -14,6 +14,7 @@ const MOTION_ALIGNMENT = preload("res://scripts/player/player_motion_alignment.g
 const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
 const HOTBAR_SCENE: PackedScene = preload("res://scenes/ui/ToolHotbar.tscn")
+const BACKPACK_SCRIPT = preload("res://scripts/ui/backpack_panel.gd")
 
 @export_range(1.0, 500.0) var walk_speed: float = 90.0
 @export_range(1.0, 3.0) var run_multiplier: float = 1.6
@@ -84,6 +85,9 @@ func _ready() -> void:
 	_hotbar.connect("tool_selected", Callable(self, "_on_hotbar_selection"))
 	_hotbar.call("set_selected_tool", _current_tool())
 	_build_wild_health_hud(hud_layer)
+	var backpack := BACKPACK_SCRIPT.new() as CanvasLayer
+	backpack.name = "Backpack"
+	add_child(backpack)
 
 
 func _current_tool() -> StringName:
