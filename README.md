@@ -78,3 +78,7 @@ A fazenda agora pode preparar terra, plantar, regar, colher flores e recuperar s
 ## Sementes e moedas (banca provisoria)
 
 Na mochila (`I`) agora e possivel escolher sementes azuis, rosas ou amarelas, vender flores colhidas por 5/7/9 moedas e comprar sementes por 3 moedas. `Q` alterna sementes durante a exploracao. As moedas sao salvas em ResourceBag junto com os itens, e o tipo de semente escolhido fica no save da fazenda. O mercado esta provisoriamente dentro da mochila, antes da implementacao de NPCs de loja. Consulte [agricultura e mochila](docs/world_farming_backpack.md).
+
+## Expansao visual — 19 pacotes de sprites
+
+Os **19 ZIPs enviados pelo criador** podem ser instalados localmente com `tools/install_all_art_packs.py`; a arte nao e publicada no GitHub. **F7** abre a galeria por pacote no menu ou mapa. No World aparecem ate 6 animais pacificos e props interativos opcionais (bau/vaso). O Sprout Sorry teve esquerda/direita corrigidas e os paineis das opcoes agora usam o atlas do Sprout UI com rolagem. Instrucoes completas, creditos e licencas: [biblioteca de 19 pacotes](docs/asset_expansion_19_packs.md).
