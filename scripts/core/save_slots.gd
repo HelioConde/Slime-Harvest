@@ -298,6 +298,7 @@ func reset_active_world() -> bool:
 			return false
 		var empty_world_resources: Dictionary = {
 			"version": 1,
+			"coins": clampi(int(data.get("coins", 0)), 0, 1000000000),
 			"counts": (data.get("counts", {}) as Dictionary).duplicate(true),
 			"drops": {},
 			"claimed": {},
