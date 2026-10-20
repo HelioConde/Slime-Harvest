@@ -217,3 +217,18 @@ jobs:
             exit 1
           fi
           grep -F "PASS world-reset: safe backup, map cleared, inventory retained and other slot protected" world-reset.log
+
+      - name: Validate installed Sprout asset paths with synthetic PNGs
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 tools/generate_sprout_ci_fixtures.py
+          godot --headless --editor --path . --import --quit 2>&1 | tee sprout-asset-import.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|Failed to load resource" sprout-asset-import.log; then
+            exit 1
+          fi
+          godot --headless --path . --scene res://tests/SproutAssetIntegrationTest.tscn --quit-after 500 2>&1 | tee sprout-asset-integration.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL sprout-asset" sprout-asset-integration.log; then
+            exit 1
+          fi
+          grep -F "PASS sprout-asset: complete" sprout-asset-integration.log
