@@ -8,6 +8,7 @@ signal wild_health_changed(current: int, maximum: int)
 signal wild_player_respawned()
 
 const PLAYER_SKINS = preload("res://scripts/player/player_skins.gd")
+const TOOL_ATLAS = preload("res://assets/Objects/Items/tools-n-meterial-items.png")
 const MOTION_ALIGNMENT = preload("res://scripts/player/player_motion_alignment.gd")
 const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
@@ -40,6 +41,8 @@ var _impact_applied: bool = true
 var _impact_frame: int = 1
 var _hotbar_index: int = 1
 var _player_appearance: String = "masculino"
+var _using_sprout_skin: bool = false
+var _tool_visual: Sprite2D
 ## Suaviza mudancas dos offsets dos sprites sem alterar o CharacterBody2D.
 var _anchor_current := Vector2.ZERO
 var _anchor_target := Vector2.ZERO
@@ -60,6 +63,7 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 	_apply_selected_appearance()
+	_create_tool_visual()
 	add_to_group("resource_collectors")
 	animation.animation_finished.connect(_on_action_animation_finished)
 	animation.frame_changed.connect(_on_tool_frame_changed)
@@ -301,6 +305,7 @@ func _start_target_action(target: Node2D, tool_id: StringName) -> bool:
 
 
 func _on_tool_frame_changed() -> void:
+	_update_tool_visual()
 	if _action_animating and not _impact_applied and animation.frame >= _impact_frame:
 		_apply_queued_impact()
 
@@ -390,6 +395,7 @@ func _play_tool_animation(tool_id: StringName) -> void:
 	animation.speed_scale = tool_animation_speed
 	animation.stop()
 	animation.play(tool_animation)
+	_show_tool_visual(tool_id, suffix)
 	_sync_sprite_anchor()
 
 
@@ -400,6 +406,8 @@ func _on_action_animation_finished() -> void:
 	_queued_target = null
 	_queued_tool = &""
 	_action_animating = false
+	if is_instance_valid(_tool_visual):
+		_tool_visual.hide()
 	animation.speed_scale = 1.0
 	_update_animation(false, false)
 
@@ -491,6 +499,7 @@ func _apply_selected_appearance() -> void:
 	_player_appearance = appearance
 	if not PLAYER_SKINS.apply(animation, appearance):
 		push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
+	_using_sprout_skin = appearance == "sprout_sorry" and animation.scale == PLAYER_SKINS.SPROUT_SCALE
 
 
 ## Mantem a colisao fixa; os sprites mudam a compensacao lateral em cada quadro.
