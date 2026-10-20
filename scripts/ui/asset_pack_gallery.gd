@@ -72,7 +72,7 @@ func _build() -> void:
 	column.add_child(_picker)
 	_preview = TextureRect.new()
 	_preview.name = "AssetPreview"
-	_preview.custom_minimum_size = Vector2(430, 170)
+	_preview.custom_minimum_size = Vector2(430, 114)
 	_preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_preview.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
