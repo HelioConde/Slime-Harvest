@@ -137,7 +137,7 @@ func _sync_avatar_picker() -> void:
 			_appearance_picker.select(0)
 	_appearance_status.text = (
 		"Sprout Sorry instalado; altere o avatar da partida aqui."
-		if SPROUT_UI.get_theme() != null and ResourceLoader.exists(
+		if ResourceLoader.exists(
 			"res://assets/Characters/sprout_sorry/free_character_spritesheet_by-cupnooble.png")
 		else "Para Sprout Sorry, instale o PNG em assets/Characters/sprout_sorry/."
 	)
