@@ -67,4 +67,4 @@ func _run() -> void:
 		scene.queue_free()
 	await get_tree().process_frame
 	print("PASS expansion: complete" if not _failed else "FAIL expansion")
-	get_tree().quit(1 if _failed else 1 if _failed else 0)
+	get_tree().quit(1 if _failed else 0)
