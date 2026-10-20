@@ -5,10 +5,11 @@ extends RefCounted
 const ATLAS_PATH := "res://assets/Characters/sprout_sorry/free_character_spritesheet_by-cupnooble.png"
 const FRAME_SIZE := Vector2i(16, 32)
 # Ordem real das 8 colunas do spritesheet, conferida quadro a quadro.
-# 0 = diagonal superior esquerda; 1 = cima; 4 = frente; 7 = diagonal superior direita.
+# A atlas mostra o rosto para a DIREITA nas colunas 2/3 e para a
+# ESQUERDA nas 5/6. Corrige a inversao constatada no jogo.
 const DIRECTIONS := {
-	"up_left": 0, "up": 1, "left": 2, "down_left": 3,
-	"down": 4, "down_right": 5, "right": 6, "up_right": 7,
+	"up_left": 7, "up": 1, "left": 6, "down_left": 5,
+	"down": 4, "down_right": 3, "right": 2, "up_right": 0,
 }
 const TOOL_ACTIONS := ["axe", "pick", "hoe", "watering"]
 
