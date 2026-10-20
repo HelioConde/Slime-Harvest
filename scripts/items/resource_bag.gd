@@ -42,6 +42,11 @@ func get_count(item_id: StringName) -> int:
 	return maxi(0, int(_counts.get(String(item_id), 0)))
 
 
+## Visao somente-leitura para a mochila; sem duplicar o estado persistido.
+func get_all_counts() -> Dictionary:
+	return _counts.duplicate(true)
+
+
 func add_item(item_id: StringName, amount: int = 1) -> void:
 	if amount <= 0:
 		return
