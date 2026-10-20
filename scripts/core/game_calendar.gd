@@ -5,6 +5,7 @@ signal day_changed(new_day: int)
 
 const SAVE_PATH := "user://slimekeepers_calendar_v1.json"
 const SAVE_INTERVAL_SECONDS := 30.0
+const SPROUT_UI = preload("res://scripts/ui/sprout_ui.gd")
 
 @export_range(30.0, 3600.0, 1.0) var seconds_per_day: float = 600.0
 
@@ -109,7 +110,8 @@ func _create_day_label() -> void:
     style.content_margin_right = 8.0
     style.content_margin_top = 4.0
     style.content_margin_bottom = 4.0
-    chip.add_theme_stylebox_override("panel", style)
+    var sprout_panel: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+    chip.add_theme_stylebox_override("panel", sprout_panel if sprout_panel != null else style)
     canvas.add_child(chip)
     _day_label = Label.new()
     _day_label.name = "DayLabel"
