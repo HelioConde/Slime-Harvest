@@ -54,7 +54,7 @@ def plan(ui_zip: Path, theme_zip: Path, project: Path) -> dict[Path, bytes]:
         destination = project / "assets" / "ui" / "sprout_lands"
         for name, output_name in UI_FILES.items():
             png = _entry(ui, name)
-            if not png.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+            if not png.startswith(bytes((137, 80, 78, 71, 13, 10, 26, 10))):
                 raise ValueError(f"Imagem PNG invalida: {name}")
             result[destination / output_name] = png
         theme = _entry(addon, THEME_SUFFIX).decode("utf-8-sig")
@@ -75,7 +75,7 @@ def install(files: dict[Path, bytes], replace: bool = False, dry_run: bool = Fal
     if conflicts:
         raise ValueError(
             "Arquivos locais diferentes encontrados. Para substitui-los use --replace:\\n"
-            + "\\n".join(conflicts)
+            + chr(10).join(conflicts)
         )
     for path, payload in files.items():
         action = "igual" if path.exists() and path.read_bytes() == payload else "instalar"
@@ -106,7 +106,7 @@ def main() -> int:
         install(files, replace=args.replace, dry_run=args.dry_run)
         return 0
     except (OSError, BadZipFile, ValueError) as exc:
-        parser.exit(1, f"ERRO: {exc}\\n")
+        parser.exit(1, f"ERRO: {exc}" + chr(10))
 
 
 if __name__ == "__main__":
