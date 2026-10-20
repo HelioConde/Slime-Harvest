@@ -23,6 +23,8 @@ static func create_frames(atlas: Texture2D) -> SpriteFrames:
 		push_warning("Sprout Sorry: esperado atlas 128x96 com celulas 16x32.")
 		return null
 	var sprites := SpriteFrames.new()
+	if sprites.has_animation(&"default"):
+		sprites.remove_animation(&"default")
 	for suffix in DIRECTIONS.keys():
 		var col: int = int(DIRECTIONS[suffix])
 		_add(sprites, atlas, "idle_" + suffix, col, [1], 3.0, true)
