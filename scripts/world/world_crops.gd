@@ -78,6 +78,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if player != null and not bool(player.get("controls_enabled")):
 		return
 	select_variety((selected_variety + 1) % FLOWER_SCENES.size())
+	if soil != null and soil.has_method("_show_feedback"):
+		soil.call("_show_feedback", "Semente selecionada: " + get_selected_seed_name())
 	get_viewport().set_input_as_handled()
 
 
