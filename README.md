@@ -53,3 +53,12 @@ No `World.tscn`, use 3 (enxada) e clique ou F sobre o chão verde: cada enxadada
 - `Continuar` funciona somente com save legado existente; `Novo jogo` impede sobrescrever a fazenda salva enquanto não houver separação de slots.
 - `Multiplayer` fica desativado (em breve), com entrada reservada para futuras sessões de rede. O menu não inicia serviços multiplayer.
 - O calendário pausa e sua HUD desaparece na tela inicial.
+
+
+## Interface Sprout Lands opcional
+
+O tema Sprout Lands pode ser instalado a partir dos dois ZIPs originais do
+UI Pack e do addon Godot; sem os arquivos, a interface antiga continua funcionando.
+O tema estiliza hotbar, calendario, opcoes e dialogs, preservando sprites de
+menu existentes. Instrucoes de instalacao e permissao de uso:
+[Guia Sprout Lands UI](docs/sprout_lands_ui.md).
