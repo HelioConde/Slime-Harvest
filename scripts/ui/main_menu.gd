@@ -205,7 +205,7 @@ func _make_button(parent: Control, label: String, callback: Callable, at: Vector
 		var simple := Button.new()
 		simple.text = label
 		simple.add_theme_font_size_override("font_size", 14)
-		simple.add_theme_color_override("font_color", Color("#f8ebcc"))
+		simple.add_theme_color_override("font_color", Color("#3c2b21") if SPROUT_UI.get_theme() != null else Color("#f8ebcc"))
 		simple.add_theme_color_override("font_disabled_color", Color("#9aa09a"))
 		if SPROUT_UI.get_theme() == null:
 			for state in ["normal", "hover", "pressed", "disabled", "focus"]:
@@ -462,7 +462,7 @@ func _build_popup() -> void:
 	_message.custom_minimum_size = Vector2(292, 60)
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.add_theme_font_size_override("font_size", 11)
-	_message.add_theme_color_override("font_color", Color("#fff1d5"))
+	_message.add_theme_color_override("font_color", Color("#3c2b21") if SPROUT_UI.get_theme() != null else Color("#fff1d5"))
 	content.add_child(_message)
 
 	_popup_fields = VBoxContainer.new()
