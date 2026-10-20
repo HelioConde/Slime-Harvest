@@ -86,3 +86,28 @@ static func inventory_heart(filled: bool = true) -> Texture2D:
 	heart.region = Rect2(0 if filled else 80, 0, 16, 16)
 	heart.filter_clip = true
 	return heart
+
+## Nove fatias do painel SEM cabecalho de Sprout Lands "Setting menu.png".
+## O quadro direito do atlas contem a moldura vazia (sem texto em ingles).
+static func settings_panel_style() -> StyleBox:
+	var path := "res://assets/ui/sprout_lands/settings_menu.png"
+	if not ResourceLoader.exists(path):
+		return get_style(&"panel", &"Panel")
+	var source: Texture2D = load(path) as Texture2D
+	if source == null or source.get_size() != Vector2(256, 144):
+		return get_style(&"panel", &"Panel")
+	var cropped := AtlasTexture.new()
+	cropped.atlas = source
+	cropped.region = Rect2(132, 11, 121, 129)
+	cropped.filter_clip = true
+	var frame := StyleBoxTexture.new()
+	frame.texture = cropped
+	frame.texture_margin_left = 13.0
+	frame.texture_margin_right = 13.0
+	frame.texture_margin_top = 13.0
+	frame.texture_margin_bottom = 13.0
+	frame.content_margin_left = 10.0
+	frame.content_margin_right = 10.0
+	frame.content_margin_top = 8.0
+	frame.content_margin_bottom = 8.0
+	return frame
