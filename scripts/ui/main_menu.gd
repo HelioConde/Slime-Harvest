@@ -43,13 +43,6 @@ var _popup_fields: VBoxContainer
 var _new_game_replaces: bool = false
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	var key := event as InputEventKey
-	if key != null and key.pressed and not key.echo and key.keycode == KEY_F7:
-		get_viewport().set_input_as_handled()
-		get_tree().change_scene_to_file("res://scenes/world/AssetPackGallery.tscn")
-
-
 func _ready() -> void:
 	SPROUT_UI.apply(self)
 	_slots = SLOTS_SCRIPT.new()
@@ -561,6 +554,12 @@ func _dismiss_popup() -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and _overlay.visible:
+	var key := event as InputEventKey
+	if key == null or not key.pressed or key.echo:
+		return
+	if key.keycode == KEY_F7 and not _overlay.visible:
+		get_viewport().set_input_as_handled()
+		get_tree().change_scene_to_file("res://scenes/world/AssetPackGallery.tscn")
+	elif key.keycode == KEY_ESCAPE and _overlay.visible:
 		_dismiss_popup()
 		get_viewport().set_input_as_handled()
