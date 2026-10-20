@@ -15,6 +15,7 @@ const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
 const HOTBAR_SCENE: PackedScene = preload("res://scenes/ui/ToolHotbar.tscn")
 const BACKPACK_SCRIPT = preload("res://scripts/ui/backpack_panel.gd")
+const SPROUT_UI = preload("res://scripts/ui/sprout_ui.gd")
 
 @export_range(1.0, 500.0) var walk_speed: float = 90.0
 @export_range(1.0, 3.0) var run_multiplier: float = 1.6
@@ -31,6 +32,7 @@ var _wild_invulnerable: float = 0.0
 var _wild_impulse := Vector2.ZERO
 var _wild_spawn := Vector2.ZERO
 var _wild_health_display: Label
+var _wild_hearts: Array[TextureRect] = []
 var facing: Vector2 = Vector2.DOWN
 var _tool_remaining: float = 0.0
 var _action_animating: bool = false
@@ -525,19 +527,58 @@ func set_controls_enabled(enabled: bool) -> void:
 	if not enabled:
 		velocity = Vector2.ZERO
 
-## A escolha pertence ao slot ativo; partidas antigas recebem a opcao masculina.
+## Saves que ja escolheram um avatar classico sao respeitados.
+## Saves legados sem escolha de avatar iniciam no Sprout, se o PNG existir.
 func _apply_selected_appearance() -> void:
-	var appearance := "masculino"
+	var appearance := "sprout_sorry" if PLAYER_SKINS.sprout_ready() else "masculino"
 	var slots: RefCounted = SAVE_SLOTS.new()
 	if bool(slots.call("initialize")):
 		var active: int = int(slots.call("active_slot"))
 		if active > 0:
 			var metadata: Dictionary = slots.call("slot_metadata", active)
-			appearance = str(metadata.get("appearance", "masculino"))
+			appearance = str(metadata.get("appearance", appearance))
+	_apply_appearance_visual(appearance)
+
+
+func get_active_appearance() -> String:
+	return _player_appearance
+
+
+## Troca o avatar na partida atual, sem resetar fazenda nem substituir itens.
+## Retorna false quando o PNG ainda nao foi extraido/importado no Godot.
+func change_appearance(appearance: String) -> bool:
+	if appearance not in ["sprout_sorry", "masculino", "feminino"]:
+		return false
+	if _action_animating:
+		return false
+	if appearance == "sprout_sorry" and not PLAYER_SKINS.sprout_ready():
+		push_warning("Player: PNG Sprout Sorry ausente em assets/Characters/sprout_sorry/.")
+		return false
+	var slots: RefCounted = SAVE_SLOTS.new()
+	if bool(slots.call("initialize")) and int(slots.call("active_slot")) > 0:
+		if not bool(slots.call("set_active_appearance", appearance)):
+			return false
+	_apply_appearance_visual(appearance)
+	return true
+
+
+func _apply_appearance_visual(appearance: String) -> void:
 	_player_appearance = appearance
 	if not PLAYER_SKINS.apply(animation, appearance):
-		push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
+		push_warning("Player: nao foi possivel aplicar o personagem.")
 	_using_sprout_skin = appearance == "sprout_sorry" and animation.scale == PLAYER_SKINS.SPROUT_SCALE
+	if appearance == "sprout_sorry" and not _using_sprout_skin:
+		push_warning("Player: Sprout Sorry escolhido, mas PNG nao encontrado; exibindo avatar de seguranca.")
+	_anchor_initialized = false
+	_anchor_current = Vector2.ZERO
+	_anchor_target = Vector2.ZERO
+	_last_visual_direction = "down"
+	animation.visible = true
+	if is_instance_valid(placeholder):
+		placeholder.visible = false
+	if is_instance_valid(_tool_visual):
+		_tool_visual.call("stop_action")
+	_sync_sprite_anchor()
 
 
 ## Mantem a colisao fixa; os sprites mudam a compensacao lateral em cada quadro.
@@ -592,22 +633,53 @@ func _wild_respawn() -> void:
 
 
 func _build_wild_health_hud(layer: CanvasLayer) -> void:
+	var panel := PanelContainer.new()
+	panel.name = "SproutHealth"
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.offset_left = -188.0
+	panel.offset_right = -44.0
+	panel.offset_top = 8.0
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+	if style != null:
+		panel.add_theme_stylebox_override("panel", style)
+	else:
+		var fallback := StyleBoxFlat.new()
+		fallback.bg_color = Color("#23382de8")
+		fallback.set_corner_radius_all(6)
+		fallback.set_content_margin_all(3)
+		panel.add_theme_stylebox_override("panel", fallback)
+	layer.add_child(panel)
+	var contents := HBoxContainer.new()
+	contents.name = "HealthContent"
+	contents.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	contents.add_theme_constant_override("separation", 1)
+	panel.add_child(contents)
+	var has_hearts := SPROUT_UI.inventory_heart() != null
+	if has_hearts:
+		for index in range(wild_max_health):
+			var heart := TextureRect.new()
+			heart.name = "Heart_%02d" % index
+			heart.custom_minimum_size = Vector2(16, 16)
+			heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			heart.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			heart.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			contents.add_child(heart)
+			_wild_hearts.append(heart)
 	_wild_health_display = Label.new()
 	_wild_health_display.name = "WildHealth"
-	_wild_health_display.anchor_left = 1.0
-	_wild_health_display.anchor_right = 1.0
-	_wild_health_display.offset_left = -130.0
-	_wild_health_display.offset_right = -42.0
-	_wild_health_display.offset_top = 8.0
-	_wild_health_display.offset_bottom = 34.0
-	_wild_health_display.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_wild_health_display.add_theme_font_size_override("font_size", 13)
-	_wild_health_display.add_theme_color_override("font_color", Color(1.0, 0.83, 0.77))
+	_wild_health_display.add_theme_font_size_override("font_size", 10)
+	_wild_health_display.add_theme_color_override("font_color", Color("#382517") if style != null else Color("#f9e7ce"))
 	_wild_health_display.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(_wild_health_display)
+	contents.add_child(_wild_health_display)
 	_refresh_wild_health_hud()
 
 
 func _refresh_wild_health_hud() -> void:
+	for index in range(_wild_hearts.size()):
+		if is_instance_valid(_wild_hearts[index]):
+			_wild_hearts[index].texture = SPROUT_UI.inventory_heart(index < wild_health)
 	if is_instance_valid(_wild_health_display):
-		_wild_health_display.text = "HP %d/%d" % [wild_health, wild_max_health]
+		_wild_health_display.text = "%d/%d" % [wild_health, wild_max_health] if not _wild_hearts.is_empty() else "HP %d/%d" % [wild_health, wild_max_health]
