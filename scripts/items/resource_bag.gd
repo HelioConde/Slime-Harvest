@@ -135,6 +135,26 @@ func _make_drop(
 	drop.z_index = 11
 
 
+## Itens de cenario abertos/vasos quebrados: marcador + recompensa no mesmo
+## save do slot atual, sem permitir coletar duas vezes apos carregar.
+func world_reward_claimed(source_key: String) -> bool:
+	return _claimed.has(source_key)
+
+
+func claim_world_reward(source_key: String, item_id: StringName, amount: int = 1) -> bool:
+	if not source_key.begins_with("expansion:") or _claimed.has(source_key):
+		return false
+	if amount < 1 or amount > 50:
+		return false
+	var key: String = String(item_id)
+	_claimed[source_key] = true
+	_counts[key] = get_count(item_id) + amount
+	_save_state()
+	amount_changed.emit(item_id, get_count(item_id))
+	item_collected.emit(item_id, amount)
+	return true
+
+
 func collect_drop(source_key: String, item_id: StringName, persistent: bool) -> bool:
 	if persistent:
 		if _claimed.has(source_key) or not _drops.has(source_key):
