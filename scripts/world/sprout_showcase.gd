@@ -119,7 +119,10 @@ func _display(next_index: int) -> void:
 	_title.text = str(record["title"])
 	_status.text = "%d / %d" % [_index + 1, GALLERY.size()]
 	var sprite_path: String = SPRITES_DIR + str(record["file"])
-	_image.texture = load(sprite_path) as Texture2D if ResourceLoader.exists(sprite_path) else null
+	if ResourceLoader.exists(sprite_path):
+		_image.texture = load(sprite_path) as Texture2D
+	else:
+		_image.texture = null
 	if _image.texture == null:
 		_title.text += " (pacote nao instalado)"
 
