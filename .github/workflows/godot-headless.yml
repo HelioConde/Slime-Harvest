@@ -232,3 +232,13 @@ jobs:
             exit 1
           fi
           grep -F "PASS sprout-asset: complete" sprout-asset-integration.log
+
+      - name: Test all 19-pack expansion systems (headless)
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --scene res://tests/AssetPackExpansionTest.tscn --quit-after 700 2>&1 | tee asset-expansion.log
+          if grep -Ei "SCRIPT ERROR|Parse Error|Failed to load script|FAIL expansion" asset-expansion.log; then
+            exit 1
+          fi
+          grep -F "PASS expansion: complete" asset-expansion.log

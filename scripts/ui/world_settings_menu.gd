@@ -56,7 +56,7 @@ func _build_controls() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_dialog = PanelContainer.new()
 	_dialog.name = "SettingsDialog"
-	var sprout_panel: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+	var sprout_panel: StyleBox = SPROUT_UI.settings_panel_style()
 	if sprout_panel != null:
 		_dialog.add_theme_stylebox_override("panel", sprout_panel)
 	_dialog.custom_minimum_size.x = 320.0
@@ -69,8 +69,14 @@ func _build_controls() -> void:
 	margin.add_theme_constant_override("margin_bottom", 10)
 	_dialog.add_child(margin)
 	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 8)
-	margin.add_child(content)
+	content.add_theme_constant_override("separation", 7)
+	# Limitar altura evita que Aplicar/Voltar fiquem cortados em 640x360.
+	var scroll := ScrollContainer.new()
+	scroll.name = "SettingsScroll"
+	scroll.custom_minimum_size = Vector2(290, 280)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	margin.add_child(scroll)
+	scroll.add_child(content)
 	var title := Label.new()
 	title.text = "Configuracoes"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -198,6 +204,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if key.keycode == KEY_ESCAPE and _overlay.visible:
 		_close_options()
 		get_viewport().set_input_as_handled()
+	elif key.keycode == KEY_F7 and not _overlay.visible:
+		get_viewport().set_input_as_handled()
+		get_tree().change_scene_to_file("res://scenes/world/AssetPackGallery.tscn")
 	elif key.keycode == KEY_F10:
 		if _overlay.visible:
 			_close_options()

@@ -24,6 +24,8 @@
 [ext_resource type="Script" path="res://scripts/slimes/world_population.gd" id="26_population"]
 [ext_resource type="Script" path="res://scripts/world/world_population.gd" id="35_world_population"]
 [ext_resource type="Script" path="res://scripts/world/world_crops.gd" id="36_world_crops"]
+[ext_resource type="Script" path="res://scripts/world/pack_animals.gd" id="37_pack_animals"]
+[ext_resource type="Script" path="res://scripts/world/pack_reward_props.gd" id="38_pack_props"]
 [ext_resource type="Script" path="res://scripts/ui/world_settings_menu.gd" id="34_world_settings"]
 
 [node name="World2" type="Node2D" unique_id=2045392138]
@@ -143,6 +145,14 @@ position = Vector2(169, 224)
 [node name="Player" parent="Actors" unique_id=1227715951 instance=ExtResource("3_v5dby")]
 z_index = 10
 position = Vector2(2, -157)
+
+[node name="PackAnimalVisitors" type="Node2D" parent="Actors/Map"]
+z_index = 2
+script = ExtResource("37_pack_animals")
+
+[node name="PackRewardProps" type="Node2D" parent="Actors/Map"]
+z_index = 3
+script = ExtResource("38_pack_props")
 
 [node name="WorldPopulation" type="Node2D" parent="Actors/Map"]
 y_sort_enabled = true
