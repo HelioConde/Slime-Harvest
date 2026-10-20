@@ -8,6 +8,8 @@ var _dialog: PanelContainer
 var _scale_controls: VBoxContainer
 var _open_button: Button
 var _was_paused: bool = false
+var _appearance_picker: OptionButton
+var _appearance_status: Label
 
 
 func _ready() -> void:
@@ -76,12 +78,85 @@ func _build_controls() -> void:
 	content.add_child(title)
 	_scale_controls = SCALE_CONTROLS.new() as VBoxContainer
 	content.add_child(_scale_controls)
+	_build_avatar_picker(content)
 	var close := Button.new()
 	close.name = "CloseSettings"
 	close.text = "Cancelar / Voltar ao jogo"
 	close.custom_minimum_size.y = 28.0
 	close.pressed.connect(_close_options)
 	content.add_child(close)
+
+
+## Essa escolha esta disponivel mesmo em fazendas antigas: nao exige Novo Jogo.
+func _build_avatar_picker(content: VBoxContainer) -> void:
+	var separator := HSeparator.new()
+	content.add_child(separator)
+	var heading := Label.new()
+	heading.text = "Personagem principal"
+	heading.add_theme_font_size_override("font_size", 12)
+	content.add_child(heading)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	content.add_child(row)
+	_appearance_picker = OptionButton.new()
+	_appearance_picker.name = "AppearancePicker"
+	_appearance_picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_appearance_picker.add_item("Sprout Sorry", 0)
+	_appearance_picker.add_item("Masculino classico", 1)
+	_appearance_picker.add_item("Feminino classico", 2)
+	row.add_child(_appearance_picker)
+	var apply := Button.new()
+	apply.name = "ApplyAppearance"
+	apply.text = "Aplicar"
+	apply.pressed.connect(_apply_avatar)
+	row.add_child(apply)
+	_appearance_status = Label.new()
+	_appearance_status.name = "AvatarStatus"
+	_appearance_status.add_theme_font_size_override("font_size", 10)
+	_appearance_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(_appearance_status)
+
+
+func _current_player() -> Node:
+	var world: Node = get_tree().current_scene
+	return world.get_node_or_null("Actors/Player") if world != null else null
+
+
+func _sync_avatar_picker() -> void:
+	if _appearance_picker == null:
+		return
+	var player: Node = _current_player()
+	if player == null or not player.has_method("get_active_appearance"):
+		return
+	match str(player.call("get_active_appearance")):
+		"feminino":
+			_appearance_picker.select(2)
+		"masculino":
+			_appearance_picker.select(1)
+		_:
+			_appearance_picker.select(0)
+	_appearance_status.text = (
+		"Sprout Sorry instalado; altere o avatar da partida aqui."
+		if SPROUT_UI.get_theme() != null and ResourceLoader.exists(
+			"res://assets/Characters/sprout_sorry/free_character_spritesheet_by-cupnooble.png")
+		else "Para Sprout Sorry, instale o PNG em assets/Characters/sprout_sorry/."
+	)
+
+
+func _apply_avatar() -> void:
+	var player: Node = _current_player()
+	if player == null or not player.has_method("change_appearance"):
+		_appearance_status.text = "Personagem nao encontrado neste mapa."
+		return
+	var options := ["sprout_sorry", "masculino", "feminino"]
+	var selected: String = options[clampi(_appearance_picker.selected, 0, 2)]
+	if bool(player.call("change_appearance", selected)):
+		_appearance_status.text = "Personagem alterado e salvo nesta fazenda!"
+	else:
+		_appearance_status.text = (
+			"Sprite ausente ou ainda nao importado! Confira assets/Characters/sprout_sorry/."
+			if selected == "sprout_sorry" else "Nao foi possivel alterar o personagem."
+	)
 
 
 func _update_dialog_scale() -> void:
@@ -102,6 +177,7 @@ func _open_options() -> void:
 		return
 	_was_paused = get_tree().paused
 	_scale_controls.call("begin_edit")
+	_sync_avatar_picker()
 	_overlay.show()
 	_update_dialog_scale.call_deferred()
 	get_tree().paused = true
