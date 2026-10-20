@@ -1,6 +1,7 @@
 extends CanvasLayer
 ## Opcoes in-game com pre-visualizacao reversivel e dialogo responsivo.
 const SCALE_CONTROLS = preload("res://scripts/ui/ui_scale_controls.gd")
+const SPROUT_UI = preload("res://scripts/ui/sprout_ui.gd")
 
 var _overlay: ColorRect
 var _dialog: PanelContainer
@@ -21,6 +22,7 @@ func _ready() -> void:
 func _build_controls() -> void:
 	var root := Control.new()
 	root.name = "WorldSettingsRoot"
+	SPROUT_UI.apply(root)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -52,6 +54,9 @@ func _build_controls() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_dialog = PanelContainer.new()
 	_dialog.name = "SettingsDialog"
+	var sprout_panel: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+	if sprout_panel != null:
+		_dialog.add_theme_stylebox_override("panel", sprout_panel)
 	_dialog.custom_minimum_size.x = 320.0
 	center.add_child(_dialog)
 	_dialog.resized.connect(_update_dialog_scale)
