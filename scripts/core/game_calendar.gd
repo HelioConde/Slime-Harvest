@@ -117,7 +117,9 @@ func _create_day_label() -> void:
     _day_label.name = "DayLabel"
     _day_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _day_label.add_theme_font_size_override("font_size", 10)
-    _day_label.add_theme_color_override("font_color", Color("#edf4e3"))
+    _day_label.add_theme_color_override("font_color", Color("#3c2b21") if sprout_panel != null else Color("#edf4e3"))
+    if sprout_panel != null:
+        chip.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
     chip.add_child(_day_label)
     _day_chip = chip
 
