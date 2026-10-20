@@ -4,8 +4,25 @@ extends RefCounted
 ## visivel e um overlay separado em Player.gd, nao uma animacao deste pacote.
 const ATLAS_PATH := "res://assets/Characters/sprout_sorry/free_character_spritesheet_by-cupnooble.png"
 const FRAME_SIZE := Vector2i(16, 32)
-const DIRECTIONS := {"up": 0, "left": 2, "down": 4, "right": 6}
+# Ordem real das 8 colunas do spritesheet, conferida quadro a quadro.
+# 0 = diagonal superior esquerda; 1 = cima; 4 = frente; 7 = diagonal superior direita.
+const DIRECTIONS := {
+	"up_left": 0, "up": 1, "left": 2, "down_left": 3,
+	"down": 4, "down_right": 5, "right": 6, "up_right": 7,
+}
 const TOOL_ACTIONS := ["axe", "pick", "hoe", "watering"]
+
+
+## So controla a animacao visual, nao muda as quatro direcoes de ataque/colisao.
+static func visual_direction(value: Vector2) -> String:
+	if value.length_squared() <= 0.001:
+		return "down"
+	var direction := value.normalized()
+	if absf(direction.x) < 0.38:
+		return "up" if direction.y < 0.0 else "down"
+	if absf(direction.y) < 0.38:
+		return "left" if direction.x < 0.0 else "right"
+	return ("up" if direction.y < 0.0 else "down") + ("_left" if direction.x < 0.0 else "_right")
 
 
 static func available() -> bool:
