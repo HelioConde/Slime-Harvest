@@ -9,3 +9,6 @@
 .env
 .env.*
 !.env.example
+
+# Os assets licenciados do UI Pack sao instalados apenas na copia local.
+/assets/ui/sprout_lands/

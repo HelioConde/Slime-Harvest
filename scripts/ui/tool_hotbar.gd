@@ -6,6 +6,7 @@ extends Control
 signal tool_selected(tool_id: StringName)
 
 const ATLAS: Texture2D = preload("res://assets/Objects/Items/tools-n-meterial-items.png")
+const SPROUT_UI = preload("res://scripts/ui/sprout_ui.gd")
 const COLUMN_COUNT: int = 4
 const CELL: int = 16
 const SLOT_IDS: Array[StringName] = [
@@ -43,6 +44,7 @@ var _selection_label: Label
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_build_panel()
 	_build_toast()
 	_build_selection_label()
@@ -77,7 +79,8 @@ func _build_panel() -> void:
 	frame_style.content_margin_right = PANEL_PADDING
 	frame_style.content_margin_top = 5.0
 	frame_style.content_margin_bottom = 5.0
-	_panel.add_theme_stylebox_override("panel", frame_style)
+	var sprout_frame: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+	_panel.add_theme_stylebox_override("panel", sprout_frame if sprout_frame != null else frame_style)
 	add_child(_panel)
 
 	_strip = HBoxContainer.new()
@@ -224,7 +227,11 @@ func _slot_pressed(item_id: StringName) -> void:
 	tool_selected.emit(item_id)
 
 
-func _slot_style(active: bool, hover: bool = false) -> StyleBoxFlat:
+func _slot_style(active: bool, hover: bool = false) -> StyleBox:
+	var sprout_state: StringName = &"hover" if active or hover else &"normal"
+	var sprout_style: StyleBox = SPROUT_UI.get_style(sprout_state)
+	if sprout_style != null:
+		return sprout_style
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("#365542") if active else SLOT_COLOR
 	if hover:
@@ -312,6 +319,7 @@ func _refresh_selection() -> void:
 			continue
 		var button: Button = _slots[item_id] as Button
 		var active: bool = item_id == _selected
+		button.self_modulate = Color(1.18, 1.1, 0.86) if active and SPROUT_UI.get_theme() != null else Color.WHITE
 		button.add_theme_stylebox_override("normal", _slot_style(active))
 		button.add_theme_stylebox_override("hover", _slot_style(active, true))
 		button.add_theme_stylebox_override("pressed", _slot_style(active, true))
