@@ -8,6 +8,7 @@ signal wild_health_changed(current: int, maximum: int)
 signal wild_player_respawned()
 
 const PLAYER_SKINS = preload("res://scripts/player/player_skins.gd")
+const TOOL_ATLAS = preload("res://assets/Objects/Items/tools-n-meterial-items.png")
 const MOTION_ALIGNMENT = preload("res://scripts/player/player_motion_alignment.gd")
 const SAVE_SLOTS = preload("res://scripts/core/save_slots.gd")
 const INVENTORY_SCRIPT = preload("res://scripts/items/tool_inventory.gd")
@@ -40,6 +41,8 @@ var _impact_applied: bool = true
 var _impact_frame: int = 1
 var _hotbar_index: int = 1
 var _player_appearance: String = "masculino"
+var _using_sprout_skin: bool = false
+var _tool_visual: Sprite2D
 ## Suaviza mudancas dos offsets dos sprites sem alterar o CharacterBody2D.
 var _anchor_current := Vector2.ZERO
 var _anchor_target := Vector2.ZERO
@@ -60,6 +63,7 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 	_apply_selected_appearance()
+	_create_tool_visual()
 	add_to_group("resource_collectors")
 	animation.animation_finished.connect(_on_action_animation_finished)
 	animation.frame_changed.connect(_on_tool_frame_changed)
@@ -301,6 +305,7 @@ func _start_target_action(target: Node2D, tool_id: StringName) -> bool:
 
 
 func _on_tool_frame_changed() -> void:
+	_update_tool_visual()
 	if _action_animating and not _impact_applied and animation.frame >= _impact_frame:
 		_apply_queued_impact()
 
@@ -365,6 +370,59 @@ func _face_world_position(target: Vector2) -> void:
 		facing = Vector2.DOWN if towards.y > 0.0 else Vector2.UP
 
 
+func _create_tool_visual() -> void:
+	_tool_visual = Sprite2D.new()
+	_tool_visual.name = "ToolVisual"
+	_tool_visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_tool_visual.visible = false
+	_tool_visual.z_index = 1
+	add_child(_tool_visual)
+
+
+func _show_tool_visual(tool_id: StringName, suffix: String) -> void:
+	if not _using_sprout_skin or _tool_visual == null:
+		return
+	var icon_index: int = -1
+	match tool_id:
+		&"watering_can":
+			icon_index = 0
+		&"axe":
+			icon_index = 1
+		&"hoe":
+			icon_index = 2
+		&"pickaxe":
+			icon_index = 3
+	if icon_index == -1:
+		return
+	var icon := AtlasTexture.new()
+	icon.atlas = TOOL_ATLAS
+	icon.region = Rect2(icon_index * 16, 0, 16, 16)
+	icon.filter_clip = true
+	_tool_visual.texture = icon
+	_tool_visual.flip_h = suffix == "left"
+	_tool_visual.z_index = -1 if suffix == "up" else 1
+	_tool_visual.visible = true
+	_update_tool_visual()
+
+
+func _update_tool_visual() -> void:
+	if not _action_animating or not is_instance_valid(_tool_visual) or not _tool_visual.visible:
+		return
+	# Icones originais da hotbar simulam o golpe enquanto nao existe uma
+	# folha oficial de bracos/ferramentas do personagem Sprout Sorry.
+	var pose: int = mini(animation.frame, 3)
+	var angles := [-0.70, -0.18, 0.42, 0.85]
+	_tool_visual.rotation = float(angles[pose]) * (-1.0 if facing == Vector2.LEFT else 1.0)
+	if facing == Vector2.UP:
+		_tool_visual.position = Vector2(-7, -17)
+	elif facing == Vector2.LEFT:
+		_tool_visual.position = Vector2(-9, -7)
+	elif facing == Vector2.RIGHT:
+		_tool_visual.position = Vector2(9, -7)
+	else:
+		_tool_visual.position = Vector2(8, -5)
+
+
 func _play_tool_animation(tool_id: StringName) -> void:
 	var prefix := String(tool_id)
 	if tool_id == &"pickaxe":
@@ -390,6 +448,7 @@ func _play_tool_animation(tool_id: StringName) -> void:
 	animation.speed_scale = tool_animation_speed
 	animation.stop()
 	animation.play(tool_animation)
+	_show_tool_visual(tool_id, suffix)
 	_sync_sprite_anchor()
 
 
@@ -400,6 +459,8 @@ func _on_action_animation_finished() -> void:
 	_queued_target = null
 	_queued_tool = &""
 	_action_animating = false
+	if is_instance_valid(_tool_visual):
+		_tool_visual.hide()
 	animation.speed_scale = 1.0
 	_update_animation(false, false)
 
@@ -491,6 +552,7 @@ func _apply_selected_appearance() -> void:
 	_player_appearance = appearance
 	if not PLAYER_SKINS.apply(animation, appearance):
 		push_warning("Player: mantendo sprites antigos porque o novo pacote nao carregou.")
+	_using_sprout_skin = appearance == "sprout_sorry" and animation.scale == PLAYER_SKINS.SPROUT_SCALE
 
 
 ## Mantem a colisao fixa; os sprites mudam a compensacao lateral em cada quadro.

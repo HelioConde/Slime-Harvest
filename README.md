@@ -66,3 +66,7 @@ menu existentes. Instrucoes de instalacao e permissao de uso:
 ## Colecao Sprout Lands (sprites + plugins)
 
 Instalacao opcional e segura de **UI Basic**, **Sprites Basic**, **plugin UI** e **plugin TileMap**, usando os quatro ZIPs originais, sem alterar os saves nem o mapa principal. Abra `scenes/world/SproutShowcase.tscn` (F6) para visualizar o exemplo e as folhas de sprites. Guia: [Colecao Sprout Lands](docs/sprout_lands_collection.md). Os arquivos licenciados ficam apenas na instalacao local.
+
+## Protagonista Sprout Sorry
+
+O avatar humano do Sprout Sorry e a opcao padrao para **novas fazendas**, com sprites 16x32 em oito direcoes e adaptacao para as ferramentas. Os avatares originais permanecem disponiveis e saves antigos nao mudam automaticamente. O PNG licenciado deve ser instalado localmente; veja [guia do protagonista Sprout Sorry](docs/sprout_sorry_player.md).

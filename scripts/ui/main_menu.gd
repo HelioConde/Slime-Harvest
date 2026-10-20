@@ -38,7 +38,7 @@ var _choices: VBoxContainer
 var _farm_input: LineEdit
 var _player_input: LineEdit
 var _appearance_picker: OptionButton
-var _selected_appearance: String = "masculino"
+var _selected_appearance: String = "sprout_sorry"
 var _popup_fields: VBoxContainer
 var _new_game_replaces: bool = false
 
@@ -316,8 +316,9 @@ func _show_new_game_form(replace: bool) -> void:
 	appearance_label.text = "Aparencia do protagonista"
 	_popup_fields.add_child(appearance_label)
 	_appearance_picker = OptionButton.new()
-	_appearance_picker.add_item("Masculino", 0)
-	_appearance_picker.add_item("Feminino", 1)
+	_appearance_picker.add_item("Sprout Sorry (principal)", 0)
+	_appearance_picker.add_item("Masculino classico", 1)
+	_appearance_picker.add_item("Feminino classico", 2)
 	_appearance_picker.select(0)
 	_popup_fields.add_child(_appearance_picker)
 	_farm_input.grab_focus()
@@ -330,7 +331,13 @@ func _confirm_new_game_form() -> void:
 	if farm.is_empty() or player.is_empty():
 		_show_message("Preencha o nome da fazenda e o nome do personagem.")
 		return
-	_selected_appearance = "feminino" if _appearance_picker.selected == 1 else "masculino"
+	match _appearance_picker.selected:
+		1:
+			_selected_appearance = "masculino"
+		2:
+			_selected_appearance = "feminino"
+		_:
+			_selected_appearance = "sprout_sorry"
 	if _new_game_replaces:
 		_show_actions("Confirmar substituicao",
 			"Substituir a fazenda atual por \"%s\"?\nUm backup separado sera criado ANTES de iniciar. Os demais espacos nao serao modificados." % farm,

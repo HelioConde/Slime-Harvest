@@ -333,7 +333,7 @@ func reset_active_world() -> bool:
 
 ## Salva o avatar no indice, junto ao slot, sem alterar os arquivos da fazenda.
 func set_active_appearance(appearance: String) -> bool:
-	if not (appearance in ["masculino", "feminino"]):
+	if not (appearance in ["sprout_sorry", "masculino", "feminino"]):
 		error_message = "Aparencia de personagem invalida."
 		return false
 	var slot: int = active_slot()
