@@ -408,7 +408,7 @@ func _on_options() -> void:
 
 
 func _on_credits() -> void:
-	_show_message("Slimekeepers: Lost Valley\nCriado por Helio Conde\n\nJogo independente feito com Godot.\nMenu de fazenda com arte original.")
+	_show_message("Slimekeepers: Lost Valley\nCriado por Helio Conde\n\nArte Sprout Lands: Cup Nooble\nPlugins Sprout Lands (UI / TileMap): Maaack\nMotor: Godot Engine")
 	# UTF-8 mantido no credito visivel.
 	_message.text = _message.text.replace("Helio", "Hélio")
 
