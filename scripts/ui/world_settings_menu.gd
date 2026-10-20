@@ -198,6 +198,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if key.keycode == KEY_ESCAPE and _overlay.visible:
 		_close_options()
 		get_viewport().set_input_as_handled()
+	elif key.keycode == KEY_F7 and not _overlay.visible:
+		get_viewport().set_input_as_handled()
+		get_tree().change_scene_to_file("res://scenes/world/AssetPackGallery.tscn")
 	elif key.keycode == KEY_F10:
 		if _overlay.visible:
 			_close_options()
