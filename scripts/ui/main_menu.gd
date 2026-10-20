@@ -4,6 +4,7 @@ extends Control
 const WORLD_SCENE := "res://scenes/world/World.tscn"
 const SLOTS_SCRIPT = preload("res://scripts/core/save_slots.gd")
 const UI_SCALE_CONTROLS = preload("res://scripts/ui/ui_scale_controls.gd")
+const SPROUT_UI = preload("res://scripts/ui/sprout_ui.gd")
 const WALLPAPER := "res://assets/ui/main_menu/vale_encantado.png"
 const FARM_WALLPAPER := "res://assets/ui/main_menu/fazenda_wallpaper.png"
 const ART_DIR := "res://assets/ui/main_menu/"
@@ -43,6 +44,7 @@ var _new_game_replaces: bool = false
 
 
 func _ready() -> void:
+	SPROUT_UI.apply(self)
 	_slots = SLOTS_SCRIPT.new()
 	_slots_ok = bool(_slots.call("initialize"))
 	_has_farm_art = _texture("farm_logo.png") != null and _texture("farm_frame.png") != null
@@ -205,8 +207,9 @@ func _make_button(parent: Control, label: String, callback: Callable, at: Vector
 		simple.add_theme_font_size_override("font_size", 14)
 		simple.add_theme_color_override("font_color", Color("#f8ebcc"))
 		simple.add_theme_color_override("font_disabled_color", Color("#9aa09a"))
-		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-			simple.add_theme_stylebox_override(state, _wood_style(state))
+		if SPROUT_UI.get_theme() == null:
+			for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+				simple.add_theme_stylebox_override(state, _wood_style(state))
 		button = simple
 	button.name = label.replace(" ", "")
 	button.position = at
@@ -438,7 +441,8 @@ func _build_popup() -> void:
 	_overlay_card = PanelContainer.new()
 	_overlay_card.name = "Dialog"
 	_overlay_card.custom_minimum_size = Vector2(326, 0)
-	_overlay_card.add_theme_stylebox_override("panel", _wood_style("normal"))
+	var sprout_panel: StyleBox = SPROUT_UI.get_style(&"panel", &"Panel")
+	_overlay_card.add_theme_stylebox_override("panel", sprout_panel if sprout_panel != null else _wood_style("normal"))
 	center.add_child(_overlay_card)
 
 	var margin := MarginContainer.new()
