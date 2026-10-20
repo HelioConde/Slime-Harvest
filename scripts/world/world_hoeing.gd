@@ -35,9 +35,19 @@ func _ready() -> void:
 
 
 func _on_tool_action(tool_id: StringName, world_position: Vector2) -> void:
-	if tool_id != &"hoe":
+	if tool_id not in [&"hoe", &"watering_can"]:
 		return
-	var reason: String = try_till(world_position)
+	var cell: Vector2i = local_to_map(to_local(world_position))
+	var crops: Node = get_node_or_null("../WorldCrops")
+	var reason := ""
+	if tool_id == &"watering_can":
+		if crops != null:
+			reason = str(crops.call("try_water", cell))
+	elif is_tilled(cell):
+		if crops != null:
+			reason = str(crops.call("try_hoe", cell))
+	else:
+		reason = try_till(world_position)
 	_show_feedback(reason)
 
 
