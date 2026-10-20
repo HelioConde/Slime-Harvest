@@ -228,6 +228,9 @@ func _slot_pressed(item_id: StringName) -> void:
 
 
 func _slot_style(active: bool, hover: bool = false) -> StyleBox:
+	var sprout_slot: StyleBox = SPROUT_UI.inventory_slot_style(&"pressed" if active else (&"hover" if hover else &"normal"))
+	if sprout_slot != null:
+		return sprout_slot
 	var sprout_state: StringName = &"hover" if active or hover else &"normal"
 	var sprout_style: StyleBox = SPROUT_UI.get_style(sprout_state)
 	if sprout_style != null:

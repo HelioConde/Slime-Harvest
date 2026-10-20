@@ -76,6 +76,7 @@ func toggle() -> void:
 func _build() -> void:
 	_layer = Control.new()
 	_layer.name = "BackpackOverlay"
+	UI_THEME.apply(_layer)
 	_layer.visible = false
 	_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_layer.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -293,12 +294,16 @@ func _atlas_icon(index: int) -> Texture2D:
 func _add_cell(item_id: String, count: int, texture: Texture2D) -> void:
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(76, 70)
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("#355445")
-	style.border_color = Color("#b4a071")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(5)
-	card.add_theme_stylebox_override("panel", style)
+	var sprout_slot: StyleBox = UI_THEME.inventory_slot_style()
+	if sprout_slot != null:
+		card.add_theme_stylebox_override("panel", sprout_slot)
+	else:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color("#355445")
+		style.border_color = Color("#b4a071")
+		style.set_border_width_all(1)
+		style.set_corner_radius_all(5)
+		card.add_theme_stylebox_override("panel", style)
 	card.tooltip_text = NAMES.get(item_id, item_id.replace("_", " ").capitalize())
 	_grid.add_child(card)
 	var stack := VBoxContainer.new()
@@ -321,12 +326,12 @@ func _add_cell(item_id: String, count: int, texture: Texture2D) -> void:
 	var name_label := Label.new()
 	name_label.text = str(NAMES.get(item_id, item_id.replace("_", " ").capitalize())).substr(0, 13)
 	name_label.add_theme_font_size_override("font_size", 9)
-	name_label.add_theme_color_override("font_color", Color("#fff1dc"))
+	name_label.add_theme_color_override("font_color", Color("#432d20") if sprout_slot != null else Color("#fff1dc"))
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stack.add_child(name_label)
 	var count_label := Label.new()
 	count_label.text = "Ferramenta" if count == -1 else "x%d" % count
 	count_label.add_theme_font_size_override("font_size", 9)
-	count_label.add_theme_color_override("font_color", Color("#f2d795"))
+	count_label.add_theme_color_override("font_color", Color("#694129") if sprout_slot != null else Color("#f2d795"))
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stack.add_child(count_label)
