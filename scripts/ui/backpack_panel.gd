@@ -28,6 +28,11 @@ var _layer: Control
 var _panel: PanelContainer
 var _grid: GridContainer
 var _summary: Label
+var _coins_label: Label
+var _seed_picker: OptionButton
+var _buy_button: Button
+var _sell_buttons: Dictionary = {}
+var _market_notice: Label
 var _was_enabled: bool = true
 var _opened: bool = false
 
@@ -37,6 +42,7 @@ func _ready() -> void:
 	_player = get_parent()
 	_build()
 	ResourceBag.amount_changed.connect(_on_resource_changed)
+	ResourceBag.coins_changed.connect(_on_coins_changed)
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -122,9 +128,10 @@ func _build() -> void:
 	_summary.add_theme_font_size_override("font_size", 11)
 	_summary.add_theme_color_override("font_color", _text_color())
 	column.add_child(_summary)
+	_build_market(column)
 	var scroll := ScrollContainer.new()
 	scroll.name = "InventoryScroll"
-	scroll.custom_minimum_size = Vector2(416, 182)
+	scroll.custom_minimum_size = Vector2(416, 105)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(scroll)
 	_grid = GridContainer.new()
@@ -140,6 +147,90 @@ func _build() -> void:
 	column.add_child(footer)
 
 
+func _build_market(column: VBoxContainer) -> void:
+	_coins_label = Label.new()
+	_coins_label.name = "CoinsLabel"
+	_coins_label.add_theme_color_override("font_color", _text_color())
+	_coins_label.add_theme_font_size_override("font_size", 12)
+	column.add_child(_coins_label)
+	var planting := HBoxContainer.new()
+	planting.name = "SeedMarket"
+	planting.add_theme_constant_override("separation", 7)
+	column.add_child(planting)
+	var seed_title := Label.new()
+	seed_title.text = "Semente:"
+	seed_title.add_theme_color_override("font_color", _text_color())
+	planting.add_child(seed_title)
+	_seed_picker = OptionButton.new()
+	_seed_picker.name = "SeedChoice"
+	for flower in ["Azul", "Rosa", "Amarela"]:
+		_seed_picker.add_item(flower)
+	_seed_picker.custom_minimum_size.x = 105
+	_seed_picker.item_selected.connect(_choose_seed)
+	planting.add_child(_seed_picker)
+	_buy_button = Button.new()
+	_buy_button.name = "BuySeed"
+	_buy_button.text = "Comprar 1 (3 moedas)"
+	_buy_button.pressed.connect(_buy_seed)
+	planting.add_child(_buy_button)
+	var sales := HBoxContainer.new()
+	sales.name = "FlowerSales"
+	sales.add_theme_constant_override("separation", 6)
+	column.add_child(sales)
+	var heading := Label.new()
+	heading.text = "Vender:"
+	heading.add_theme_color_override("font_color", _text_color())
+	sales.add_child(heading)
+	for entry in [
+		{"id": &"flower_blue", "title": "Azul"},
+		{"id": &"flower_pink", "title": "Rosa"},
+		{"id": &"flower_yellow", "title": "Amarela"},
+	]:
+		var item_id: StringName = entry["id"]
+		var sale := Button.new()
+		sale.name = "Sell_" + String(item_id)
+		sale.text = String(entry["title"]) + " +%d" % ResourceBag.get_sell_price(item_id)
+		sale.pressed.connect(_sell_flower.bind(item_id))
+		sales.add_child(sale)
+		_sell_buttons[item_id] = sale
+	_market_notice = Label.new()
+	_market_notice.name = "MarketFeedback"
+	_market_notice.add_theme_font_size_override("font_size", 10)
+	_market_notice.add_theme_color_override("font_color", _text_color())
+	column.add_child(_market_notice)
+
+
+func _get_crops() -> Node:
+	return _player.get_node_or_null("../Map/WorldCrops") if is_instance_valid(_player) else null
+
+
+func _choose_seed(index: int) -> void:
+	var crops: Node = _get_crops()
+	if crops != null and bool(crops.call("select_variety", index)):
+		_market_notice.text = "Proxima semente: " + str(crops.call("get_selected_seed_name"))
+	_refresh()
+
+
+func _buy_seed() -> void:
+	var crops: Node = _get_crops()
+	if crops == null:
+		return
+	var purchased: bool = bool(crops.call("buy_seeds", 1))
+	_market_notice.text = "Semente comprada!" if purchased else "Sem moedas suficientes ou estoque cheio."
+	_refresh()
+
+
+func _sell_flower(item_id: StringName) -> void:
+	var earned: int = ResourceBag.sell_item(item_id, 1)
+	_market_notice.text = "Venda concluida: +%d moedas!" % earned if earned > 0 else "Sem flores para vender."
+	_refresh()
+
+
+func _on_coins_changed(_new_total: int) -> void:
+	if _opened:
+		_refresh()
+
+
 func _text_color() -> Color:
 	return Color("#34251a") if UI_THEME.get_theme() != null else Color("#fff0d0")
 
@@ -153,8 +244,14 @@ func _refresh() -> void:
 	for child in _grid.get_children():
 		_grid.remove_child(child)
 		child.queue_free()
-	var crops: Node = _player.get_node_or_null("../Map/WorldCrops") if is_instance_valid(_player) else null
+	var crops: Node = _get_crops()
+	_coins_label.text = "Moedas: %d  |  Banca de flores (venda imediata)" % ResourceBag.get_coins()
+	_buy_button.disabled = crops == null or ResourceBag.get_coins() < 3
+	_seed_picker.disabled = crops == null
+	for item_id in _sell_buttons.keys():
+		(_sell_buttons[item_id] as Button).disabled = ResourceBag.get_count(item_id) < 1
 	if crops != null:
+		_seed_picker.select(int(crops.call("get_selected_variety")))
 		_summary.text = "Sementes: %d  |  Colheitas: %d  |  I: fechar" % [
 			int(crops.call("get_seed_count")), int(crops.call("get_harvest_count")),
 		]
