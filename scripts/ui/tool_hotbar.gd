@@ -44,6 +44,7 @@ var _selection_label: Label
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_build_panel()
 	_build_toast()
 	_build_selection_label()
