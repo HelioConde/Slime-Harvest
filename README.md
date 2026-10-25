@@ -1,105 +1,117 @@
-# Slimekeepers: Lost Valley — edição Godot 2D
+<div align="center">
 
-**Um jogo cozy de exploração, agricultura, coleta de recursos e criaturas slime em um vale selvagem.**
+<h1>🌿 Slimekeepers: Lost Valley</h1>
 
-![Godot](https://img.shields.io/badge/Godot-4.x-478CBF?logo=godotengine&logoColor=white) ![GDScript](https://img.shields.io/badge/GDScript-jogabilidade-478CBF) ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-64748b)
+<strong>Um vale selvagem, uma fazenda para construir e slimes para descobrir</strong>
 
-## Comece a jogar
+<p>Jogo indie 2D de exploração, cultivo, coleta e construção desenvolvido com Godot.</p>
 
-1. Abra `project.godot` no Godot (a configuração atual declara Godot 4.7).
-2. Importe os recursos e pressione **F5** para abrir o menu principal.
-3. Para testar diretamente o mundo, execute `scenes/world/World.tscn` com **F6**.
+<a href="https://godotengine.org/"><img alt="Godot 4" src="https://img.shields.io/badge/Godot-4.x-478CBF?style=for-the-badge&logo=godotengine&logoColor=white"></a>
+<a href="https://github.com/HelioConde/Slime-Harvest"><img alt="Em desenvolvimento" src="https://img.shields.io/badge/STATUS-EM%20DESENVOLVIMENTO-64748b?style=for-the-badge"></a>
 
-**Sistemas descritos neste repositório:** movimentação 2D, ferramentas, mineração, corte de árvores, cultivo experimental, coleta, construção e slimes ambientais. Os sistemas continuam em evolução e precisam de validação no editor em cada ambiente.
+<p><a href="#jogar-no-godot"><strong>Como jogar</strong></a> · <a href="docs/roadmap_godot.md"><strong>Roadmap</strong></a> · <a href="docs/gameplay_polish.md"><strong>Polimento</strong></a></p>
 
-| Edição | Repositório |
+</div>
+
+![Arte do menu de Slimekeepers: Lost Valley](assets/ui/main_menu/vale_encantado.png)
+
+*Arte utilizada no menu principal — não é uma captura de gameplay.*
+
+## Sobre o jogo
+
+**Slimekeepers: Lost Valley** é um projeto cozy/fantasia voltado ao prazer de explorar um mundo vivo. A progressão combina tarefas de fazenda, coleta e construção com criaturas que pertencem ao ecossistema selvagem.
+
+**Estado atual:** protótipo em desenvolvimento, com sistemas jogáveis e demos de teste. Alguns recursos ainda estão em integração ou dependem de validação visual dentro do Godot.
+
+## Sistemas e mecânicas
+
+| Sistema | Implementação descrita |
 | --- | --- |
-| Godot 2D (este projeto; nomes anteriores FarmSlime/Slime Harvest) | [Slime-Harvest](https://github.com/HelioConde/Slime-Harvest) |
-| Outra implementação, mantida separadamente | [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley) |
+| **Personagem** | Movimentação 2D, câmera, corrida e animações direcionais |
+| **Ferramentas** | Hotbar com dez posições, machado, picareta, enxada e regador |
+| **Recursos** | Árvores, tocos, pedras, flores e cogumelos com drops |
+| **Fazenda** | Preparo do terreno, cultivo experimental, rega e passagem de dias |
+| **Construção** | Casas/estruturas integradas ao mundo principal |
+| **Criaturas** | Slimes ambientais com temperamentos e comportamentos diferentes |
+| **Persistência** | Alguns recursos e estados salvos; sistema completo ainda em evolução |
 
-**Documentação:** [ferramentas](docs/tool_inventory.md) · [cultivo](docs/farming_loop.md) · [roteiro de desenvolvimento](docs/roadmap_godot.md).
+### O que torna o vale especial
+
+Os slimes não são apenas itens de coleção. A direção de design prioriza **criaturas com necessidades e comportamentos ambientais**. Explorar, observar e interagir com o ambiente devem ter importância semelhante ao cultivo e à construção.
+
+## Jogar no Godot
+
+**Requisito:** Godot 4.x — o `project.godot` atual declara recursos de **Godot 4.7**. Recomenda-se essa versão para reproduzir o estado do projeto.
+
+1. Clone ou baixe [este repositório](https://github.com/HelioConde/Slime-Harvest).
+2. Abra **`project.godot`** no editor Godot.
+3. Espere terminar a importação de recursos.
+4. Pressione **F5** para executar o menu `scenes/ui/MainMenu.tscn`.
+
+### Controles e testes
+
+| Ação | Controle |
+| --- | --- |
+| Movimento | `WASD` ou setas |
+| Correr | `Shift` |
+| Interagir | `E` |
+| Usar ferramenta equipada | `F` |
+| Selecionar hotbar | `1`–`9`, `0` ou clique |
+| Atalho para picareta | `P` |
+
+Cenas úteis para testar sistemas isolados:
+
+- `scenes/world/World.tscn` — mundo principal.
+- `scenes/trees/TreeChopDemo.tscn` — árvores, mineração e coleta.
+- `scenes/farming/FarmingToolDemo.tscn` — enxada, rega e cultivo.
+- `scenes/trees/FruitTreesDemo.tscn` — árvores frutíferas.
+- `scenes/world/TerrainGallery.tscn` — amostras de terreno.
+
+Abra a cena desejada no editor e execute com **F6**.
+
+## Estrutura do projeto
+
+```text
+project.godot    Configuração do jogo
+assets/          Personagens, tilesets, slimes e UI
+scenes/          Menu, mundo e cenas de sistemas
+scripts/         Regras, ferramentas e lógica de gameplay
+data/            Dados auxiliares do jogo
+docs/            Guias de mecânicas e planejamento
+tools/           Verificações de integridade e recursos
+tests/           Testes e suporte à validação
+```
+
+Para verificar referências estruturais:
+
+```bash
+python tools/validate_godot_project.py
+```
+
+A verificação estática **não substitui** abrir e executar o jogo no Godot, especialmente para colisões, animações, caminhos de sprites e UI.
+
+## Roadmap e documentação
+
+**Prioridades de desenvolvimento:** consolidar o mundo jogável, finalizar os ciclos de ferramentas e fazenda, aprimorar animações e interface, integrar salvamento e revisar o comportamento dos slimes.
+
+| Área | Guia |
+| --- | --- |
+| Próximos marcos | [Roadmap Godot](docs/roadmap_godot.md) |
+| Ferramentas e inventário | [Ferramentas](docs/tool_inventory.md) |
+| Cultivo | [Loop de fazenda](docs/farming_loop.md) |
+| Construção | [Casas](docs/house_building.md) |
+| Ecossistema dos slimes | [Mundo selvagem](docs/wild_ecosystem_1_0.md) |
+| Salvamento | [Slots](docs/save_slots.md) |
+| Histórico de integração | [Documentação anterior](docs/README_REFERENCE_2026-10-25.md) |
+
+### Outras implementações
+
+Este repositório se chama **`Slime-Harvest`** por razões históricas (FarmSlime / Slime Harvest), mas o nome exibido no jogo é **Slimekeepers: Lost Valley**. Existe também [outra implementação do universo Slimekeepers](https://github.com/HelioConde/Slimekeepers-Lost-Valley), mantida separadamente. **Não presuma que as cenas ou recursos sejam intercambiáveis.**
+
+## Recursos e direitos de uso
+
+Parte dos sprites ou pacotes visuais pode ter **licenças próprias**. O uso no projeto não significa autorização para redistribuição isolada ou uso comercial. Consulte as fontes e condições de cada asset antes de copiar ou publicar.
 
 ---
 
-**Nomes anteriores:** FarmSlime / Slime Harvest.
-
-Jogo 2D de fazenda, construcao, criaturas companheiras e exploracao em desenvolvimento no Godot 4.x.
-
-## Funcionalidades atuais
-
-- Personagem: movimentacao suave (aceleracao/desaceleracao), Shift, camera e animacoes direcionais, com impactos sincronizados.
-- Hotbar inferior com 10 espacos e icones recortados do spritesheet atualizado 4x4: 1 Regador, 2 Machado, 3 Enxada, 4 Picareta, 5-0 materiais. Atalho P para picareta mantido. A selecao fica salva.
-- Machado: corte de arvores em cinco golpes com balanco completo; queda deixa um tronco; toco pede mais tres golpes e deixa outro tronco.
-- Cultivo experimental: enxada prepara/plantar/colher; regador permite o crescimento por etapas a cada tres dias do jogo.
-- Picareta (tecla P): minerar pedras nivel por nivel; pedra pequena e grande geram recompensas distintas usando sprites originais.
-- Flores e cogumelos: clique com qualquer ferramenta para gerar drops no chao; regeneracao configuravel por dias.
-- Drops: salto inicial, magnetismo de proximidade que respeita paredes, contadores na hotbar e recursos salvos.
-- Casas: HouseBuilder integrado ao mapa principal scenes/world/World.tscn.
-- Arte: tilesets, personagens, flores, arvores, pedras e cogumelos presentes em assets/ e scenes/.
-- Catalogo: 78 cenas referenciadas, incluindo as 64 restauradas do historico.
-- Mundo selvagem: 32 especies de slimes com necessidade ecologica, cinco temperamentos (medroso, curioso, amigavel, territorial e agressivo), fuga, afeicao, ataque com aviso/cooldown e vida simples do jogador. Nao ha captura nem domesticacao.
-- Checagem estrutural de referencias: `py -3 tools/validate_godot_project.py`.
-
-## Executar
-
-1. Importe a pasta deste projeto no Godot, usando project.godot.
-2. Pressione F5 para abrir scenes/ui/MainMenu.tscn. Para testar o mundo diretamente, abra scenes/world/World.tscn e use F6.
-3. Pressione 1-9/0 ou clique na hotbar para selecionar itens; F usa a ferramenta equipada.
-4. Teste o machado em scenes/trees/TreeChopDemo.tscn (F6).
-5. Teste mineracao e coleta na mesma TreeChopDemo (F6). Aproxime-se da pedra, equipe P e use clique ou F. Clique em drops, flores ou cogumelos para recolher.
-6. Teste a enxada e o regador em scenes/farming/FarmingToolDemo.tscn (F6).
-7. O campo FarmField ainda e uma cena de teste separada; sua integracao ao mapa definitivo continua pendente.
-
-Documentos: [refinamentos](docs/gameplay_polish.md), [ferramentas](docs/tool_inventory.md), [cultivo](docs/farming_loop.md), [machado](docs/tree_chopping.md), [casas](docs/house_building.md), [proximos marcos](docs/roadmap_godot.md).
-
-## Projeto e escopo
-
-O repositorio e [HelioConde/Slime-Harvest](https://github.com/HelioConde/Slime-Harvest). O projeto Roblox 3D e separado e utiliza [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley).
-
-A implementacao foi verificada por inspecao dos arquivos GitHub, mas requer validacao de execucao local no Godot.
-
-## Árvores frutíferas e terreno reutilizável
-
-A macieira animada agora serve de modelo para laranjeira, pessegueiro e pereira usando os sprites existentes. O TileSet do mundo é reutilizado em seis superfícies de exemplo, preservando o World original. Abra scenes/trees/FruitTreesDemo.tscn ou scenes/world/TerrainGallery.tscn e pressione F6. Para inserir um terreno em outro mapa, instancie scenes/world/TerrainPatch.tscn. Detalhes: [árvores e terrenos](docs/fruit_trees_terrains.md).
-
-## Enxada no mundo principal e casa fixa
-
-No `World.tscn`, use 3 (enxada) e clique ou F sobre o chão verde: cada enxadada cria terra arada real no TileSet original. Não se pode arar em cima de objetos, fora da grama ou perto da casa inicial. Arbustos, troncos, brotos e tocos decorativos podem ser removidos com o machado antes de arar. A casa inicial mantém sua posição depois da primeira construção, com salvamento compatível. Guia: [preparo de terreno e casa fixa](docs/world_hoe.md).
-
-## Menu inicial e atlas de ferramentas atualizado
-
-- A cena inicial agora é `scenes/ui/MainMenu.tscn`, com interface própria; o mundo principal continua disponível em `scenes/world/World.tscn`.
-- A imagem oficial do menu deve ficar em `assets/ui/main_menu/vale_encantado.png`. Caso ainda não esteja instalada, o menu exibe um fundo verde seguro sem quebrar o projeto.
-- O novo atlas `tools-n-meterial-items.png` foi substituído pelo original enviado nesta conversa, 64 × 64 pixels (4 × 4 ícones). A picareta ocupa o **4º slot**, e a tecla P continua como atalho.
-- `Continuar` funciona somente com save legado existente; `Novo jogo` impede sobrescrever a fazenda salva enquanto não houver separação de slots.
-- `Multiplayer` fica desativado (em breve), com entrada reservada para futuras sessões de rede. O menu não inicia serviços multiplayer.
-- O calendário pausa e sua HUD desaparece na tela inicial.
-
-
-## Interface Sprout Lands opcional
-
-O tema Sprout Lands pode ser instalado a partir dos dois ZIPs originais do
-UI Pack e do addon Godot; sem os arquivos, a interface antiga continua funcionando.
-O tema estiliza hotbar, calendario, opcoes e dialogs, preservando sprites de
-menu existentes. Instrucoes de instalacao e permissao de uso:
-[Guia Sprout Lands UI](docs/sprout_lands_ui.md).
-
-## Colecao Sprout Lands (sprites + plugins)
-
-Instalacao opcional e segura de **UI Basic**, **Sprites Basic**, **plugin UI** e **plugin TileMap**, usando os quatro ZIPs originais, sem alterar os saves nem o mapa principal. Abra `scenes/world/SproutShowcase.tscn` (F6) para visualizar o exemplo e as folhas de sprites. Guia: [Colecao Sprout Lands](docs/sprout_lands_collection.md). Os arquivos licenciados ficam apenas na instalacao local.
-
-## Protagonista Sprout Sorry
-
-O avatar humano do Sprout Sorry e a opcao padrao para **novas fazendas**, com sprites 16x32 em oito direcoes e adaptacao para as ferramentas. Os avatares originais permanecem disponiveis e saves antigos nao mudam automaticamente. O PNG licenciado deve ser instalado localmente; veja [guia do protagonista Sprout Sorry](docs/sprout_sorry_player.md).
-
-## Cultivo no mapa principal e mochila (I)
-
-A fazenda agora pode preparar terra, plantar, regar, colher flores e recuperar sementes **no World.tscn**, usando as ferramentas ja existentes. A colheita acrescenta flores ao ResourceBag e a tecla I mostra a mochila com ferramentas, materiais e contadores. Salvos por slot, com tema Sprout Lands opcional. Manual: [cultivo e mochila](docs/world_farming_backpack.md).
-
-## Sementes e moedas (banca provisoria)
-
-Na mochila (`I`) agora e possivel escolher sementes azuis, rosas ou amarelas, vender flores colhidas por 5/7/9 moedas e comprar sementes por 3 moedas. `Q` alterna sementes durante a exploracao. As moedas sao salvas em ResourceBag junto com os itens, e o tipo de semente escolhido fica no save da fazenda. O mercado esta provisoriamente dentro da mochila, antes da implementacao de NPCs de loja. Consulte [agricultura e mochila](docs/world_farming_backpack.md).
-
-## Expansao visual — 19 pacotes de sprites
-
-Os **19 ZIPs enviados pelo criador** podem ser instalados localmente com `tools/install_all_art_packs.py`; a arte nao e publicada no GitHub. **F7** abre a galeria por pacote no menu ou mapa. No World aparecem ate 6 animais pacificos e props interativos opcionais (bau/vaso). O Sprout Sorry teve esquerda/direita corrigidas e os paineis das opcoes agora usam o atlas do Sprout UI com rolagem. Instrucoes completas, creditos e licencas: [biblioteca de 19 pacotes](docs/asset_expansion_19_packs.md).
+<div align="center"><strong>Desenvolvido por <a href="https://github.com/HelioConde">Hélio Conde</a></strong></div>
