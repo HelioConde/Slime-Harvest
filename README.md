@@ -1,4 +1,25 @@
-# Slimekeepers: Lost Valley — Godot 2D
+# Slimekeepers: Lost Valley — edição Godot 2D
+
+**Um jogo cozy de exploração, agricultura, coleta de recursos e criaturas slime em um vale selvagem.**
+
+![Godot](https://img.shields.io/badge/Godot-4.x-478CBF?logo=godotengine&logoColor=white) ![GDScript](https://img.shields.io/badge/GDScript-jogabilidade-478CBF) ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-64748b)
+
+## Comece a jogar
+
+1. Abra `project.godot` no Godot (a configuração atual declara Godot 4.7).
+2. Importe os recursos e pressione **F5** para abrir o menu principal.
+3. Para testar diretamente o mundo, execute `scenes/world/World.tscn` com **F6**.
+
+**Sistemas descritos neste repositório:** movimentação 2D, ferramentas, mineração, corte de árvores, cultivo experimental, coleta, construção e slimes ambientais. Os sistemas continuam em evolução e precisam de validação no editor em cada ambiente.
+
+| Edição | Repositório |
+| --- | --- |
+| Godot 2D (este projeto; nomes anteriores FarmSlime/Slime Harvest) | [Slime-Harvest](https://github.com/HelioConde/Slime-Harvest) |
+| Outra implementação, mantida separadamente | [Slimekeepers-Lost-Valley](https://github.com/HelioConde/Slimekeepers-Lost-Valley) |
+
+**Documentação:** [ferramentas](docs/tool_inventory.md) · [cultivo](docs/farming_loop.md) · [roteiro de desenvolvimento](docs/roadmap_godot.md).
+
+---
 
 **Nomes anteriores:** FarmSlime / Slime Harvest.
 
